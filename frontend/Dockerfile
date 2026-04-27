@@ -1,0 +1,17 @@
+FROM node:20-alpine
+WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+ARG NEXT_PUBLIC_PROTOMAPS_KEY
+ENV NEXT_PUBLIC_PROTOMAPS_KEY=$NEXT_PUBLIC_PROTOMAPS_KEY
+
+RUN npm run build
+
+EXPOSE 3000
+CMD ["npm", "start"]
