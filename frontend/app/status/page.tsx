@@ -96,7 +96,7 @@ export default function StatusPage() {
       if (apiName) params.append("api", apiName);
       
       const queryString = params.toString();
-      const url = `${baseUrl}/health${queryString ? `?${queryString}` : ""}`;
+      const url = `${baseUrl}/health/${queryString ? `?${queryString}` : ""}`;
       
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) throw new Error("Failed to fetch system status");

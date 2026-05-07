@@ -6,7 +6,6 @@ import SearchBar from "@/components/search/Searchbar";
 import Navbar from "@/components/Navbar";
 import LandingPage from "@/components/landing/LandingPage";
 import { TripSearchParams } from "@/services/api";
-import { fetchTripData } from "@/services/tripSearch";
 
 export default function Home() {
   const router = useRouter();
@@ -19,24 +18,23 @@ export default function Home() {
     sessionStorage.removeItem("route_data_Origin_Destination");
   }, []);
 
-  const handleSearch = async (params: TripSearchParams) => {
+  const handleSearch = (params: TripSearchParams) => {
     setLoading(true);
+    
+    // Clear previous UI states
     sessionStorage.removeItem("active_tab");
     sessionStorage.removeItem("drive_intermediates_open");
     sessionStorage.removeItem("stay_dropdown_state");
     localStorage.removeItem("trip_state");
 
-    try {
-      const newTripData = await fetchTripData(params);
-      sessionStorage.setItem("current_trip_results", JSON.stringify(newTripData));
-      router.push("/results");
-    } catch (err) {
-      console.error("Failed to fetch trip data:", err);
-      setLoading(false); 
-    }
+    // Set flag so the results page knows to trigger a search
+    sessionStorage.setItem("pending_search", "true");
+    
+    // Route instantly!
+    router.push("/results");
   };
 
-return (
+  return (
     // Removed h-screen, w-screen, and overflow-hidden to allow natural page scrolling
     <div className="flex flex-col flex-1 w-full bg-theme-bg">
       <Navbar

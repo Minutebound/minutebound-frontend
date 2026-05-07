@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import SearchBar from "@/components/search/Searchbar";
@@ -23,26 +23,12 @@ export default function Results() {
   const [mapOpen, setMapOpen] = useState(false);
   const [isItineraryOpen, setIsItineraryOpen] = useState(false);
 
-  useEffect(() => {
-    const cachedTrip = sessionStorage.getItem("current_trip_results");
-    if (cachedTrip) {
-      try {
-        setTripData(JSON.parse(cachedTrip));
-      } catch (err) {
-        console.error("Failed to parse cached trip data", err);
-      }
-    } else {
-      router.push("/");
-    }
-    setLoading(false);
-  }, [router]);
-
-  const handleSearch = async (params: TripSearchParams) => {
+  const handleSearch = useCallback(async (params: TripSearchParams) => {
     setLoading(true);
     setError(null);
 
     // Mobile specific: auto close header on search
-    if (window.innerWidth < 1024) {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
       setSearchOpen(false);
     }
 
@@ -60,8 +46,46 @@ export default function Results() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    const initializeData = async () => {
+      // 1. Check if we just navigated from the home page with a pending search
+      const isPending = sessionStorage.getItem("pending_search");
+      if (isPending) {
+        sessionStorage.removeItem("pending_search");
+        const savedState = localStorage.getItem("search_state");
+        if (savedState) {
+          try {
+            const params = JSON.parse(savedState);
+            await handleSearch(params);
+            return; // handleSearch handles removing the loading state
+          } catch (err) {
+            console.error("Failed to parse pending search state", err);
+          }
+        }
+      }
+
+      // 2. Otherwise, check if we have an existing session loaded
+      const cachedTrip = sessionStorage.getItem("current_trip_results");
+      if (cachedTrip) {
+        try {
+          setTripData(JSON.parse(cachedTrip));
+        } catch (err) {
+          console.error("Failed to parse cached trip data", err);
+        }
+        setLoading(false);
+      } else {
+        // No pending search and no cached data, return to home
+        router.push("/results");
+      }
+    };
+    
+
+    initializeData();
+  }, [router, handleSearch]);
+
+  
   return (
     <div className="flex flex-col h-screen w-screen bg-theme-bg overflow-hidden">
       <ItineraryModal

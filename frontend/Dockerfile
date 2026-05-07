@@ -14,4 +14,4 @@ ENV NEXT_PUBLIC_PROTOMAPS_KEY=$NEXT_PUBLIC_PROTOMAPS_KEY
 RUN npm run build
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["npm", "run","dev"]

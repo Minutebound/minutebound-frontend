@@ -1,6 +1,6 @@
-# 🎨 WanderPlan Frontend
+# 🎨 minutebound Frontend
 
-The frontend for WanderPlan is a highly responsive, modern web application built to consume our complex backend data and display it in an intuitive, map-integrated dashboard.
+The frontend for minutebound is a highly responsive, modern web application built to consume our complex backend data and display it in an intuitive, map-integrated dashboard.
 
 ## 🛠️ Tech Stack
 

@@ -154,8 +154,15 @@ export default function TripMap({ mapData }: TripMapProps) {
             mapRef.current!.setPaintProperty(layer.id, "line-opacity", layer.id.includes("minor") ? 0.05 : 0.15);
           } catch (e) {}
         }
+// Buildings
         if (layer.id.includes("buildings") && layer.type === "fill") {
-          mapRef.current!.setLayoutProperty(layer.id, "visibility", "none");
+          try {
+            // Change visibility to 'visible'
+            mapRef.current!.setLayoutProperty(layer.id, "visibility", "visible");
+            // Set distinct color and opacity for the buildings
+            mapRef.current!.setPaintProperty(layer.id, "fill-color", "#e9eaec"); // Slate/Gray building color
+            mapRef.current!.setPaintProperty(layer.id, "fill-opacity", 0.75); // Slight transparency
+          } catch (e) {}
         }
       });
     });

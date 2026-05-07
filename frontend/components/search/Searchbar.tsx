@@ -82,6 +82,22 @@ export default function SearchBar({
     }
   }, []);
 
+  // NEW: Block body scroll when overlay is open
+  useEffect(() => {
+    if (isOverlayOpen) {
+      // Prevent scrolling
+      document.body.style.overflow = "hidden";
+    } else {
+      // Restore scrolling
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup function in case component unmounts while open
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOverlayOpen]);
+  
   const getCoordinates = async (locationName: string, isDestination: boolean = false) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -212,7 +228,7 @@ export default function SearchBar({
   // Reusable component that renders the full search capabilities
   const renderFullSearchContent = () => (
     <div className={`w-full bg-theme-text font-sans text-theme-bg shadow-xl z-30 ${isCompact ? 'rounded-3xl overflow-hidden' : 'border-b border-theme-secondary/20'}`}>
-      <div className={`px-4 md:px-6 lg:px-8 max-w-[1600px] mx-auto flex flex-col py-6 md:py-8 gap-5 md:gap-6`}>
+      <div className={`px-6 md:px-6 lg:px-8 max-w-[1400px] mx-auto flex flex-col py-6 md:py-8 gap-5 md:gap-6`}>
         
         {/* ROW 1: Core Inputs */}
         <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 lg:items-end relative z-10">
@@ -441,7 +457,7 @@ export default function SearchBar({
 
       {/* 2. Blurred Overlay (Opens when clicking the Summary Bar) */}
       {isCompact && isOverlayOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-16 md:pt-24 px-4 bg-theme-bg/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-30 md:pt-30 px-4 bg-theme-bg/60 backdrop-blur-md">
           {/* Click background to close */}
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
           

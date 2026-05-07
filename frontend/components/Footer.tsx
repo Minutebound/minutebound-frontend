@@ -62,10 +62,20 @@ export default function Footer() {
                 `}</style>
                 <path d="M 20 160 C 100 40, 90 40, 120 120" className=" fill-theme-primary" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M 120 120 C 180 20, 180 20, 200 140" className=" fill-theme-primary" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />            
+                     <g transform="translate(40, -10)"> 
+       <path 
+        d="M 420 170 Q 550 230 680 170" 
+        className="text-[#102942]"
+        stroke="currentColor"
+        fill="none"
+        strokeWidth="8" 
+        strokeLinecap="round"
+      /></g>
                 <text x="240" y="120" className="footer-logo-text">
-                  <tspan className="font-semibold fill-theme-primary">Minute</tspan>
-                  <tspan className="font-bold fill-theme-primary">bound</tspan>
+                  <tspan className="font-semibold fill-theme-surface">Minute</tspan>
+                  <tspan className="font-bold fill-theme-surface">bound</tspan>
                 </text>
+                
               </svg>
             </Link>
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans } from "next/font/google"; // <-- Import all fonts here
+import { Inter, DM_Sans, Raleway, Inter_Tight } from "next/font/google"; // <-- Import all fonts here
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import ClientInit from "../components/ClientInIt";

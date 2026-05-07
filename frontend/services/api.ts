@@ -11,6 +11,127 @@ if (!API_BASE_URL) {
   console.error("🚨 NEXT_PUBLIC_API_URL is missing! Please check your frontend/.env.frontend file.");
 }
 
+// --- NEW TYPESCRIPT INTERFACES ALIGNED WITH BACKEND SCHEMAS ---
+
+export interface UserCreatePayload {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
+  suffix?: string;
+  phone_country_code?: string;
+  phone_number?: string;
+}
+
+export interface VerifyEmailOTP {
+  email: string;
+  code: string;
+}
+
+export interface VerifyPhoneOTP {
+  email: string;
+  phone_code: string;
+}
+
+export interface Activity {
+  id: string;
+  name: string;
+  short_description?: string;
+  geo_code?: Record<string, number>;
+  price?: number;
+  currency?: string;
+  picture_url?: string;
+  minimum_duration?: string;
+  distance_km?: number;
+}
+
+export interface Attraction {
+  id: number;
+  name: string;
+  category: string;
+  attraction_type: string;
+  address: string;
+  website?: string;
+  opening_hours?: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface FlightSegment {
+  departure_airport: string;
+  departure_airport_name?: string;
+  departure_lat?: number;
+  departure_lon?: number;
+  departure_time: string;
+  arrival_airport: string;
+  arrival_airport_name?: string;
+  arrival_lat?: number;
+  arrival_lon?: number;
+  arrival_time: string;
+  carrier_code: string;
+  carrier_name: string;
+  flight_number: string;
+  checked_bags?: number;
+}
+
+export interface FlightItinerary {
+  duration: string;
+  stops: number;
+  segments: FlightSegment[];
+}
+
+export interface FlightOffer {
+  id: string;
+  price: number;
+  currency: string;
+  airline_code: string;
+  airline_name: string;
+  cabin_class: string;
+  itineraries: FlightItinerary[];
+}
+
+export interface RoomOffer {
+  room_name: string;
+  description?: string;
+  category?: string;
+  bed_type?: string;
+  beds_count?: number;
+  price: number;
+  currency: string;
+  amenities: string[];
+}
+
+export interface HotelOffer {
+  hotel_id: string;
+  name?: string;
+  check_in_date: string;
+  check_out_date: string;
+  guests: number;
+  price: number;
+  currency: string;
+  address?: Record<string, any>;
+  latitude?: number;
+  longitude?: number;
+  rooms?: RoomOffer[];
+}
+
+export interface WeatherDay {
+  date: string;
+  max_temp: number;
+  min_temp: number;
+  weather: string;
+  humidity: number;
+  pressure: number;
+}
+
+export interface WeatherSummary {
+  overall_summary: string;
+  days: WeatherDay[];
+}
+
+// --- EXISTING INTERFACES ---
+
 export interface LocationResult {
   city?: string;
   name?: string;
@@ -73,50 +194,60 @@ export const travelApi = {
     });
     return response.data;
   },
-sharePdf: async (data: any, email: string, signal?: AbortSignal) => {
-  try {
-    const payload = { ...data, email };
-    const response = await axios.post(`${API_BASE_URL}/trips/share-pdf`, payload, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      signal
+
+  sharePdf: async (data: any, email: string, signal?: AbortSignal) => {
+    try {
+      const payload = { ...data, email };
+      const response = await axios.post(`${API_BASE_URL}/trips/share-pdf`, payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        signal
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to share PDF:", error);
+      throw error;
+    }
+  },
+
+  signup: async (userData: UserCreatePayload) => {
+    const { data } = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
+    return data;
+  },
+
+  verifyEmailOtp: async (payload: VerifyEmailOTP) => {
+    const { data } = await axios.post(`${API_BASE_URL}/auth/verify-email`, payload);
+    return data;
+  },
+
+  verifyPhoneOtp: async (payload: VerifyPhoneOTP) => {
+    const { data } = await axios.post(`${API_BASE_URL}/auth/verify-phone`, payload);
+    return data;
+  },
+
+  login: async (email: string, password: string) => {
+    const { data } = await axios.post(`${API_BASE_URL}/auth/login`, {
+      email: email,
+      password: password
+    });
+    return data;
+  },
+
+  forgotPassword: async (email: string) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
+    return response.data;
+  },
+
+  resetPassword: async (email: string, code: string, newPassword: string) => {
+    const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { 
+      email: email,
+      code: code,
+      new_password: newPassword
     });
     return response.data;
-  } catch (error) {
-    console.error("Failed to share PDF:", error);
-    throw error;
-  }
-},
-signup: async (name: string, email: string, password: string) => {
-  const { data } = await axios.post(`${API_BASE_URL}/auth/signup`, {
-    full_name: name,
-    email: email,
-    password: password
-  });
-  return data;
-},
+  },
 
-login: async (email: string, password: string) => {
-  const { data } = await axios.post(`${API_BASE_URL}/auth/login`, {
-    email: email,
-    password: password
-  });
-  return data;
-},
-forgotPassword: async (email: string) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
-  return response.data;
-},
-
-resetPassword: async (email: string, code: string, newPassword: string) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { 
-    email: email,
-    code: code,
-    new_password: newPassword
-  });
-  return response.data;
-},
   getProfile: async () => {
     const response = await axios.get(`${API_BASE_URL}/users/me`, {
       headers: getAuthHeaders()
@@ -136,7 +267,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
 
   getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
 
-  getFlights: async (params: TripSearchParams, signal?: AbortSignal) => {
+  getFlights: async (params: TripSearchParams, signal?: AbortSignal): Promise<FlightOffer[]> => {
     try {
       let originIata = params.source.iata;
       let destIata = params.destination.iata;
@@ -210,7 +341,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
     return response.data;
   },
 
-  getStays: async (params: TripSearchParams, signal?: AbortSignal) => {
+  getStays: async (params: TripSearchParams, signal?: AbortSignal): Promise<HotelOffer[]> => {
     try {
       const radiusKm = Math.round(params.radius * 1.60934); 
       const response = await axios.get(`${API_BASE_URL}/hotels/nearby`, {
@@ -235,7 +366,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
     }
   },
 
-  getHotelOffer: async (hotelId: string, params: any, signal?: AbortSignal) => {
+  getHotelOffer: async (hotelId: string, params: any, signal?: AbortSignal): Promise<HotelOffer | { error: boolean } | null> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/hotels/offer`, {
         params: {
@@ -253,7 +384,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
     }
   },
 
-  getWeather: async (dest: any, dates: any, signal?: AbortSignal) => {
+  getWeather: async (dest: any, dates: any, signal?: AbortSignal): Promise<WeatherSummary | null> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/weather/forecast`, {
         params: {
@@ -272,7 +403,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
     }
   },
 
-  getAttractions: async (dest: any, radiusMiles: number, signal?: AbortSignal, retries = 2): Promise<any> => {
+  getAttractions: async (dest: any, radiusMiles: number, signal?: AbortSignal, retries = 2): Promise<Attraction[]> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/attractions/nearby`, {
         params: {
@@ -301,7 +432,7 @@ resetPassword: async (email: string, code: string, newPassword: string) => {
     }
   },
 
-  getTours: async (dest: any, radiusMiles: number, signal?: AbortSignal) => {
+  getTours: async (dest: any, radiusMiles: number, signal?: AbortSignal): Promise<Activity[]> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/activities/nearby`, {
         params: {
