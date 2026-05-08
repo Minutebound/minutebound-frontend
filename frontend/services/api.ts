@@ -265,8 +265,23 @@ export const travelApi = {
     return response.data;
   },
 
-  getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
+requestAccountDeletion: async () => {
+    const response = await axios.post(`${API_BASE_URL}/users/me/request-delete`, {}, {
+      headers: getAuthHeaders()
+    });
+    return response.data;
+  },
 
+  confirmAccountDeletion: async (code: string) => {
+    const response = await axios.delete(`${API_BASE_URL}/users/me/confirm-delete`, {
+      headers: getAuthHeaders(),
+      data: { code }
+    });
+    return response.data;
+  },
+
+  getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
+  
   getFlights: async (params: TripSearchParams, signal?: AbortSignal): Promise<FlightOffer[]> => {
     try {
       let originIata = params.source.iata;

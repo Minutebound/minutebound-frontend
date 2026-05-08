@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Loader2, Calendar, TrendingUp, PenBox, PenBoxIcon } from "lucide-react";
+// Added Map and X icons here
+import { Search, Loader2, Calendar, TrendingUp, PenBox, PenBoxIcon, Map, X } from "lucide-react";
 import LocationAutocomplete from "./LocationAutoComplete";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -26,6 +27,8 @@ interface SearchBarProps {
   onCancel?: () => void;
   loading?: boolean;
   isCompact?: boolean; 
+  mapOpen?: boolean;           // Added for Map Toggle
+  onMapToggle?: () => void;    // Added for Map Toggle
 }
 
 export default function SearchBar({
@@ -34,6 +37,8 @@ export default function SearchBar({
   onCancel,
   loading,
   isCompact = false,
+  mapOpen,
+  onMapToggle,
 }: SearchBarProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [source, setSource] = useState("");
@@ -82,17 +87,12 @@ export default function SearchBar({
     }
   }, []);
 
-  // NEW: Block body scroll when overlay is open
   useEffect(() => {
     if (isOverlayOpen) {
-      // Prevent scrolling
       document.body.style.overflow = "hidden";
     } else {
-      // Restore scrolling
       document.body.style.overflow = "";
     }
-
-    // Cleanup function in case component unmounts while open
     return () => {
       document.body.style.overflow = "";
     };
@@ -207,7 +207,6 @@ export default function SearchBar({
 
     localStorage.setItem("search_state", JSON.stringify(params));
     
-    // Close the overlay if in compact mode before triggering the search visually
     setIsOverlayOpen(false); 
     onSearch(params);
   };
@@ -225,11 +224,9 @@ export default function SearchBar({
 
   const minEndDate = dates.start ? new Date(new Date(dates.start + "T12:00:00").getTime() + 86400000) : new Date();
 
-  // Reusable component that renders the full search capabilities
   const renderFullSearchContent = () => (
     <div className={`w-full bg-theme-text font-sans text-theme-bg shadow-xl z-30 ${isCompact ? 'rounded-3xl overflow-hidden' : 'border-b border-theme-secondary/20'}`}>
       <div className={`px-6 md:px-6 lg:px-8 max-w-[1400px] mx-auto flex flex-col py-6 md:py-8 gap-5 md:gap-6`}>
-        
         {/* ROW 1: Core Inputs */}
         <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 lg:items-end relative z-10">
           <div className="w-full lg:flex-[1.2] relative">
@@ -312,7 +309,7 @@ export default function SearchBar({
             {!isWorking ? (
               <button
                 id="submit-side"
-                className="w-full h-[52px] rounded-xl bg-theme-primary text-theme-bg text-[15px] font-black tracking-wider flex items-center justify-center gap-2 hover:bg-theme-secondary transition-all shadow-md active:scale-95"
+                className="w-full h-[52px] rounded-xl bg-theme-primary text-theme-bg text-[15px] font-black tracking-wider flex items-center justify-center gap-2 hover:bg-theme-primary/90 transition-all shadow-md active:scale-95"
                 onClick={handleSearchSubmit}
               >
                 <Search size={18} /> SEARCH
@@ -326,11 +323,9 @@ export default function SearchBar({
           </div>
         </div>
 
-        {/* ROW 2: Secondary Options (Always visible in full view / overlay) */}
+        {/* ROW 2: Secondary Options */}
         <div className="flex flex-col xl:flex-row justify-between gap-5 pt-4 border-t border-theme-secondary/20 relative z-0">
           <div className="flex flex-wrap gap-5 lg:gap-8 items-center">
-            
-            {/* Passengers */}
             <div className="flex gap-4">
               <div>
                 <SbLabel>Adults</SbLabel>
@@ -342,7 +337,6 @@ export default function SearchBar({
               </div>
             </div>
 
-            {/* Budget Toggle */}
             <div className="w-[190px]">
               <SbLabel>Budget Category</SbLabel>
               <div className="flex bg-theme-bg rounded-xl p-[4px] shadow-inner gap-1 border border-theme-surface">
@@ -354,7 +348,6 @@ export default function SearchBar({
               </div>
             </div>
 
-            {/* Mode Toggle */}
             <div className="w-[170px]">
               <SbLabel>Travel Mode</SbLabel>
               <div className="flex bg-theme-bg rounded-xl p-[4px] shadow-inner gap-1 border border-theme-surface">
@@ -366,7 +359,6 @@ export default function SearchBar({
               </div>
             </div>
 
-            {/* Radius Slider */}
             <div className="w-full sm:w-[220px]">
               <SbLabel>Search Radius <span className="font-bold text-theme-bg/60 ml-1">({radius} mi)</span></SbLabel>
               <input
@@ -377,7 +369,6 @@ export default function SearchBar({
             </div>
           </div>
 
-          {/* Trending Searches */}
           {topDestinations.length > 0 && (
             <div className="hidden xl:flex items-center gap-3 max-w-[450px]">
               <div className="text-[11px] font-black tracking-[0.1em] uppercase text-theme-bg/60 whitespace-nowrap flex items-center gap-1.5">
@@ -409,58 +400,61 @@ export default function SearchBar({
     <>
       {/* 1. Summary Bar (Only displays when isCompact is true) */}
       {isCompact && (
-        <div className="w-full bg-theme-bg py-3 px-4 md:px-6 flex justify-center border-b border-theme-surface z-20 relative">
+        <div className="w-full bg-theme-bg py-3 px-4 md:px-6 flex items-center justify-center gap-3 border-b border-theme-surface z-20 relative">
           <button
             onClick={() => setIsOverlayOpen(true)}
             className="w-full max-w-5xl bg-theme-surface/20 hover:bg-theme-surface/40 border border-theme-surface rounded-full flex items-center justify-between px-4 md:px-6 py-2.5 transition-all shadow-sm hover:shadow-md cursor-pointer group"
           >
             <div className="flex items-center gap-3 md:gap-4 text-theme-text text-xs sm:text-sm font-bold truncate">
-
               {/* Origin to Destination */}
               <div className="flex items-center gap-2 truncate">
                 <span className="truncate">{source || "Origin"}</span>
                 <span className="text-theme-muted shrink-0 text-[10px]">➔</span>
                 <span className="truncate">{destination || "Destination"}</span>
               </div>
-
               {/* Dates */}
               <span className="text-theme-surface hidden sm:inline shrink-0">|</span>
               <span className="truncate hidden sm:inline">
                 {dates.start ? `${dates.start} to ${dates.end || '?'}` : "Any Dates"}
               </span>
-
               {/* Adults & Children */}
               <span className="text-theme-surface hidden md:inline shrink-0">|</span>
               <span className="truncate hidden md:inline">
                 {adults} Adult{adults > 1 ? 's' : ''}, {children} Child{children !== 1 ? 'ren' : ''}
               </span>
-
               {/* Travel Mode */}
               <span className="text-theme-surface hidden lg:inline shrink-0">|</span>
               <span className="truncate hidden lg:inline uppercase tracking-widest text-[10px]">
                 {travelMode === 'fly' ? '✈️ Fly' : '🚗 Drive'}
               </span>
-
               {/* Budget Category */}
               <span className="text-theme-surface hidden xl:inline shrink-0">|</span>
               <span className="truncate hidden xl:inline uppercase tracking-widest text-[10px]">
                 {budget === 'budget' ? '💰 Budget' : '✨ Premium'}
               </span>
             </div>
-
             <div className="bg-theme-primary text-theme-bg rounded-full p-2 shrink-0 shadow-sm transition-transform group-hover:scale-110 ml-4">
               <PenBoxIcon size={14} strokeWidth={3} />
             </div>
           </button>
+
+          {/* Map Toggle Button (Mobile/Tablet only) */}
+          {onMapToggle && (
+            <button
+              onClick={onMapToggle}
+              className="cursor-pointer p-2.5 rounded-full bg-theme-surface/20 text-theme-text border border-theme-surface hover:bg-theme-surface/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
+              aria-label={mapOpen ? "Close map" : "View map"}
+            >
+              {mapOpen ? <X size={20} className="text-theme-primary" /> : <Map size={20} className="text-theme-primary" />}
+            </button>
+          )}
         </div>
       )}
 
-      {/* 2. Blurred Overlay (Opens when clicking the Summary Bar) */}
+      {/* 2. Blurred Overlay */}
       {isCompact && isOverlayOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-30 md:pt-30 px-4 bg-theme-bg/60 backdrop-blur-md">
-          {/* Click background to close */}
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
-          
           <div className="relative w-full max-w-6xl animate-in fade-in zoom-in-95 duration-200">
             <button 
               onClick={() => setIsOverlayOpen(false)}
@@ -473,7 +467,7 @@ export default function SearchBar({
         </div>
       )}
 
-      {/* 3. Standard Inline View (For the home page when isCompact is false) */}
+      {/* 3. Standard Inline View */}
       {!isCompact && renderFullSearchContent()}
     </>
   );

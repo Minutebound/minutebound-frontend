@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   Menu,
-  Map,
   X,
   LogOut,
   User as UserIcon,
@@ -13,106 +12,90 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
-import { travelApi } from "../services/api"; // Added API import to fetch profile
+import { travelApi } from "../services/api";
 
 interface NavbarProps {
   onMenuClick?: () => void;
-  mapOpen?: boolean;
-  onMapToggle?: () => void;
   menuOpen?: boolean;
 }
 
 const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
   <>
     {/* Mobile & Tablet Logo (Icon + Text, Less Wide Smile, Min Height) */}
-    <svg viewBox="0 20 1400 170" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} lg:hidden`}>
+    <svg viewBox="0 20 1500 160" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} lg:hidden`}>
       <defs>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-          .logo-text-mobile {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont;
-            font-size: 140px;
+          @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+          .logo-text {
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont;
+            font-size: 170px;
             letter-spacing: -0.01em;
           }
         `}</style>
       </defs>
-      <g transform="translate(580, -30)">
+      <text x="320" y="150" className="logo-text" textAnchor="start">
+        <tspan className="font-bold fill-[#012C23]">Minute</tspan>
+        <tspan className="font-bold fill-[#012C23]">Bound</tspan>
+      </text>
+      <rect x="0" y="0" width="300" height="350" fill="" rx="20" ry="20" transform="rotate(-10 70 140)" />
+      <g transform="translate(20,-30) scale(1)">
         <path
           d="M 20 160 C 100 40, 90 40, 120 120"
-          className="fill-[#00C950]"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          className="fill-[#012C23]"
         />
         <path
           d="M 120 120 C 180 20, 180 20, 200 140"
-          className="fill-[#00C950]"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          className="fill-[#012C23]"
         />  
       </g>
 
-      <text x="200" y="130" className="logo-text-mobile" textAnchor="start">
-        <tspan className="font-bold fill-[#102942]">Minute</tspan>
-        <tspan className="font-bold fill-[#102942]">Bound</tspan>
-      </text>
-
-      <g transform="translate(140, -20)"> 
-        <path 
-          d="M 420 170 Q 550 230 680 170" 
-          className="text-[#102942]"
+      <g transform="translate(-310,10) scale(0.8)"> 
+      <path 
+          d="M 420 170 Q 550 240 680 170" 
+          className="text-[#012C23]"
           stroke="currentColor"
           fill="none"
-          strokeWidth="8" 
+          strokeWidth="14" 
           strokeLinecap="round"
         />
       </g>
     </svg>
 
-    {/* Desktop Logo (Icon + Text) */}
-    <svg viewBox="0 20 1300 180" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} hidden lg:block`}>
+     {/* Desktop Logo (Icon + Text) */}
+    <svg viewBox="10 20 1300 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} hidden lg:block`}>
       <defs>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
           .logo-text {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont;
-            font-size: 130px;
+            font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont;
+            font-size: 150px;
             letter-spacing: -0.01em;
           }
         `}</style>
       </defs>
-      <text x="20" y="140" className="logo-text" textAnchor="start">
-        <tspan className="font-bold fill-[#102942]">MINUTE</tspan>
-        </text>
-      <g transform="translate(550,-30)">
+      <text x="350" y="160" className="logo-text" textAnchor="start">
+        <tspan className="font-bold fill-[#012C23]">Minute</tspan>
+        <tspan className="font-bold fill-[#012C23]">Bound</tspan>
+      </text>
+      <rect x="0" y="0" width="300" height="300" fill="" rx="20" ry="20" transform="rotate(-10 70 140)" />
+      <g transform="translate(10,-30) scale(1.2)">
         <path
           d="M 20 160 C 100 40, 90 40, 120 120"
-          className="fill-[#00C950]"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          className="fill-[#012C23]"
         />
         <path
           d="M 120 120 C 180 20, 180 20, 200 140"
-          className="fill-[#00C950]"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          className="fill-[#012C23]"
         />  
       </g>
 
-      <text x="800" y="140" className="logo-text" textAnchor="start">
-        <tspan className="font-bold fill-[#102942]">BOUND</tspan>
-      </text>
-
-      <g transform="translate(110, -20)"> 
-        <path 
-          d="M 420 170 Q 550 230 680 170" 
-          className="text-[#102942]"
+      <g transform="translate(-410,10)"> 
+      <path 
+          d="M 420 170 Q 550 240 680 170" 
+          className="text-[#012C23]"
           stroke="currentColor"
           fill="none"
-          strokeWidth="8" 
+          strokeWidth="14" 
           strokeLinecap="round"
         />
       </g>
@@ -122,8 +105,6 @@ const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
 
 export default function Navbar({
   onMenuClick = () => {},
-  mapOpen = false,
-  onMapToggle = () => {},
   menuOpen = false,
 }: NavbarProps) {
   const { user, email, logout, isLoggedIn } = useAuth() as any;
@@ -151,7 +132,6 @@ export default function Navbar({
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:8000";
   const avatarUrl = profileData?.profile_picture_url;
   const displayName = profileData?.full_name || (typeof user === 'string' ? user : user?.name) || "Traveler";
-  const displayEmail = profileData?.email || email || "";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -167,21 +147,12 @@ export default function Navbar({
   }, []);
 
   return (
-    <nav className="relative sticky top-0 w-full flex-shrink-0 z-[999]">
+    <nav className="sticky top-0 w-full flex-shrink-0 z-[999] bg-theme-bg shadow-sm border-b border-theme-text/10">
       <div 
-        className="w-full flex items-center justify-between px-4 md:px-6 bg-theme-bg text-theme-text shadow-sm border-b border-theme-text/10 relative z-[999] transition-all duration-300 h-[60px]"
+        className="w-full lg:w-[70%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-text relative z-[999] transition-all duration-300 h-[60px]"
       >
-        {/* LEFT SECTION */}
-        <div className="flex items-center gap-3 md:gap-4 flex-shrink-0 h-full">
-          
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="cursor-pointer rounded-lg bg-theme-surface text-theme-text lg:hidden hover:bg-theme-surface/80 transition-all duration-300 shadow-sm active:scale-95 border border-theme-surface p-1.5"
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-
+        {/* LEFT SECTION - Logo */}
+        <div className="flex items-center flex-shrink-0 h-full">
           <Link
             href="/"
             className="flex items-center hover:opacity-90 transition-opacity"
@@ -193,7 +164,7 @@ export default function Navbar({
           </Link>
         </div>
 
-        {/* RIGHT SECTION */}
+        {/* RIGHT SECTION - Profile Dropdown & Mobile Menu Button */}
         <div className="flex items-center justify-end gap-3 flex-shrink-0 h-full">
           
           {/* Profile/Auth Container - Hidden on Mobile/Tablet (lg) */}
@@ -222,43 +193,20 @@ export default function Navbar({
                     </div>
                   )}
 
-                  <span className="text-sm font-bold hidden sm:block max-w-[120px] truncate">
+                  <span className="text-theme-primary text-sm font-bold hidden sm:block max-w-[120px] truncate">
                     {displayName}
                   </span>
                 </button>
 
                 {isDropdownOpen && (
-                  /* DROPDOWN PANEL: 
-                    rounded-t-none makes the top completely flat/flush with the navbar.
-                    border-t-0 removes the top line so it merges nicely.
-                  */
                   <div className="absolute right-0 top-[100%] mt-0 w-64 bg-theme-bg rounded-b-2xl rounded-t-none shadow-2xl border border-t-0 border-theme-surface py-2 z-[1000] animate-in slide-in-from-top-2 fade-in duration-200">
                     
-                    {/* AVATAR + SIGNED IN AS SECTION (Inside Dropdown) */}
-                    <div className="px-4 py-3 mb-1 border-b border-theme-surface bg-theme-surface/20 flex items-center gap-3">
-                      
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl.startsWith("http") ? avatarUrl : `${API_BASE_URL}${avatarUrl}`}
-                          alt="Profile"
-                          className="w-10 h-10 rounded-full object-cover border border-theme-surface shadow-sm shrink-0"
-                        />
-                      ) : (
-                        <div className="bg-theme-primary/10 p-2 rounded-full shrink-0">
-                          <UserIcon size={20} className="text-theme-primary" />
-                        </div>
-                      )}
-
+                    {/* TRAVEL ID SECTION (Inside Dropdown) */}
+                    <div className="px-4 py-3 mb-1 border-b border-theme-surface bg-theme-surface/20">
                       <div className="overflow-hidden">
-                        <p className="text-[10px] font-black text-theme-muted uppercase tracking-widest leading-tight">Signed in as</p>
-                        <p className="text-sm font-bold text-theme-text truncate leading-tight mt-0.5" title={displayName}>
-                          {displayName}
+                        <p className="text-sm font-bold text-theme-muted truncate leading-tight mt-0.5" title={profileData?.unique_travel_id}>
+                         Travel ID: {profileData?.unique_travel_id || "Loading..."}
                         </p>
-                        {displayEmail && displayEmail !== displayName && (
-                          <p className="text-xs font-medium text-theme-muted truncate leading-tight" title={displayEmail}>
-                            {displayEmail}
-                          </p>
-                        )}
                       </div>
                     </div>
 
@@ -319,16 +267,14 @@ export default function Navbar({
             )}
           </div>
 
-          {/* Map Toggle - Visible only on Mobile/Tablet (lg) */}
-          {!isHomePage && (
-            <button
-              onClick={onMapToggle}
-              className="cursor-pointer p-1.5 rounded-lg bg-theme-text text-theme-bg hover:bg-theme-muted/20 border border-theme-surface transition-colors shadow-sm lg:hidden active:scale-95"
-              aria-label={mapOpen ? "Close map" : "Toggle map"}
-            >
-              {mapOpen ? <X size={20} /> : <Map size={20} className="text-theme-primary" />}
-            </button>
-          )}
+          {/* Mobile Menu Toggle - Visible only on Mobile/Tablet (lg) */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="cursor-pointer rounded-lg bg-theme-surface text-theme-text lg:hidden hover:bg-theme-surface/80 transition-all duration-300 shadow-sm active:scale-95 border border-theme-surface p-1.5"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
 

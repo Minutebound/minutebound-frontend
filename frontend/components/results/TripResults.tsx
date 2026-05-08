@@ -8,7 +8,7 @@ import SummaryCard from "./SummaryCard";
 
 type TabOption = "summary" | "flights" | "drive" | "stays" | "tours";
 
-interface TripResultsProps {
+export interface TripResultsProps {
   data: any;
   loading: boolean;
   error?: string | null;
@@ -35,7 +35,7 @@ const LoadingState = () => {
   );
 };
 
-export default function TripResults({ data, loading, error, onOpenItinerary }: TripResultsProps) {
+const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenItinerary }) => {
   const [activeTab, setActiveTab] = useState<TabOption>("summary");
 
   const showFlights = data?.rawParams?.travelMode === "fly";
@@ -68,7 +68,7 @@ export default function TripResults({ data, loading, error, onOpenItinerary }: T
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
       
-      {/* HEADER SECTION (Moved from page.tsx) */}
+      {/* HEADER SECTION */}
       <div className="flex justify-between items-center mb-4 md:mb-6">
         <h1 className="text-2xl md:text-3xl font-black text-theme-text tracking-tight">
           Trip Planner
@@ -84,7 +84,7 @@ export default function TripResults({ data, loading, error, onOpenItinerary }: T
         )}
       </div>
 
-      {/* ERROR SECTION (Moved from page.tsx) */}
+      {/* ERROR SECTION */}
       {error && (
         <div className="bg-red-50 text-red-700 p-4 border border-red-100 rounded-xl mb-6 text-sm font-bold shadow-sm">
           {error}
@@ -146,4 +146,6 @@ export default function TripResults({ data, loading, error, onOpenItinerary }: T
       )}
     </div>
   );
-}
+};
+
+export default TripResults;

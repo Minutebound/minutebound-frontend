@@ -50,7 +50,6 @@ export default function Results() {
 
   useEffect(() => {
     const initializeData = async () => {
-      // 1. Check if we just navigated from the home page with a pending search
       const isPending = sessionStorage.getItem("pending_search");
       if (isPending) {
         sessionStorage.removeItem("pending_search");
@@ -59,14 +58,13 @@ export default function Results() {
           try {
             const params = JSON.parse(savedState);
             await handleSearch(params);
-            return; // handleSearch handles removing the loading state
+            return;
           } catch (err) {
             console.error("Failed to parse pending search state", err);
           }
         }
       }
 
-      // 2. Otherwise, check if we have an existing session loaded
       const cachedTrip = sessionStorage.getItem("current_trip_results");
       if (cachedTrip) {
         try {
@@ -76,12 +74,10 @@ export default function Results() {
         }
         setLoading(false);
       } else {
-        // No pending search and no cached data, return to home
         router.push("/results");
       }
     };
     
-
     initializeData();
   }, [router, handleSearch]);
 
@@ -95,14 +91,12 @@ export default function Results() {
         weatherData={tripData?.weather}
       />
 
+      {/* Map props removed from Navbar entirely */}
       <Navbar
         onMenuClick={() => setSearchOpen(!searchOpen)}
         menuOpen={searchOpen}
-        mapOpen={mapOpen}
-        onMapToggle={() => setMapOpen(!mapOpen)}
       />
 
-      {/* Permanently visible Compact Summary Bar wrapper */}
       <div className="w-full z-[60] flex-shrink-0 relative">
         <SearchBar
           onSearch={handleSearch}
@@ -112,15 +106,14 @@ export default function Results() {
           }}
           loading={loading}
           isCompact={true}
+          mapOpen={mapOpen}
+          onMapToggle={() => setMapOpen(!mapOpen)}
         />
       </div>
 
       <main className="flex-1 flex overflow-hidden min-w-0 bg-theme-bg/20">
-        
-        {/* Left Side: Results Stream */}
         <div className={`flex-1 h-full overflow-y-auto custom-scrollbar ${mapOpen && !loading ? "hidden md:block" : ""}`}>
           <div className="p-4 md:p-6 w-full relative max-w-[1200px] mx-auto">
-            {/* The entire UI is now elegantly encapsulated here */}
             <TripResults 
               data={tripData} 
               loading={loading} 
@@ -130,7 +123,6 @@ export default function Results() {
           </div>
         </div>
 
-        {/* Right Side: Map */}
         {!loading && tripData && (
           <div className={`h-full border-l border-theme-surface bg-theme-bg ${mapOpen ? "flex-1 w-full" : "hidden"} md:flex md:flex-none md:w-[40vw] lg:w-[35vw]`}>
             <div className="w-full h-full relative">

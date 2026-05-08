@@ -16,8 +16,10 @@
   --color-theme-secondary: #012C23; 
   --color-theme-muted: #8FB87A;     
   --color-theme-accent: #f9d625;    
-  --color-theme-bg: #FEFEFE;        
-  --color-theme-surface: #FFF9EE;   
+  --color-theme-bg: #FFFFFF;        
+  --color-theme-surface: #FFF9EE;  
+  --color-theme-error: #E63946;
+  --color-theme-footer: #102942; 
 
   /* FONT MAPPINGS */
   /* This maps the Inter variable to Tailwind's default font-sans utility */

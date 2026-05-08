@@ -44,40 +44,13 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-theme-text text-theme-bg pt-8 pb-8 border-t-4 border-theme-primary shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 relative mt-auto">      
+    <footer className="bg-theme-footer text-theme-bg pt-8 pb-8 border-t-4 border-theme-primary shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 relative mt-auto">      
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-12">
           
           <div className="flex flex-col gap-5">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <svg viewBox="0 0 1050 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 sm:h-12 w-auto -ml-2">
-                <style>{`
-                  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;700&display=swap');
-                  .footer-logo-text {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont;
-                    font-size: 100px;
-                    letter-spacing: -0.04em;
-                  }
-                `}</style>
-                <path d="M 20 160 C 100 40, 90 40, 120 120" className=" fill-theme-primary" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 120 120 C 180 20, 180 20, 200 140" className=" fill-theme-primary" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />            
-                     <g transform="translate(40, -10)"> 
-       <path 
-        d="M 420 170 Q 550 230 680 170" 
-        className="text-[#102942]"
-        stroke="currentColor"
-        fill="none"
-        strokeWidth="8" 
-        strokeLinecap="round"
-      /></g>
-                <text x="240" y="120" className="footer-logo-text">
-                  <tspan className="font-semibold fill-theme-surface">Minute</tspan>
-                  <tspan className="font-bold fill-theme-surface">bound</tspan>
-                </text>
-                
-              </svg>
-            </Link>
+
 
             <p className="text-sm text-theme-bg/70 leading-relaxed max-w-sm font-medium">
               Your intelligent travel companion. Plan flights, accommodations, road trips, and adventures in minutes.
@@ -139,12 +112,8 @@ export default function Footer() {
             <FooterLink href="/status" text="System Status" />
             <FooterLink href="#" text="Privacy Policy" />
             <FooterLink href="#" text="Terms of Service" />
+            <FooterLink href="#" text="Contact Us" />
           </div>
-
-          <div className="flex flex-col gap-4">
-            <h4 className="font-black text-lg text-theme-bg tracking-wide mb-2 uppercase text-[13px]">Contact Us</h4>
-          </div>
-
         </div>
 
         <div className="pt-8 border-t border-theme-bg/10 flex flex-col md:flex-row justify-between items-center gap-4">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans, Raleway, Inter_Tight } from "next/font/google"; // <-- Import all fonts here
+import { Inter, DM_Sans, Ubuntu} from "next/font/google"; // <-- Import all fonts here
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import ClientInit from "../components/ClientInIt";
@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 
 // Configure Inter (Your Default)
 const inter = Inter({
+  weight: ['400'],
   subsets: ["latin"],
   variable: "--font-inter",
   display: 'swap', 
@@ -17,6 +18,13 @@ const inter = Inter({
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
+  display: 'swap',
+});
+
+const ubuntu = Ubuntu({
+  weight: ['400'],
+  subsets: ["latin"],
+  variable: "--font-ubuntu",
   display: 'swap',
 });
 

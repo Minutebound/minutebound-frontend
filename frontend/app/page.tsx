@@ -40,8 +40,6 @@ export default function Home() {
       <Navbar
         onMenuClick={() => setSearchOpen(!searchOpen)}
         menuOpen={searchOpen}
-        mapOpen={false}
-        onMapToggle={() => {}}
       />
 
       <div 

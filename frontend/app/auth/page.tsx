@@ -36,11 +36,14 @@ export default function LoginPage() {
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [suffix, setSuffix] = useState("");
   
   const [phoneCountryCode, setPhoneCountryCode] = useState("+1");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [emailOtp, setEmailOtp] = useState("");
+
+  const SUFFIXES = ["Jr.", "Sr.", "II", "III", "IV", "V"];
 
   const [fieldErrors, setFieldErrors] = useState<{
     firstName?: string;
@@ -139,6 +142,7 @@ export default function LoginPage() {
           first_name: firstName,
           last_name: lastName,
           middle_name: middleName || undefined,
+          suffix: suffix || undefined,
           email: email,
           password: password,
           phone_country_code: phoneNumber ? phoneCountryCode : undefined,
@@ -156,7 +160,6 @@ export default function LoginPage() {
         setInfoMessage("Your email isn't verified yet. We just sent a fresh code to your inbox!");
         setIsVerifyMode(true);
       } else {
-        // Will properly display "User not found" or "User already exists" or "Incorrect password"
         setGlobalError(
           errorDetail || err.message || "Authentication failed. Please check your credentials."
         );
@@ -229,7 +232,7 @@ export default function LoginPage() {
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string>>, field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setter(e.target.value);
       if (fieldErrors[field as keyof typeof fieldErrors]) {
         setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -336,7 +339,7 @@ export default function LoginPage() {
               {!isLogin && !isForgotMode && !isVerifyMode && (
                 <>
                   <div className="flex gap-3 animate-in slide-in-from-top-2 fade-in duration-300">
-                    <div className="flex-1 relative group">
+                    <div className="flex-[1.5] relative group">
                       <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors ${fieldErrors.firstName ? "text-red-400" : "text-theme-muted group-focus-within:text-theme-primary"}`}>
                         <UserIcon size={18} />
                       </div>
@@ -361,8 +364,8 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  <div className="animate-in slide-in-from-top-2 fade-in duration-300 mt-2">
-                    <div className="relative group">
+                  <div className="flex gap-3 animate-in slide-in-from-top-2 fade-in duration-300 mt-2">
+                    <div className="flex-[2] relative group">
                       <input
                         type="text"
                         placeholder="Last Name"
@@ -371,6 +374,16 @@ export default function LoginPage() {
                         className={`w-full px-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.lastName ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
                       />
                       {fieldErrors.lastName && <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">{fieldErrors.lastName}</p>}
+                    </div>
+                    <div className="flex-1 relative group">
+                      <select
+                        value={suffix}
+                        onChange={(e) => setSuffix(e.target.value)}
+                        className="w-full px-2 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                      >
+                        <option value="">Suffix</option>
+                        {SUFFIXES.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
                     </div>
                   </div>
 
