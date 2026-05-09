@@ -14,11 +14,20 @@ import {
   Ticket,
   Car,
   DollarSign,
+  Share2,
+  Mail,
+  Copy,
+  Lock,
+  Globe,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 
 interface SavedTrip {
-  id: number;
+  id: string; // Updated to string because UUID from new backend
   destination: string;
+  visibility: "PRIVATE" | "SHARED" | "PUBLIC";
+  share_token?: string | null;
   data: {
     check_in_date?: string;
     check_out_date?: string;
@@ -40,6 +49,23 @@ export default function SavedTripsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState<SavedTrip | null>(null);
 
+  // --- NEW: EMAIL MODAL STATE ---
+  const [emailModal, setEmailModal] = useState<{
+    isOpen: boolean;
+    tripId: string | null;
+    email: string;
+    message: string;
+    loading: boolean;
+    success: boolean;
+  }>({
+    isOpen: false,
+    tripId: null,
+    email: "",
+    message: "",
+    loading: false,
+    success: false,
+  });
+
   useEffect(() => {
     const fetchTrips = async () => {
       if (!isLoggedIn) return;
@@ -55,7 +81,7 @@ export default function SavedTripsPage() {
     fetchTrips();
   }, [isLoggedIn]);
 
-  const handleDelete = async (tripId: number) => {
+  const handleDelete = async (tripId: string) => {
     if (!window.confirm("Are you sure you want to delete this itinerary?"))
       return;
     try {
@@ -66,6 +92,69 @@ export default function SavedTripsPage() {
     }
   };
 
+  // --- NEW: VISIBILITY & SHARING HANDLERS ---
+  const handleVisibilityChange = async (
+    tripId: string,
+    visibility: "PRIVATE" | "SHARED" | "PUBLIC"
+  ) => {
+    try {
+      const updated = await travelApi.updateItineraryVisibility(
+        tripId,
+        visibility
+      );
+      setSavedTrips((prev) =>
+        prev.map((t) =>
+          t.id === tripId
+            ? {
+                ...t,
+                visibility: updated.visibility,
+                share_token: updated.share_token,
+              }
+            : t
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update visibility", error);
+      alert("Could not update visibility.");
+    }
+  };
+
+  const handleCopyLink = (token: string) => {
+    const url = `${window.location.origin}/shared/${token}`;
+    navigator.clipboard.writeText(url);
+    alert("Share link copied to clipboard!");
+  };
+
+  const handleSendEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailModal.tripId || !emailModal.email) return;
+
+    setEmailModal((prev) => ({ ...prev, loading: true }));
+    try {
+      await travelApi.shareItineraryEmail(
+        emailModal.tripId,
+        emailModal.email,
+        emailModal.message
+      );
+      setEmailModal((prev) => ({ ...prev, loading: false, success: true }));
+      setTimeout(() => {
+        setEmailModal({
+          isOpen: false,
+          tripId: null,
+          email: "",
+          message: "",
+          loading: false,
+          success: false,
+        });
+      }, 2000);
+    } catch (error) {
+      console.error("Email failed", error);
+      alert("Failed to send email. Please try again.");
+      setEmailModal((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  // --- FORMATTING HELPERS ---
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "N/A";
     const parts = dateStr.split("-");
@@ -147,7 +236,7 @@ export default function SavedTripsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-theme-bg relative">
+    <div className="min-h-screen bg-theme-bg relative pb-20">
       <Navbar />
 
       <main className="max-w-6xl mx-auto p-8">
@@ -190,26 +279,48 @@ export default function SavedTripsPage() {
             {savedTrips.map((trip) => (
               <div
                 key={trip.id}
-                className="bg-theme-surface rounded-2xl shadow-sm border border-theme-muted/30 overflow-hidden hover:shadow-md transition flex flex-col"
+                className="bg-theme-surface rounded-2xl shadow-sm border border-theme-muted/30 overflow-hidden hover:shadow-md transition flex flex-col relative"
               >
-                <div className="p-6 flex-grow">
-                  <div className="flex justify-between items-start mb-4">
+                {/* Visibility Badge/Dropdown overlay */}
+                <div className="absolute top-4 right-4 z-10 flex items-center bg-theme-bg/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
+                  {trip.visibility === "PRIVATE" ? (
+                    <Lock size={12} className="text-theme-muted mr-1" />
+                  ) : (
+                    <Globe size={12} className="text-blue-500 mr-1" />
+                  )}
+                  <select
+                    value={trip.visibility || "PRIVATE"}
+                    onChange={(e) =>
+                      handleVisibilityChange(trip.id, e.target.value as any)
+                    }
+                    className="bg-transparent text-[10px] font-bold tracking-wider uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-text"
+                  >
+                    <option value="PRIVATE">Private</option>
+                    <option value="SHARED">Shared</option>
+                    <option value="PUBLIC">Public</option>
+                  </select>
+                </div>
+
+                <div className="p-6 flex-grow mt-4">
+                  <div className="flex justify-between items-start mb-2 pr-24">
                     <h2
-                      className="text-xl font-black text-theme-text line-clamp-1"
+                      className="text-xl font-black text-theme-text line-clamp-2 leading-tight"
                       title={getTripTitle(trip)}
                     >
                       {getTripTitle(trip)}
                     </h2>
-                    <span className="bg-theme-primary/10 text-theme-primary text-xs font-black px-2 py-1 rounded-md whitespace-nowrap border border-theme-primary/20">
-                      {formatDate(
-                        trip.data.check_in_date ||
-                          trip.data.rawParams?.startDate ||
-                          trip.data.startDate ||
-                          ""
-                      )}
-                    </span>
                   </div>
-                  <div className="space-y-3 text-sm text-theme-text/80 mb-6 font-medium">
+
+                  <span className="inline-block bg-theme-primary/10 text-theme-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider mb-4 border border-theme-primary/20">
+                    {formatDate(
+                      trip.data.check_in_date ||
+                        trip.data.rawParams?.startDate ||
+                        trip.data.startDate ||
+                        ""
+                    )}
+                  </span>
+
+                  <div className="space-y-3 text-sm text-theme-text/80 mb-4 font-medium">
                     <div className="flex items-center gap-2">
                       {trip.data.flight ? (
                         <Plane size={16} className="text-theme-muted" />
@@ -237,19 +348,49 @@ export default function SavedTripsPage() {
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-theme-bg border-t border-theme-muted/30 flex gap-2">
-                  <button
-                    onClick={() => setSelectedTrip(trip)}
-                    className="flex-1 text-center bg-theme-surface border border-theme-muted/50 text-theme-text py-2 rounded-xl text-sm font-bold hover:bg-theme-muted/20 active:scale-95 transition"
-                  >
-                    View Details
-                  </button>
-                  <button
-                    onClick={() => handleDelete(trip.id)}
-                    className="bg-theme-surface border border-red-200 text-red-500 p-2 rounded-xl hover:bg-red-50 active:scale-95 transition"
-                  >
-                    🗑️
-                  </button>
+
+                {/* --- UPDATED FOOTER WITH SHARING CONTROLS --- */}
+                <div className="p-4 bg-theme-bg border-t border-theme-muted/30 flex flex-col gap-2">
+                  {trip.visibility !== "PRIVATE" && trip.share_token && (
+                    <button
+                      onClick={() => handleCopyLink(trip.share_token!)}
+                      className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-xl border border-blue-200 transition"
+                    >
+                      <Copy size={14} /> Copy Public Link
+                    </button>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedTrip(trip)}
+                      className="flex-[2] text-center bg-theme-surface border border-theme-muted/50 text-theme-text py-2 rounded-xl text-sm font-bold hover:bg-theme-muted/20 active:scale-95 transition"
+                    >
+                      View Details
+                    </button>
+                    <button
+                      title="Email to a Friend"
+                      onClick={() =>
+                        setEmailModal({
+                          isOpen: true,
+                          tripId: trip.id,
+                          email: "",
+                          message: "",
+                          loading: false,
+                          success: false,
+                        })
+                      }
+                      className="flex-1 flex justify-center items-center bg-theme-surface border border-theme-primary/30 text-theme-primary py-2 rounded-xl hover:bg-theme-primary/10 active:scale-95 transition"
+                    >
+                      <Mail size={18} />
+                    </button>
+                    <button
+                      title="Delete Trip"
+                      onClick={() => handleDelete(trip.id)}
+                      className="flex-1 flex justify-center items-center bg-theme-surface border border-red-200 text-red-500 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -257,7 +398,97 @@ export default function SavedTripsPage() {
         )}
       </main>
 
-      {/* ITINERARY DETAILS MODAL */}
+      {/* --- NEW EMAIL MODAL --- */}
+      {emailModal.isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-theme-text/60 backdrop-blur-sm"
+            onClick={() =>
+              !emailModal.loading &&
+              setEmailModal((prev) => ({ ...prev, isOpen: false }))
+            }
+          />
+          <div className="relative bg-theme-bg w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 p-6">
+            <h3 className="text-xl font-black text-theme-text flex items-center gap-2 mb-1">
+              <Share2 size={20} className="text-theme-primary" /> Share
+              Itinerary
+            </h3>
+            <p className="text-xs font-medium text-theme-text/70 mb-5">
+              Send a beautiful PDF copy of this trip to a friend via email.
+            </p>
+
+            {emailModal.success ? (
+              <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 font-bold mb-4 border border-green-200">
+                <CheckCircle2 size={20} /> Email sent successfully!
+              </div>
+            ) : (
+              <form onSubmit={handleSendEmail} className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs font-bold text-theme-text uppercase tracking-wider mb-1 block">
+                    Friend's Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={emailModal.email}
+                    onChange={(e) =>
+                      setEmailModal((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    placeholder="friend@example.com"
+                    className="w-full px-4 py-3 bg-theme-surface border border-theme-muted/30 rounded-xl text-sm focus:ring-2 focus:ring-theme-primary focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-theme-text uppercase tracking-wider mb-1 block">
+                    Personal Message (Optional)
+                  </label>
+                  <textarea
+                    value={emailModal.message}
+                    onChange={(e) =>
+                      setEmailModal((prev) => ({
+                        ...prev,
+                        message: e.target.value,
+                      }))
+                    }
+                    placeholder="Hey! Check out this trip I planned..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-theme-surface border border-theme-muted/30 rounded-xl text-sm focus:ring-2 focus:ring-theme-primary focus:outline-none resize-none"
+                  />
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEmailModal((prev) => ({ ...prev, isOpen: false }))
+                    }
+                    className="flex-1 py-3 text-sm font-bold text-theme-text bg-theme-surface rounded-xl hover:bg-theme-muted/20 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={emailModal.loading}
+                    className="flex-1 py-3 text-sm font-bold text-theme-bg bg-theme-primary rounded-xl flex justify-center items-center gap-2 hover:bg-theme-secondary transition disabled:opacity-70"
+                  >
+                    {emailModal.loading ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <>
+                        <Mail size={16} /> Send Email
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- EXISTING ITINERARY DETAILS MODAL (Kept exactly the same) --- */}
       {selectedTrip && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div

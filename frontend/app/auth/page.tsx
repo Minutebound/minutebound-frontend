@@ -22,28 +22,40 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
 
   const [isForgotMode, setIsForgotMode] = useState(false);
-  const [isVerifyMode, setIsVerifyMode] = useState(false); 
-  
+  const [isVerifyMode, setIsVerifyMode] = useState(false);
+
   const [resetStep, setResetStep] = useState<"email" | "verify">("email");
   const [resetCode, setResetCode] = useState("");
-  
+
   const [successMessage, setSuccessMessage] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
   const [suffix, setSuffix] = useState("");
-  
+
+  // NEW: Gender State
+  const [gender, setGender] = useState("PREFER_NOT_TO_SAY");
+
   const [phoneCountryCode, setPhoneCountryCode] = useState("+1");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [emailOtp, setEmailOtp] = useState("");
 
   const SUFFIXES = ["Jr.", "Sr.", "II", "III", "IV", "V"];
+
+  // NEW: Gender Options mapping to Backend Enum
+  const GENDERS = [
+    { value: "PREFER_NOT_TO_SAY", label: "Prefer not to say" },
+    { value: "MALE", label: "Male" },
+    { value: "FEMALE", label: "Female" },
+    { value: "NON_BINARY", label: "Non-Binary" },
+    { value: "OTHER", label: "Other" },
+  ];
 
   const [fieldErrors, setFieldErrors] = useState<{
     firstName?: string;
@@ -115,9 +127,12 @@ export default function LoginPage() {
     try {
       const profile = await travelApi.getProfile();
       if (profile.first_name) {
-         displayUsername = `${profile.first_name} ${profile.last_name || ''}`.trim();
+        displayUsername = `${profile.first_name} ${
+          profile.last_name || ""
+        }`.trim();
       } else {
-         displayUsername = profile.full_name || profile.name || profile.email || fallbackEmail;
+        displayUsername =
+          profile.full_name || profile.name || profile.email || fallbackEmail;
       }
     } catch (profileErr) {
       console.warn("Could not fetch profile, falling back to email");
@@ -143,25 +158,30 @@ export default function LoginPage() {
           last_name: lastName,
           middle_name: middleName || undefined,
           suffix: suffix || undefined,
+          gender: gender, // SENDING NEW GENDER FIELD
           email: email,
           password: password,
           phone_country_code: phoneNumber ? phoneCountryCode : undefined,
           phone_number: phoneNumber || undefined,
         });
-        
+
         setInfoMessage("Account created! Please verify your email.");
         setIsVerifyMode(true);
       }
     } catch (err: any) {
       const errorDetail = err.response?.data?.detail;
-      
+
       // Handle the unverified user login attempt
       if (errorDetail === "UNVERIFIED_EMAIL") {
-        setInfoMessage("Your email isn't verified yet. We just sent a fresh code to your inbox!");
+        setInfoMessage(
+          "Your email isn't verified yet. We just sent a fresh code to your inbox!"
+        );
         setIsVerifyMode(true);
       } else {
         setGlobalError(
-          errorDetail || err.message || "Authentication failed. Please check your credentials."
+          errorDetail ||
+            err.message ||
+            "Authentication failed. Please check your credentials."
         );
       }
     } finally {
@@ -176,22 +196,23 @@ export default function LoginPage() {
 
     try {
       if (!emailOtp || emailOtp.length !== 6) {
-         throw new Error("Please enter the 6-digit email OTP.");
+        throw new Error("Please enter the 6-digit email OTP.");
       }
-      
+
       // Verify Email
       await travelApi.verifyEmailOtp({ email, code: emailOtp });
 
       setInfoMessage("");
       setSuccessMessage("Account verified! Logging you in...");
-      
+
       // Automatically log them in after a successful verify
       const res = await travelApi.login(email, password);
       await handleLoginSuccess(res.access_token, email);
-
     } catch (err: any) {
       setGlobalError(
-        err.response?.data?.detail || err.message || "Verification failed. Check your code."
+        err.response?.data?.detail ||
+          err.message ||
+          "Verification failed. Check your code."
       );
     } finally {
       setIsLoading(false);
@@ -211,10 +232,14 @@ export default function LoginPage() {
         setResetStep("verify");
       } else {
         if (!resetCode || password.length < 6) {
-          throw new Error("Please enter the code and a new password (min 6 chars).");
+          throw new Error(
+            "Please enter the code and a new password (min 6 chars)."
+          );
         }
         await travelApi.resetPassword(email, resetCode, password);
-        setSuccessMessage("Password reset successfully! Redirecting to login...");
+        setSuccessMessage(
+          "Password reset successfully! Redirecting to login..."
+        );
         setTimeout(() => {
           setIsForgotMode(false);
           setResetStep("email");
@@ -224,7 +249,9 @@ export default function LoginPage() {
         }, 3000);
       }
     } catch (err: any) {
-      setGlobalError(err.response?.data?.detail || err.message || "Action failed.");
+      setGlobalError(
+        err.response?.data?.detail || err.message || "Action failed."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -257,7 +284,8 @@ export default function LoginPage() {
             <span className="text-theme-accent">planned in seconds.</span>
           </h1>
           <p className="text-lg text-theme-bg/80 font-medium">
-            Let us craft a perfect itinerary tailored to your unique travel style.
+            Let us craft a perfect itinerary tailored to your unique travel
+            style.
           </p>
         </div>
       </div>
@@ -268,8 +296,15 @@ export default function LoginPage() {
 
         <div className="w-full max-w-[420px] relative z-10">
           <div className="lg:hidden text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Link href="/" className="inline-flex items-center gap-2 text-3xl font-extrabold text-theme-text tracking-tight">
-              <PlaneTakeoff className="text-theme-primary" size={32} strokeWidth={2.5} />
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-3xl font-extrabold text-theme-text tracking-tight"
+            >
+              <PlaneTakeoff
+                className="text-theme-primary"
+                size={32}
+                strokeWidth={2.5}
+              />
               WanderPlan <span className="text-theme-primary">US</span>
             </Link>
           </div>
@@ -298,32 +333,60 @@ export default function LoginPage() {
           <div className="bg-theme-surface/60 backdrop-blur-xl rounded-[2rem] shadow-sm border border-theme-surface p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             {!isForgotMode && !isVerifyMode && (
               <div className="flex bg-theme-bg p-1 rounded-2xl mb-8 relative border border-theme-surface">
-                <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-theme-surface rounded-xl shadow-sm transition-all duration-300 ease-out ${isLogin ? "left-1" : "left-[calc(50%+2px)]"}`}></div>
+                <div
+                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-theme-surface rounded-xl shadow-sm transition-all duration-300 ease-out ${
+                    isLogin ? "left-1" : "left-[calc(50%+2px)]"
+                  }`}
+                ></div>
                 <button
                   type="button"
-                  onClick={() => { setIsLogin(true); clearMessages(); setFieldErrors({}); }}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${isLogin ? "text-theme-text" : "text-theme-muted hover:text-theme-text"}`}
+                  onClick={() => {
+                    setIsLogin(true);
+                    clearMessages();
+                    setFieldErrors({});
+                  }}
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${
+                    isLogin
+                      ? "text-theme-text"
+                      : "text-theme-muted hover:text-theme-text"
+                  }`}
                 >
                   Sign In
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setIsLogin(false); clearMessages(); setFieldErrors({}); }}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${!isLogin ? "text-theme-text" : "text-theme-muted hover:text-theme-text"}`}
+                  onClick={() => {
+                    setIsLogin(false);
+                    clearMessages();
+                    setFieldErrors({});
+                  }}
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${
+                    !isLogin
+                      ? "text-theme-text"
+                      : "text-theme-muted hover:text-theme-text"
+                  }`}
                 >
                   Sign Up
                 </button>
               </div>
             )}
 
-            <form onSubmit={isForgotMode ? handleForgotSubmit : isVerifyMode ? handleVerifySubmit : handleAuthSubmit} className="flex flex-col gap-4">
-              
+            <form
+              onSubmit={
+                isForgotMode
+                  ? handleForgotSubmit
+                  : isVerifyMode
+                  ? handleVerifySubmit
+                  : handleAuthSubmit
+              }
+              className="flex flex-col gap-4"
+            >
               {globalError && (
                 <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-xs font-bold rounded-xl text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
                   <AlertCircle size={16} /> {globalError}
                 </div>
               )}
-              
+
               {infoMessage && (
                 <div className="p-3 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold rounded-xl text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
                   <AlertCircle size={16} /> {infoMessage}
@@ -340,7 +403,13 @@ export default function LoginPage() {
                 <>
                   <div className="flex gap-3 animate-in slide-in-from-top-2 fade-in duration-300">
                     <div className="flex-[1.5] relative group">
-                      <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors ${fieldErrors.firstName ? "text-red-400" : "text-theme-muted group-focus-within:text-theme-primary"}`}>
+                      <div
+                        className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors ${
+                          fieldErrors.firstName
+                            ? "text-red-400"
+                            : "text-theme-muted group-focus-within:text-theme-primary"
+                        }`}
+                      >
                         <UserIcon size={18} />
                       </div>
                       <input
@@ -348,9 +417,17 @@ export default function LoginPage() {
                         placeholder="First Name"
                         value={firstName}
                         onChange={handleInputChange(setFirstName, "firstName")}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.firstName ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          fieldErrors.firstName
+                            ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                            : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                        }`}
                       />
-                      {fieldErrors.firstName && <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">{fieldErrors.firstName}</p>}
+                      {fieldErrors.firstName && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                          {fieldErrors.firstName}
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex-1 relative group">
@@ -371,9 +448,17 @@ export default function LoginPage() {
                         placeholder="Last Name"
                         value={lastName}
                         onChange={handleInputChange(setLastName, "lastName")}
-                        className={`w-full px-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.lastName ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
+                        className={`w-full px-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          fieldErrors.lastName
+                            ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                            : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                        }`}
                       />
-                      {fieldErrors.lastName && <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">{fieldErrors.lastName}</p>}
+                      {fieldErrors.lastName && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                          {fieldErrors.lastName}
+                        </p>
+                      )}
                     </div>
                     <div className="flex-1 relative group">
                       <select
@@ -382,8 +467,47 @@ export default function LoginPage() {
                         className="w-full px-2 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
                       >
                         <option value="">Suffix</option>
-                        {SUFFIXES.map(s => <option key={s} value={s}>{s}</option>)}
+                        {SUFFIXES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
                       </select>
+                    </div>
+                  </div>
+
+                  {/* NEW GENDER FIELD */}
+                  <div className="animate-in slide-in-from-top-2 fade-in duration-300 mt-2">
+                    <div className="relative group">
+                      <select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        className="w-full px-4 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                      >
+                        <option value="" disabled>
+                          Select Gender
+                        </option>
+                        {GENDERS.map((g) => (
+                          <option key={g.value} value={g.value}>
+                            {g.label}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-theme-muted">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
+                      </div>
                     </div>
                   </div>
 
@@ -393,10 +517,21 @@ export default function LoginPage() {
                         type="text"
                         placeholder="+1"
                         value={phoneCountryCode}
-                        onChange={handleInputChange(setPhoneCountryCode, "phoneCountryCode")}
-                        className={`w-full px-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-center text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.phoneCountryCode ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
+                        onChange={handleInputChange(
+                          setPhoneCountryCode,
+                          "phoneCountryCode"
+                        )}
+                        className={`w-full px-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-center text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          fieldErrors.phoneCountryCode
+                            ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                            : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                        }`}
                       />
-                      {fieldErrors.phoneCountryCode && <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">{fieldErrors.phoneCountryCode}</p>}
+                      {fieldErrors.phoneCountryCode && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">
+                          {fieldErrors.phoneCountryCode}
+                        </p>
+                      )}
                     </div>
                     <div className="flex-1 relative group">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors text-theme-muted group-focus-within:text-theme-primary">
@@ -406,10 +541,21 @@ export default function LoginPage() {
                         type="text"
                         placeholder="Phone Number (Optional)"
                         value={phoneNumber}
-                        onChange={handleInputChange(setPhoneNumber, "phoneNumber")}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.phoneNumber ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
+                        onChange={handleInputChange(
+                          setPhoneNumber,
+                          "phoneNumber"
+                        )}
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          fieldErrors.phoneNumber
+                            ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                            : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                        }`}
                       />
-                      {fieldErrors.phoneNumber && <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">{fieldErrors.phoneNumber}</p>}
+                      {fieldErrors.phoneNumber && (
+                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                          {fieldErrors.phoneNumber}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </>
@@ -419,7 +565,13 @@ export default function LoginPage() {
                 <>
                   <div className={!isLogin && !isForgotMode ? "mt-2" : ""}>
                     <div className="relative group">
-                      <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors ${fieldErrors.email ? "text-red-400" : "text-theme-muted group-focus-within:text-theme-primary"}`}>
+                      <div
+                        className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors ${
+                          fieldErrors.email
+                            ? "text-red-400"
+                            : "text-theme-muted group-focus-within:text-theme-primary"
+                        }`}
+                      >
                         <Mail size={18} />
                       </div>
                       <input
@@ -428,27 +580,55 @@ export default function LoginPage() {
                         value={email}
                         disabled={isForgotMode && resetStep === "verify"}
                         onChange={handleInputChange(setEmail, "email")}
-                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.email ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"} ${isForgotMode && resetStep === "verify" ? "opacity-60 cursor-not-allowed bg-theme-surface" : ""}`}
+                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          fieldErrors.email
+                            ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                            : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                        } ${
+                          isForgotMode && resetStep === "verify"
+                            ? "opacity-60 cursor-not-allowed bg-theme-surface"
+                            : ""
+                        }`}
                       />
                     </div>
-                    {fieldErrors.email && <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">{fieldErrors.email}</p>}
+                    {fieldErrors.email && (
+                      <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">
+                        {fieldErrors.email}
+                      </p>
+                    )}
                   </div>
 
                   {(!isForgotMode || resetStep === "verify") && (
                     <div className="animate-in fade-in duration-300">
                       <div className="relative group">
-                        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors ${fieldErrors.password ? "text-red-400" : "text-theme-muted group-focus-within:text-theme-primary"}`}>
+                        <div
+                          className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors ${
+                            fieldErrors.password
+                              ? "text-red-400"
+                              : "text-theme-muted group-focus-within:text-theme-primary"
+                          }`}
+                        >
                           <Lock size={18} />
                         </div>
                         <input
                           type="password"
-                          placeholder={isForgotMode ? "Enter New Password" : "Password"}
+                          placeholder={
+                            isForgotMode ? "Enter New Password" : "Password"
+                          }
                           value={password}
                           onChange={handleInputChange(setPassword, "password")}
-                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${fieldErrors.password ? "border-red-300 focus:ring-red-500/20 focus:border-red-500" : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"}`}
+                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                            fieldErrors.password
+                              ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+                              : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
+                          }`}
                         />
                       </div>
-                      {fieldErrors.password && <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">{fieldErrors.password}</p>}
+                      {fieldErrors.password && (
+                        <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">
+                          {fieldErrors.password}
+                        </p>
+                      )}
                     </div>
                   )}
                 </>
@@ -493,7 +673,14 @@ export default function LoginPage() {
 
               {isLogin && !isForgotMode && !isVerifyMode && (
                 <div className="flex justify-end mt-[-8px] animate-in fade-in duration-300">
-                  <button type="button" onClick={() => { setIsForgotMode(true); clearMessages(); }} className="text-xs font-bold text-theme-primary hover:text-theme-secondary transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotMode(true);
+                      clearMessages();
+                    }}
+                    className="text-xs font-bold text-theme-primary hover:text-theme-secondary transition-colors"
+                  >
                     Forgot password?
                   </button>
                 </div>
@@ -508,15 +695,36 @@ export default function LoginPage() {
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <>
-                    {!isForgotMode ? isVerifyMode ? "Verify Email" : isLogin ? "Sign In" : "Create Account" : resetStep === "email" ? "Send Reset Code" : "Verify & Reset Password"}
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    {!isForgotMode
+                      ? isVerifyMode
+                        ? "Verify Email"
+                        : isLogin
+                        ? "Sign In"
+                        : "Create Account"
+                      : resetStep === "email"
+                      ? "Send Reset Code"
+                      : "Verify & Reset Password"}
+                    <ArrowRight
+                      size={18}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
                   </>
                 )}
               </button>
 
               {(isForgotMode || isVerifyMode) && (
                 <div className="flex justify-center mt-2 animate-in fade-in duration-300">
-                  <button type="button" onClick={() => { setIsForgotMode(false); setIsVerifyMode(false); setResetStep("email"); setEmailOtp(""); clearMessages(); }} className="text-xs font-bold text-theme-muted hover:text-theme-text transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotMode(false);
+                      setIsVerifyMode(false);
+                      setResetStep("email");
+                      setEmailOtp("");
+                      clearMessages();
+                    }}
+                    className="text-xs font-bold text-theme-muted hover:text-theme-text transition-colors"
+                  >
                     Back to login
                   </button>
                 </div>
@@ -527,13 +735,21 @@ export default function LoginPage() {
               <>
                 <div className="mt-8 flex items-center gap-4">
                   <div className="flex-1 h-px bg-theme-surface"></div>
-                  <span className="text-[10px] font-bold text-theme-muted uppercase tracking-widest">Or continue with</span>
+                  <span className="text-[10px] font-bold text-theme-muted uppercase tracking-widest">
+                    Or continue with
+                  </span>
                   <div className="flex-1 h-px bg-theme-surface"></div>
                 </div>
                 <div className="mt-6">
-                  <button type="button" className="w-full flex items-center justify-center gap-3 py-3 bg-theme-bg border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-xl text-sm font-bold text-theme-text transition-all shadow-sm active:scale-[0.98]">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-center gap-3 py-3 bg-theme-bg border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-xl text-sm font-bold text-theme-text transition-all shadow-sm active:scale-[0.98]"
+                  >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <path fill="#EA4335" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+                      <path
+                        fill="#EA4335"
+                        d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                      />
                     </svg>
                     Google
                   </button>
@@ -549,7 +765,17 @@ export default function LoginPage() {
 
 function SparkleIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-theme-accent">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-theme-accent"
+    >
       <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
     </svg>
   );
