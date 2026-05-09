@@ -22,6 +22,7 @@ export interface UserCreatePayload {
   suffix?: string;
   phone_country_code?: string;
   phone_number?: string;
+  gender?: string; // Added gender
 }
 
 export interface VerifyEmailOTP {
@@ -181,8 +182,16 @@ export const travelApi = {
     }
   },
 
-  saveTrip: async (tripData: any) => {
-    const response = await axios.post(`${API_BASE_URL}/trips/save`, tripData, {
+  // --- UPDATED ITINERARY ENDPOINTS ---
+
+  saveTrip: async (tripData: any, visibility: "PRIVATE" | "SHARED" | "PUBLIC" = "PRIVATE") => {
+    // Formats the payload to match the backend ItineraryCreate schema
+    const payload = {
+      destination: tripData.destination || "My Trip",
+      data: tripData,
+      visibility: visibility
+    };
+    const response = await axios.post(`${API_BASE_URL}/trips/save`, payload, {
       headers: getAuthHeaders()
     });
     return response.data;
@@ -195,6 +204,35 @@ export const travelApi = {
     return response.data;
   },
 
+  deleteTrip: async (itineraryId: string) => {
+    const response = await axios.delete(`${API_BASE_URL}/trips/${itineraryId}`, {
+      headers: getAuthHeaders()
+    });
+    return response.data;
+  },
+
+  updateItineraryVisibility: async (itineraryId: string, visibility: "PRIVATE" | "SHARED" | "PUBLIC") => {
+    const response = await axios.patch(`${API_BASE_URL}/trips/${itineraryId}/visibility`, 
+      { visibility }, 
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  getSharedItinerary: async (shareToken: string) => {
+    const response = await axios.get(`${API_BASE_URL}/trips/shared/${shareToken}`);
+    return response.data;
+  },
+
+  shareItineraryEmail: async (itineraryId: string, email: string, message?: string) => {
+    const response = await axios.post(`${API_BASE_URL}/trips/${itineraryId}/share-email`, 
+      { email, message }, 
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  // --- LEGACY PDF SHARE (Kept for backwards compatibility if needed) ---
   sharePdf: async (data: any, email: string, signal?: AbortSignal) => {
     try {
       const payload = { ...data, email };
@@ -210,6 +248,28 @@ export const travelApi = {
       throw error;
     }
   },
+
+  exportPdf: async (data: any, signal?: AbortSignal) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/trips/generate-pdf`, data, {
+        responseType: 'blob', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        signal
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("PDF generation cancelled by user");
+      } else {
+        console.error("Failed to generate PDF:", error);
+      }
+      return null;
+    }
+  },
+
+  // --- AUTH ENDPOINTS ---
 
   signup: async (userData: UserCreatePayload) => {
     const { data } = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
@@ -265,7 +325,7 @@ export const travelApi = {
     return response.data;
   },
 
-requestAccountDeletion: async () => {
+  requestAccountDeletion: async () => {
     const response = await axios.post(`${API_BASE_URL}/users/me/request-delete`, {}, {
       headers: getAuthHeaders()
     });
@@ -279,6 +339,8 @@ requestAccountDeletion: async () => {
     });
     return response.data;
   },
+
+  // --- TRAVEL DATA ENDPOINTS ---
 
   getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
   
@@ -347,13 +409,6 @@ requestAccountDeletion: async () => {
       console.error("Failed to fetch driving route:", error);
       return null;
     }
-  },
-
-  deleteTrip: async (tripId: number) => {
-    const response = await axios.delete(`${API_BASE_URL}/trips/${tripId}`, {
-      headers: getAuthHeaders()
-    });
-    return response.data;
   },
 
   getStays: async (params: TripSearchParams, signal?: AbortSignal): Promise<HotelOffer[]> => {
@@ -464,26 +519,6 @@ requestAccountDeletion: async () => {
     } catch (error) {
       if (axios.isCancel(error)) return [];
       return [];
-    }
-  },
-
-  exportPdf: async (data: any, signal?: AbortSignal) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/trips/generate-pdf`, data, {
-        responseType: 'blob', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        signal
-      });
-      return response.data;
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log("PDF generation cancelled by user");
-      } else {
-        console.error("Failed to generate PDF:", error);
-      }
-      return null;
     }
   },
 
