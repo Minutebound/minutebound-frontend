@@ -81,11 +81,11 @@ const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
       <g transform="translate(10,-30) scale(1.2)">
         <path
           d="M 20 160 C 100 40, 90 40, 120 120"
-          className="fill-[#012C23]"
+          className="fill-[#0E9C4C]"
         />
         <path
           d="M 120 120 C 180 20, 180 20, 200 140"
-          className="fill-[#012C23]"
+          className="fill-[#0E9C4C]"
         />  
       </g>
 
@@ -149,7 +149,7 @@ export default function Navbar({
   return (
     <nav className="sticky top-0 w-full flex-shrink-0 z-[999] bg-theme-bg shadow-sm border-b border-theme-text/10">
       <div 
-        className="w-full lg:w-[70%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-text relative z-[999] transition-all duration-300 h-[60px]"
+        className="w-full lg:w-[90%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-text relative z-[999] transition-all duration-300 h-[60px]"
       >
         {/* LEFT SECTION - Logo */}
         <div className="flex items-center flex-shrink-0 h-full">
@@ -193,7 +193,7 @@ export default function Navbar({
                     </div>
                   )}
 
-                  <span className="text-theme-primary text-sm font-bold hidden sm:block max-w-[120px] truncate">
+                  <span className="text-theme-text text-sm font-bold hidden sm:block max-w-[120px] truncate">
                     {displayName}
                   </span>
                 </button>
@@ -204,7 +204,7 @@ export default function Navbar({
                     {/* TRAVEL ID SECTION (Inside Dropdown) */}
                     <div className="px-4 py-3 mb-1 border-b border-theme-surface bg-theme-surface/20">
                       <div className="overflow-hidden">
-                        <p className="text-sm font-bold text-theme-muted truncate leading-tight mt-0.5" title={profileData?.unique_travel_id}>
+                        <p className="text-sm font-bold text-theme-primary truncate leading-tight mt-0.5" title={profileData?.unique_travel_id}>
                          Travel ID: {profileData?.unique_travel_id || "Loading..."}
                         </p>
                       </div>
@@ -227,7 +227,7 @@ export default function Navbar({
                       className="flex items-center gap-3 px-4 py-3 text-sm text-theme-text hover:bg-theme-surface font-bold transition-colors"
                     >
                       <UserIcon size={16} className="text-theme-primary" />
-                      Profile
+                      Profile Settings
                     </Link>
                     <Link
                       href="/savedtrips"
@@ -301,7 +301,7 @@ export default function Navbar({
                   className="flex items-center gap-3 px-4 py-4 text-theme-text hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
                 >
                   <UserIcon size={20} className="text-theme-primary" />
-                  Profile
+                  Profile Settings
                 </Link>
                 <Link
                   href="/savedtrips"

@@ -5,7 +5,7 @@ import { Compass, Calendar, Search, MapPin, ArrowRight } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <div className="w-full min-h-[120vh] relative bg-theme-bg overflow-x-hidden">
+    <div className="w-full min-h-[100vh] relative bg-theme-bg overflow-x-hidden">
       
 {/* --- DOTTED/SPOTTED BACKGROUND TEXTURE --- */}
       <div 

@@ -184,15 +184,17 @@ export default function LocationAutocomplete({
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
-      <div className="relative flex items-center">
+      <div className="relative flex items-center w-full">
+        {/* MapPin at the far left edge */}
+        <MapPin className="size-5 text-theme-text/50 absolute left-0 pointer-events-none" />
+        
+        {/* Input with proper pl-8 to clear the MapPin, and dynamic pr-* to clear the right buttons */}
         <input
-          className={`w-full h-[52px] pl-4 rounded-xl outline-none transition-all duration-300 text-sm font-semibold shadow-inner backdrop-blur-sm
-            bg-theme-bg border-[1.5px] border-theme-secondary/30 text-theme-text placeholder:text-theme-text/50 
-            focus:border-theme-primary focus:ring-1 focus:ring-theme-primary focus:bg-theme-bg
+          className={`w-full h-full min-h-[40px] pl-8 outline-none transition-all duration-300 text-[15px] font-bold bg-transparent border-none shadow-none text-theme-text placeholder:text-theme-text/40 focus:ring-0
             ${
               !isSearching && query.length === 0 && showGPS
-                ? "pr-[80px]"
-                : "pr-12"
+                ? "pr-10" // Spacing for the GPS button
+                : "pr-10"           // Spacing for the X or Loader
             }`}
           placeholder={placeholder}
           value={query}
@@ -209,9 +211,10 @@ export default function LocationAutocomplete({
           }}
         />
 
+        {/* Dynamic Right-Side Elements */}
         {isSearching ? (
-          <div className="absolute right-4 flex items-center justify-center text-theme-primary">
-            <Loader2 size={18} className="animate-spin" />
+          <div className="absolute right-[-10px] flex items-center justify-center text-theme-primary">
+            <Loader2 size={16} className="animate-spin" />
           </div>
         ) : isOpen || query.length > 0 ? (
           <button
@@ -223,9 +226,9 @@ export default function LocationAutocomplete({
               setIsOpen(false);
               setResults([]);
             }}
-            className="absolute right-3 p-1.5 rounded-lg transition-colors text-theme-text/50 hover:text-theme-text hover:bg-theme-secondary/10"
+            className="absolute right-[-10px] p-1 rounded-lg transition-colors text-theme-text/50 hover:text-theme-text hover:bg-theme-secondary/10"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         ) : showGPS ? (
           <button
@@ -233,19 +236,14 @@ export default function LocationAutocomplete({
             onClick={handleGPS}
             disabled={gpsLoading}
             title="Use current location"
-            className={`absolute right-3 px-3 py-1.5 rounded-lg transition-all duration-300 text-[11px] font-black tracking-wider flex items-center gap-1.5
+            className={`absolute right-0 px-1.5 py-1.5 rounded-lg transition-all duration-300 text-[11px] font-black tracking-wider flex items-center gap-1.5
               ${gpsLoading ? "opacity-60 cursor-not-allowed" : ""}
               bg-theme-secondary/10 hover:bg-theme-secondary text-theme-secondary hover:text-theme-bg border border-transparent hover:border-theme-secondary`}
           >
             {gpsLoading ? (
-              <>
-                <Loader2 size={14} className="animate-spin" />
-              </>
+              <Loader2 size={16} className="animate-spin" />
             ) : (
-              <>
-                <Navigation size={14} />
-                GPS
-              </>
+              <Navigation size={16} />
             )}
           </button>
         ) : null}
@@ -254,7 +252,9 @@ export default function LocationAutocomplete({
       {isOpen && results.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-50 w-full mt-2 border rounded-xl shadow-2xl max-h-[220px] overflow-y-auto backdrop-blur-md bg-theme-bg border-theme-secondary/20 custom-scrollbar"
+          className={`absolute z-50 mt-4 border rounded-2xl shadow-2xl max-h-[220px] overflow-y-auto backdrop-blur-md bg-theme-bg border-theme-secondary/20 custom-scrollbar w-[220px] sm:w-[250px] md:w-[250px] lg:w-[250px]
+            ${showGPS ? "left-0" : "right-0"}
+          `}
         >
           {results.map((loc, i) => (
             <li
@@ -263,7 +263,7 @@ export default function LocationAutocomplete({
                 e.preventDefault();
                 handleSelect(loc);
               }}
-              className="p-3.5 flex items-center gap-4 cursor-pointer transition-colors duration-200 group hover:bg-theme-surface/50 border-b border-theme-surface last:border-0 text-theme-text"
+              className="p-4 flex items-center gap-4 cursor-pointer transition-colors duration-200 group hover:bg-theme-surface/50 border-b border-theme-surface last:border-0 text-theme-text"
             >
               <div className="p-2 rounded-xl transition-all duration-300 group-hover:scale-110 bg-theme-primary/10 text-theme-primary group-hover:bg-theme-primary group-hover:text-theme-bg">
                 <MapPin className="size-5" />

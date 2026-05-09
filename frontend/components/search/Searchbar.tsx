@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-// Added Map and X icons here
-import { Search, Loader2, Calendar, TrendingUp, PenBox, PenBoxIcon, Map, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Search, Loader2, Calendar, TrendingUp, PenBoxIcon, Map, X, ArrowRightLeft, Users, ChevronDown, Plane, Car, Edit } from "lucide-react";
 import LocationAutocomplete from "./LocationAutoComplete";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,8 +26,8 @@ interface SearchBarProps {
   onCancel?: () => void;
   loading?: boolean;
   isCompact?: boolean; 
-  mapOpen?: boolean;           // Added for Map Toggle
-  onMapToggle?: () => void;    // Added for Map Toggle
+  mapOpen?: boolean;           
+  onMapToggle?: () => void;    
 }
 
 export default function SearchBar({
@@ -54,6 +53,9 @@ export default function SearchBar({
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [topDestinations, setTopDestinations] = useState<any[]>([]);
+  
+  const [showTravellerDropdown, setShowTravellerDropdown] = useState(false);
+  const travellerRef = useRef<HTMLDivElement>(null);
 
   const refreshTrending = async () => {
     const data = await travelApi.getTopDestinations();
@@ -88,14 +90,22 @@ export default function SearchBar({
   }, []);
 
   useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (travellerRef.current && !travellerRef.current.contains(event.target as Node)) {
+        setShowTravellerDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
     if (isOverlayOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [isOverlayOpen]);
   
   const getCoordinates = async (locationName: string, isDestination: boolean = false) => {
@@ -113,6 +123,15 @@ export default function SearchBar({
       console.error(`Failed to fetch coordinates for ${locationName}:`, err);
     }
     return null;
+  };
+
+  const handleSwapLocations = () => {
+    const tempSrc = source;
+    const tempSrcValid = sourceValid;
+    setSource(destination);
+    setSourceValid(destValid);
+    setDestination(tempSrc);
+    setDestValid(tempSrcValid);
   };
 
   const handleSearchSubmit = async () => {
@@ -139,18 +158,18 @@ export default function SearchBar({
     }
 
     const newErrors: Record<string, string> = {};
-    if (!finalSource.trim()) newErrors.source = "Required.";
-    else if (!finalSourceValid) newErrors.source = "Select valid city.";
+    if (!finalSource.trim()) newErrors.source = "Required";
+    else if (!finalSourceValid) newErrors.source = "Invalid city";
 
-    if (!finalDest.trim()) newErrors.destination = "Required.";
-    else if (!finalDestValid) newErrors.destination = "Select valid city.";
+    if (!finalDest.trim()) newErrors.destination = "Required";
+    else if (!finalDestValid) newErrors.destination = "Invalid city";
 
     if (finalSourceValid && finalDestValid && finalSource.toLowerCase().trim() === finalDest.toLowerCase().trim()) {
-      newErrors.destination = "Cannot be same as source.";
+      newErrors.destination = "Must differ from origin";
     }
 
-    if (!dates.start) newErrors.start = "Required.";
-    if (!dates.end) newErrors.end = "Required.";
+    if (!dates.start) newErrors.start = "Required";
+    if (!dates.end) newErrors.end = "Required";
 
     if (dates.start && dates.end) {
       const startDate = new Date(dates.start + "T12:00:00");
@@ -158,11 +177,11 @@ export default function SearchBar({
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      if (startDate < today) newErrors.start = "Cannot be in past.";
-      if (startDate >= endDate) newErrors.end = "Must be after start.";
+      if (startDate < today) newErrors.start = "Past date";
+      if (startDate >= endDate) newErrors.end = "Must be after start";
       else {
         const diffDays = Math.ceil(Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (diffDays > 30) newErrors.end = "Max 30 days.";
+        if (diffDays > 30) newErrors.end = "Max 30 days";
       }
     }
 
@@ -184,11 +203,11 @@ export default function SearchBar({
     refreshTrending();
 
     if (!srcCoords) {
-      setErrors({ source: "Could not find coordinates." });
+      setErrors({ source: "Coordinates not found" });
       return;
     }
     if (!dstCoords) {
-      setErrors({ destination: "Could not find coordinates." });
+      setErrors({ destination: "Coordinates not found" });
       return;
     }
 
@@ -212,10 +231,6 @@ export default function SearchBar({
   };
 
   const isWorking = loading || isGeocoding;
-  const nightCount = dates.start && dates.end
-    ? Math.max(0, Math.ceil((new Date(dates.end).getTime() - new Date(dates.start).getTime()) / 86400000))
-    : 0;
-
   const formatDate = (date: Date) => {
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60 * 1000);
@@ -223,266 +238,421 @@ export default function SearchBar({
   };
 
   const minEndDate = dates.start ? new Date(new Date(dates.start + "T12:00:00").getTime() + 86400000) : new Date();
+  const totalTravellers = adults + children;
 
-  const renderFullSearchContent = () => (
-    <div className={`w-full bg-theme-text font-sans text-theme-bg shadow-xl z-30 ${isCompact ? 'rounded-3xl overflow-hidden' : 'border-b border-theme-secondary/20'}`}>
-      <div className={`px-6 md:px-6 lg:px-8 max-w-[1400px] mx-auto flex flex-col py-6 md:py-8 gap-5 md:gap-6`}>
-        {/* ROW 1: Core Inputs */}
-        <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 lg:items-end relative z-10">
-          <div className="w-full lg:flex-[1.2] relative">
-            <SbLabel>Source</SbLabel>
-            <LocationAutocomplete
-              id="source-input"
-              placeholder="eg. NEW YORK, NY"
-              value={source}
-              onChange={(val, isValid) => {
-                setSource(val); setSourceValid(isValid);
-                if (errors.source) setErrors((prev) => ({ ...prev, source: "" }));
-              }}
-              isDark={false}
-              showGPS={true}
-            />
-            {errors.source && <span className="absolute -bottom-5 left-1 text-red-400 text-[11px] font-bold">{errors.source}</span>}
-          </div>
+const renderFullSearchContent = () => (
+    <div className="relative w-full z-30 flex flex-col items-center justify-center">
+      
+      {/* COMPACT MODAL CLOSE BUTTON (INSIDE THE SEARCHBAR) */}
+      {isCompact && (
+        <button 
+          onClick={() => setIsOverlayOpen(false)}
+          className="absolute top-4 right-4 md:top-6 md:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-theme-bg/10 border border-theme-bg/20 text-theme-bg rounded-full flex items-center justify-center hover:bg-theme-bg/20 transition-all z-[100] active:scale-90 backdrop-blur-md cursor-pointer"
+        >
+          <X size={20} />
+        </button>
+      )}
 
-          <div className="w-full lg:flex-[1.2] relative">
-            <SbLabel>Destination</SbLabel>
-            <LocationAutocomplete
-              placeholder="eg. LOS ANGELES, CA"
-              value={destination}
-              onChange={(val, isValid) => {
-                setDestination(val); setDestValid(isValid);
-                if (errors.destination) setErrors((prev) => ({ ...prev, destination: "" }));
-              }}
-              isDark={false}
-              showGPS={false}
-            />
-            {errors.destination && <span id="destination_error" className="absolute -bottom-5 left-1 text-red-400 text-[11px] font-bold">{errors.destination}</span>}
-          </div>
+      {/* BACKGROUND: h-full and rounded if compact, otherwise standard 60% height */}
+      <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-text to-theme-text/95 shadow-inner ${isCompact ? 'h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
 
-          <div className="w-full lg:flex-[1.5] relative">
-            <SbLabel>
-              Travel Dates {nightCount > 0 && <span className="font-normal text-theme-bg/60 text-[11px] ml-1">· {nightCount} night{nightCount !== 1 ? "s" : ""}</span>}
-            </SbLabel>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <DatePicker
-                  selected={dates.start ? new Date(dates.start + "T12:00:00") : null}
-                  onChange={(date: Date | null): void => {
-                    if (!date) return;
-                    const formatted: string = formatDate(date);
-                    setDates((d) => ({ ...d, start: formatted }));
-                    if (errors.start) setErrors((prev) => ({ ...prev, start: "" }));
-                    if (dates.end && date >= new Date(dates.end + "T12:00:00")) {
-                      setDates((d) => ({ ...d, start: formatted, end: "" }));
-                    }
-                  }}
-                  minDate={new Date()}
-                  placeholderText="Start Date"
-                  popperPlacement="bottom-start"
-                  className={`w-full h-[52px] pl-10 pr-3 bg-theme-bg border-[1.5px] ${errors.start ? "border-red-500" : "border-theme-secondary/30"} rounded-xl font-semibold text-[14px] text-theme-text focus:border-theme-primary focus:ring-1 focus:ring-theme-primary outline-none shadow-sm`}
-                />
-                <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-secondary pointer-events-none" />
-              </div>
-              <div className="flex-1 relative">
-                <DatePicker
-                  selected={dates.end ? new Date(dates.end + "T12:00:00") : null}
-                  onChange={(date: Date | null) => {
-                    if (!date) return;
-                    setDates((d) => ({ ...d, end: formatDate(date) }));
-                    if (errors.end) setErrors((prev) => ({ ...prev, end: "" }));
-                  }}
-                  minDate={minEndDate}
-                  placeholderText="End Date"
-                  popperPlacement="bottom-end"
-                  className={`w-full h-[52px] pl-10 pr-3 bg-theme-bg border-[1.5px] ${errors.end ? "border-red-500" : "border-theme-secondary/30"} rounded-xl font-semibold text-[14px] text-theme-text focus:border-theme-primary focus:ring-1 focus:ring-theme-primary outline-none shadow-sm`}
-                />
-                <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-secondary pointer-events-none" />
-              </div>
-            </div>
-            {(errors.start || errors.end) && (
-              <span className="absolute -bottom-5 left-1 text-red-400 text-[11px] font-bold">{errors.start || errors.end}</span>
-            )}
-          </div>
+      {/* --- DOTTED/SPOTTED BACKGROUND TEXTURE --- */}
+      <div 
+        className={`absolute inset-0 z-0 pointer-events-none opacity-[0.1] ${isCompact ? 'rounded-[2.5rem] overflow-hidden' : ''}`} 
+        style={{ 
+          backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 1.5px)',
+          backgroundSize: '24px 24px',
+          color: '#94a3b8' 
+        }} 
+      />
 
-          <div className="w-full lg:w-[160px] flex mt-4 lg:mt-0">
-            {!isWorking ? (
-              <button
-                id="submit-side"
-                className="w-full h-[52px] rounded-xl bg-theme-primary text-theme-bg text-[15px] font-black tracking-wider flex items-center justify-center gap-2 hover:bg-theme-primary/90 transition-all shadow-md active:scale-95"
-                onClick={handleSearchSubmit}
-              >
-                <Search size={18} /> SEARCH
-              </button>
-            ) : (
-              <div className="w-full h-[52px] rounded-xl bg-theme-text border border-theme-secondary/40 text-theme-bg/80 font-black flex items-center justify-center gap-2 shadow-inner">
-                <Loader2 size={18} className="animate-spin text-theme-muted" />
-                <span className="text-xs tracking-widest uppercase">Working...</span>
-              </div>
-            )}
+      {/* FOREGROUND COMPONENT */}
+      <div className={`relative z-10 max-w-full mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 w-full ${isCompact ? 'pt-8 lg:pt-8' : ''}`}>
+        
+        {/* Travel Mode Pills */}
+        <div className="mb-4 flex">
+          <div className="flex bg-theme-text/20 p-1 rounded-full border border-theme-bg/10 backdrop-blur-md shadow-sm">
+            <button 
+              onClick={() => setTravelMode("fly")}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-bg shadow-sm text-theme-text" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+            >
+              <Plane size={16} /> Flights
+            </button>
+            <button 
+              onClick={() => setTravelMode("drive")}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-bg shadow-sm text-theme-text" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+            >
+              <Car size={16} /> Drive
+            </button>
           </div>
         </div>
 
-        {/* ROW 2: Secondary Options */}
-        <div className="flex flex-col xl:flex-row justify-between gap-5 pt-4 border-t border-theme-secondary/20 relative z-0">
-          <div className="flex flex-wrap gap-5 lg:gap-8 items-center">
-            <div className="flex gap-4">
-              <div>
-                <SbLabel>Adults</SbLabel>
-                <SbCounter value={adults} min={1} max={9} onChange={setAdults} />
+        {/* MAIN WHITE CONTAINER */}
+        <div className="bg-theme-bg rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
+          
+          {/* MAIN INPUT ROW: Labels are completely outside the input borders now */}
+          <div className="flex flex-col lg:flex-row w-full gap-4 lg:gap-3 overflow-visible relative z-20">
+            
+            {/* 1. Location Block Container */}
+            <div className="flex flex-col flex-[1.2] w-full">
+              {/* LABELS OUTSIDE */}
+              <div className="flex w-full px-2 lg:px-4 mb-1.5">
+                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60">From?</label>
+                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60 pl-4 lg:pl-8">To?</label>
               </div>
-              <div>
-                <SbLabel>Children</SbLabel>
-                <SbCounter value={children} min={0} max={9} onChange={setChildren} />
-              </div>
-            </div>
 
-            <div className="w-[190px]">
-              <SbLabel>Budget Category</SbLabel>
-              <div className="flex bg-theme-bg rounded-xl p-[4px] shadow-inner gap-1 border border-theme-surface">
-                {(["budget", "Premium"] as const).map((opt) => (
-                  <button key={opt} onClick={() => setBudget(opt)} className={`flex-1 py-2 rounded-lg text-xs transition-all ${budget === opt ? "bg-theme-primary font-black tracking-wider text-theme-bg shadow-sm" : "bg-transparent font-bold text-theme-text/70 hover:text-theme-text hover:bg-theme-secondary/5"}`}>
-                    {opt === "budget" ? "💰 Budget" : "✨ Premium"}
-                  </button>
-                ))}
-              </div>
-            </div>
+              {/* CONNECTED BORDER PILL */}
+              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
+                
+                {/* Origin */}
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
+                  <LocationAutocomplete
+                    id="source-input"
+                    placeholder="Origin City"
+                    value={source}
+                    onChange={(val, isValid) => {
+                      setSource(val); setSourceValid(isValid);
+                      if (errors.source) setErrors((prev) => ({ ...prev, source: "" }));
+                    }}
+                    isDark={false}
+                    showGPS={true}
+                  />
+                  {errors.source && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.source}</span>}
+                </div>
 
-            <div className="w-[170px]">
-              <SbLabel>Travel Mode</SbLabel>
-              <div className="flex bg-theme-bg rounded-xl p-[4px] shadow-inner gap-1 border border-theme-surface">
-                {(["fly", "drive"] as const).map((opt) => (
-                  <button key={opt} onClick={() => setTravelMode(opt)} className={`flex-1 py-2 rounded-lg text-xs transition-all ${travelMode === opt ? "bg-theme-primary font-black tracking-wider text-theme-bg shadow-sm" : "bg-transparent font-bold text-theme-text/70 hover:text-theme-text hover:bg-theme-secondary/5"}`}>
-                    {opt === "fly" ? "✈️ Fly" : "🚗 Drive"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="w-full sm:w-[220px]">
-              <SbLabel>Search Radius <span className="font-bold text-theme-bg/60 ml-1">({radius} mi)</span></SbLabel>
-              <input
-                type="range" min={1} max={25} step={1} value={radius}
-                onChange={(e) => setRadius(parseInt(e.target.value))}
-                className="w-full cursor-pointer mt-3 accent-theme-primary h-2 bg-theme-bg rounded-lg appearance-none shadow-inner"
-              />
-            </div>
-          </div>
-
-          {topDestinations.length > 0 && (
-            <div className="hidden xl:flex items-center gap-3 max-w-[450px]">
-              <div className="text-[11px] font-black tracking-[0.1em] uppercase text-theme-bg/60 whitespace-nowrap flex items-center gap-1.5">
-                <TrendingUp size={16} className="text-theme-primary" /> Trending:
-              </div>
-              <div className="flex flex-wrap gap-2.5 overflow-hidden max-h-[36px]">
-                {topDestinations.slice(0, 3).map((dest, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setDestination(dest.full_name); setDestValid(true);
+                {/* Destination */}
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
+                  <LocationAutocomplete
+                    placeholder="Destination City"
+                    value={destination}
+                    onChange={(val, isValid) => {
+                      setDestination(val); setDestValid(isValid);
                       if (errors.destination) setErrors((prev) => ({ ...prev, destination: "" }));
                     }}
-                    className="px-3 py-2 rounded-lg border border-theme-secondary/30 bg-theme-secondary/10 text-theme-bg text-[11px] font-black hover:bg-theme-primary hover:text-theme-bg transition-all whitespace-nowrap shadow-sm hover:shadow active:scale-95 uppercase tracking-wider"
-                  >
-                    {dest.city}{dest.state ? `, ${stateAbbreviations[dest.state] || dest.state}` : ""}
-                  </button>
-                ))}
+                    isDark={false}
+                    showGPS={false}
+                  />
+                  {errors.destination && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.destination}</span>}
+                </div>
               </div>
             </div>
-          )}
+
+            {/* 2. Dates Block Container */}
+            <div className="flex flex-col flex-[1] w-full relative z-10">
+              {/* LABELS OUTSIDE */}
+              <div className="flex w-full px-2 lg:px-4 mb-1.5">
+                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60">Depart</label>
+                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60 pl-2 lg:pl-4">Return</label>
+              </div>
+
+              {/* CONNECTED BORDER PILL */}
+              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm">
+                
+                {/* Depart */}
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
+                  <Calendar size={14} className="text-theme-primary/80 shrink-0 mr-1.5" />
+                  <DatePicker
+                    selected={dates.start ? new Date(dates.start + "T12:00:00") : null}
+                    onChange={(date: Date | null): void => {
+                      if (!date) return;
+                      const formatted = formatDate(date);
+                      setDates((d) => ({ ...d, start: formatted }));
+                      if (errors.start) setErrors((prev) => ({ ...prev, start: "" }));
+                      if (dates.end && date >= new Date(dates.end + "T12:00:00")) {
+                        setDates((d) => ({ ...d, start: formatted, end: "" }));
+                      }
+                    }}
+                    minDate={new Date()}
+                    placeholderText="Add date"
+                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-text outline-none border-none cursor-pointer placeholder-theme-text/40"
+                  />
+                  {errors.start && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.start}</span>}
+                </div>
+
+                {/* Return */}
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-full hover:bg-theme-secondary/5 transition-colors">
+                  <Calendar size={14} className="text-theme-primary/80 shrink-0 mr-1.5" />
+                  <DatePicker
+                    selected={dates.end ? new Date(dates.end + "T12:00:00") : null}
+                    onChange={(date: Date | null) => {
+                      if (!date) return;
+                      setDates((d) => ({ ...d, end: formatDate(date) }));
+                      if (errors.end) setErrors((prev) => ({ ...prev, end: "" }));
+                    }}
+                    minDate={minEndDate}
+                    placeholderText="Add date"
+                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-text outline-none border-none cursor-pointer placeholder-theme-text/40"
+                  />
+                  {errors.end && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.end}</span>}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Search Button Component */}
+            <div className="flex flex-col justify-end mt-2 lg:mt-0 lg:flex-shrink-0 relative z-10">
+              <div className="hidden lg:block h-[18px] mb-1.5"></div> {/* Spacer aligns button with inputs */}
+              {!isWorking ? (
+                <button
+                  className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary text-theme-bg text-[16px] font-black tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all px-8 shadow-lg active:scale-95 border-none"
+                  onClick={handleSearchSubmit}
+                >
+                  <Search size={18} strokeWidth={3} /> Search
+                </button>
+              ) : (
+                <div className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary/80 text-theme-bg/80 font-black flex items-center justify-center gap-2 px-8 shadow-inner cursor-not-allowed border-none">
+                  <Loader2 size={20} className="animate-spin text-theme-bg" />
+                </div>
+              )}
+            </div>
+            
+          </div>
+          
+          {/* BOTTOM ROW: Modifiers (Single line on Mobile) & Trending */}
+          <div className="flex flex-col md:flex-row items-start lg:items-center justify-between gap-3 mt-1 px-1 relative z-50">
+            
+            {/* Buttons: Flexible Row on Mobile */}
+            <div className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-between sm:justify-start gap-1 sm:gap-2 w-full xl:w-auto overflow-visible relative z-50">
+              
+              {/* Traveller Dropdown */}
+              <div className="relative z-50 shrink-0" ref={travellerRef}>
+                <button 
+                  onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}
+                  className="flex items-center gap-1.5 sm:gap-2 font-bold text-[12px] sm:text-[13px] text-theme-text hover:text-theme-primary transition-colors py-1 px-1.5 sm:px-2 rounded-lg hover:bg-theme-secondary/10 whitespace-nowrap"
+                >
+                  <Users size={16} className="text-theme-primary/80 shrink-0" />
+                  <span>{totalTravellers} <span>Guest{totalTravellers !== 1 ? 's' : ''}</span></span>
+                  <ChevronDown size={14} className="text-theme-text/60 shrink-0" />
+                </button>
+                
+                {/* POPUP MENU */}
+                {showTravellerDropdown && (
+                  <div className="relative top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-bg text-theme-text rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="flex items-center justify-between mb-5">
+                      <div>
+                        <div className="font-bold text-[15px]">Adults</div>
+                        <div className="text-[11px] text-theme-muted uppercase tracking-wider">Ages 12+</div>
+                      </div>
+                      <SbCounter value={adults} min={1} max={9} onChange={setAdults} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-[15px]">Children</div>
+                        <div className="text-[11px] text-theme-muted uppercase tracking-wider">Ages 0-11</div>
+                      </div>
+                      <SbCounter value={children} min={0} max={9} onChange={setChildren} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Budget Dropdown */}
+              <div className="relative group cursor-pointer flex items-center gap-1 sm:gap-1.5 py-1 px-1.5 sm:px-2 rounded-lg hover:bg-theme-secondary/10 transition-colors whitespace-nowrap shrink-0">
+                <span className="text-base sm:text-lg">{budget === 'budget' ? '💰' : '✨'}</span>
+                <select 
+                  value={budget} 
+                  onChange={(e) => setBudget(e.target.value as "budget" | "Premium")}
+                  className="appearance-none bg-transparent font-bold text-[12px] sm:text-[13px] text-theme-text cursor-pointer outline-none pr-4 sm:pr-5 hover:text-theme-primary transition-colors border-none"
+                >
+                  <option value="budget">Budget</option>
+                  <option value="Premium">Premium</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-text/60" />
+              </div>
+
+              {/* Sleek Radius Input */}
+              <div className="flex items-center gap-1 sm:gap-2 py-1 px-1 sm:px-2 whitespace-nowrap shrink-0 ml-auto sm:ml-0">
+                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-text/50 hidden sm:inline">Radius:</span>
+                 <span className="text-[10px] font-black uppercase tracking-wider text-theme-text/50 sm:hidden">Rad:</span>
+                 <input
+                    type="number"
+                    min={1} 
+                    max={100}
+                    value={radius}
+                    onChange={(e) => setRadius(parseInt(e.target.value) || 1)}
+                    className="w-[42px] sm:w-[52px] bg-theme-secondary/5 border border-theme-secondary/20 rounded-md px-1 py-1 text-[12px] sm:text-[13px] font-bold text-theme-text outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all text-center hide-arrows"
+                  />
+                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-text/50">mi</span>
+              </div>
+            </div>
+
+            {/* Trending Context: Sticky Icon + Scrollable Places List */}
+            {topDestinations.length > 0 && (
+              <div className="flex flex-row items-center w-full xl:w-auto relative z-10 py-1">
+                {/* Sticky Label */}
+                <div className="flex items-center gap-1.5 shrink-0 pr-3">
+                   <TrendingUp size={16} className="text-theme-primary" />
+                   <span className="text-[11px] font-black uppercase text-theme-text/60 tracking-wider">Trending:</span>
+                </div>
+                
+                {/* Scrollable Places */}
+                <div className="flex flex-row items-center gap-2 overflow-x-auto no-scrollbar w-full">
+                  {topDestinations.map((dest, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        setDestination(dest.full_name); setDestValid(true);
+                        if (errors.destination) setErrors((prev) => ({ ...prev, destination: "" }));
+                      }}
+                      className="px-4 py-1.5 rounded-full bg-theme-secondary/5 text-theme-text/80 text-[11px] font-bold hover:bg-theme-secondary/10 transition-all whitespace-nowrap border border-theme-secondary/10 shadow-sm shrink-0"
+                    >
+                      {dest.city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
+      
+      {/* Utility CSS for Number Inputs and hiding scrollbars on mobile */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-arrows::-webkit-outer-spin-button,
+        .hide-arrows::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .hide-arrows {
+          -moz-appearance: textfield;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
     </div>
   );
 
-  return (
+ return (
     <>
       {/* 1. Summary Bar (Only displays when isCompact is true) */}
       {isCompact && (
-        <div className="w-full bg-theme-bg py-3 px-4 md:px-6 flex items-center justify-center gap-3 border-b border-theme-surface z-20 relative">
-          <button
-            onClick={() => setIsOverlayOpen(true)}
-            className="w-full max-w-5xl bg-theme-surface/20 hover:bg-theme-surface/40 border border-theme-surface rounded-full flex items-center justify-between px-4 md:px-6 py-2.5 transition-all shadow-sm hover:shadow-md cursor-pointer group"
-          >
-            <div className="flex items-center gap-3 md:gap-4 text-theme-text text-xs sm:text-sm font-bold truncate">
-              {/* Origin to Destination */}
-              <div className="flex items-center gap-2 truncate">
-                <span className="truncate">{source || "Origin"}</span>
-                <span className="text-theme-muted shrink-0 text-[10px]">➔</span>
-                <span className="truncate">{destination || "Destination"}</span>
-              </div>
-              {/* Dates */}
-              <span className="text-theme-surface hidden sm:inline shrink-0">|</span>
-              <span className="truncate hidden sm:inline">
-                {dates.start ? `${dates.start} to ${dates.end || '?'}` : "Any Dates"}
-              </span>
-              {/* Adults & Children */}
-              <span className="text-theme-surface hidden md:inline shrink-0">|</span>
-              <span className="truncate hidden md:inline">
-                {adults} Adult{adults > 1 ? 's' : ''}, {children} Child{children !== 1 ? 'ren' : ''}
-              </span>
-              {/* Travel Mode */}
-              <span className="text-theme-surface hidden lg:inline shrink-0">|</span>
-              <span className="truncate hidden lg:inline uppercase tracking-widest text-[10px]">
-                {travelMode === 'fly' ? '✈️ Fly' : '🚗 Drive'}
-              </span>
-              {/* Budget Category */}
-              <span className="text-theme-surface hidden xl:inline shrink-0">|</span>
-              <span className="truncate hidden xl:inline uppercase tracking-widest text-[10px]">
-                {budget === 'budget' ? '💰 Budget' : '✨ Premium'}
-              </span>
-            </div>
-            <div className="bg-theme-primary text-theme-bg rounded-full p-2 shrink-0 shadow-sm transition-transform group-hover:scale-110 ml-4">
-              <PenBoxIcon size={14} strokeWidth={3} />
-            </div>
-          </button>
-
-          {/* Map Toggle Button (Mobile/Tablet only) */}
-          {onMapToggle && (
+        <div className="w-full bg-theme-bg/95 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
+          
+          <div className="flex items-center w-full max-w-[750px] mx-auto justify-center">
+            
+            {/* THE COMPACT PILL */}
             <button
-              onClick={onMapToggle}
-              className="cursor-pointer p-2.5 rounded-full bg-theme-surface/20 text-theme-text border border-theme-surface hover:bg-theme-surface/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
-              aria-label={mapOpen ? "Close map" : "View map"}
+              onClick={() => setIsOverlayOpen(true)}
+              className="w-full bg-theme-bg border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-1.5 sm:p-2 transition-all duration-300 cursor-pointer group"
             >
-              {mapOpen ? <X size={20} className="text-theme-primary" /> : <Map size={20} className="text-theme-primary" />}
-            </button>
-          )}
-        </div>
-      )}
+          {/* MOBILE: Stacked Text Content (Now on the left, taking full width) */}
+              <div className="flex flex-col sm:hidden flex-1 text-left overflow-hidden pl-4 py-1">
+                <span className="font-bold text-[13px] text-theme-text truncate">
+                  {source || 'Anywhere'} {destination ? `to ${destination}` : ''}
+                </span>
+                <div className="flex items-center text-[11px] text-theme-text/60 gap-1 mt-[2px] truncate font-medium">
+                  <span>{dates.start ? `${dates.start}` : 'Any dates'}</span>
+                  <span>•</span>
+                   <span>{dates.end ? `${dates.end}` : 'Any dates'}</span>
+                   <span>•</span>
+                  <span>{adults + children} Guest{adults + children !== 1 ? 's' : ''}</span>
+                  <span>•</span>
+                  <span>{travelMode === 'fly' ? 'Flights' : 'Drive'}</span>
+                </div>
+              </div>
 
-      {/* 2. Blurred Overlay */}
-      {isCompact && isOverlayOpen && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-30 md:pt-30 px-4 bg-theme-bg/60 backdrop-blur-md">
-          <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
-          <div className="relative w-full max-w-6xl animate-in fade-in zoom-in-95 duration-200">
-            <button 
-              onClick={() => setIsOverlayOpen(false)}
-              className="absolute -top-14 right-0 md:-right-4 w-10 h-10 bg-theme-text text-theme-bg rounded-full flex items-center justify-center font-bold text-xl hover:bg-theme-secondary transition-colors shadow-lg z-[101]"
-            >
-              ✕
+              {/* MOBILE: Right Edit Icon */}
+              <div className="sm:hidden bg-theme-primary text-theme-bg p-2 rounded-full shadow-sm mr-1 shrink-0">
+                <PenBoxIcon size={16} strokeWidth={2.5} />
+              </div>
+
+              {/* DESKTOP: Segmented Content */}
+              <div className="hidden sm:flex items-center justify-between flex-1 pl-2 pr-1">
+                <div className="flex items-center flex-1">
+                  
+                  {/* Location Segment */}
+                  <div className="font-bold text-[14px] text-theme-text px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[200px] lg:max-w-[320px]">
+                    {source || 'Anywhere'} {destination ? `→ ${destination}` : ''}
+                  </div>
+                  
+                  <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
+                  
+                  {/* Dates Segment */}
+                  <div className="font-medium text-[13px] text-theme-text/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
+                    {dates.start ? `${dates.start} - ${dates.end || '?'}` : 'Any week'}
+                  </div>
+
+                  <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
+                  
+                  {/* Guests Segment */}
+                  <div className="font-medium text-[13px] text-theme-text/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
+                    {adults + children} Guest{adults + children !== 1 ? 's' : ''}
+                  </div>
+
+                  <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
+
+                  {/* Mode Indicator */}
+                  <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-[10px] text-theme-primary font-black bg-theme-primary/10 px-2 py-1 rounded-md shrink-0">
+                    {travelMode === 'fly' ? <Plane size={12}/> : <Car size={12}/>}
+                    {travelMode === 'fly' ? 'Flights' : 'Drive'}
+                  </div>
+
+                </div>
+                
+                {/* DESKTOP: Right Edit Button */}
+                <div className="bg-theme-primary text-theme-bg p-2.5 rounded-full shadow-sm group-hover:scale-105 transition-transform ml-2 shrink-0">
+                  <PenBoxIcon size={16} strokeWidth={3} />
+                </div>
+              </div>
             </button>
-            {renderFullSearchContent()}
+
+            {/* Mobile Map Toggle */}
+            {onMapToggle && (
+              <button
+                onClick={onMapToggle}
+                className="ml-3 p-3 rounded-full bg-theme-bg text-theme-text border border-theme-secondary/30 hover:bg-theme-secondary/10 hover:border-theme-primary/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
+              >
+                {mapOpen ? <X size={18} className="text-theme-primary" /> : <Map size={18} className="text-theme-primary" />}
+              </button>
+            )}
+
           </div>
         </div>
       )}
 
-      {/* 3. Standard Inline View */}
+      {/* 2. Blurred Overlay Modal (Opens when pill is clicked) */}
+      {isCompact && isOverlayOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 px-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
+          <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
+          
+          <div className="relative w-full max-w-6xl animate-in slide-in-from-top-4 fade-in duration-200 z-50">
+            {/* The Expanded Searchbar - overflow-visible fixes the clipping issue! */}
+            <div className="bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
+              {renderFullSearchContent()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Standard Inline View (When isCompact is false) */}
       {!isCompact && renderFullSearchContent()}
     </>
   );
 }
 
-function SbLabel({ children }: { children: React.ReactNode }) {
-  return <div className="text-[11px] font-black tracking-[0.1em] uppercase text-theme-bg/80 mb-1.5 ml-1">{children}</div>;
-}
-
+// Modernized Counter for the Popover
 function SbCounter({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void; }) {
   return (
-    <div className="flex items-center justify-between px-1 bg-theme-bg rounded-xl border border-theme-surface h-[44px] min-w-[100px] shadow-inner">
-      <button type="button" className="w-8 h-8 rounded-lg bg-theme-surface text-theme-text hover:bg-theme-secondary/20 flex items-center justify-center font-bold text-lg active:scale-95 transition-all" onClick={() => onChange(Math.max(min, value - 1))}>−</button>
-      <span className="font-black text-[15px] text-theme-text text-center w-8">{value}</span>
-      <button type="button" className="w-8 h-8 rounded-lg bg-theme-surface text-theme-text hover:bg-theme-secondary/20 flex items-center justify-center font-bold text-lg active:scale-95 transition-all" onClick={() => onChange(Math.min(max, value + 1))}>+</button>
+    <div className="flex items-center gap-3 bg-theme-secondary/5 rounded-full p-1 border border-theme-secondary/20">
+      <button 
+        type="button" 
+        className="w-8 h-8 rounded-full bg-theme-bg shadow-sm text-theme-text hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+      >−</button>
+      <span className="font-black text-[15px] text-theme-text text-center w-4">{value}</span>
+      <button 
+        type="button" 
+        className="w-8 h-8 rounded-full bg-theme-bg shadow-sm text-theme-text hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={value >= max}
+      >+</button>
     </div>
   );
 }

@@ -11,8 +11,26 @@ if (!API_BASE_URL) {
   console.error("🚨 NEXT_PUBLIC_API_URL is missing! Please check your frontend/.env.frontend file.");
 }
 
-// --- NEW TYPESCRIPT INTERFACES ALIGNED WITH BACKEND SCHEMAS ---
+// --- AXIOS INTERCEPTOR TO HANDLE 401s GLOBALLY ---
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('email');
+        // Optional: redirect to login
+        window.location.href = '/auth'; 
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
+// --- API SERVICE OBJECT ---
 export interface UserCreatePayload {
   email: string;
   password: string;
@@ -281,7 +299,7 @@ requestAccountDeletion: async () => {
   },
 
   getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
-  
+
   getFlights: async (params: TripSearchParams, signal?: AbortSignal): Promise<FlightOffer[]> => {
     try {
       let originIata = params.source.iata;
