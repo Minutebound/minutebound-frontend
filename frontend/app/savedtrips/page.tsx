@@ -21,12 +21,20 @@ import {
   Globe,
   Loader2,
   CheckCircle2,
+  Droplet,
+  ArrowBigDown,
+  LucideArrowDownAz,
+  ArrowDown,
+  Delete,
+  DeleteIcon,
+  LucideDelete,
+  Trash,
 } from "lucide-react";
 
 interface SavedTrip {
   id: string; // Updated to string because UUID from new backend
   destination: string;
-  visibility: "PRIVATE" | "SHARED" | "PUBLIC";
+  visibility: "PRIVATE" | "PUBLIC";
   share_token?: string | null;
   data: {
     check_in_date?: string;
@@ -95,7 +103,7 @@ export default function SavedTripsPage() {
   // --- NEW: VISIBILITY & SHARING HANDLERS ---
   const handleVisibilityChange = async (
     tripId: string,
-    visibility: "PRIVATE" | "SHARED" | "PUBLIC"
+    visibility: "PRIVATE" | "PUBLIC"
   ) => {
     try {
       const updated = await travelApi.updateItineraryVisibility(
@@ -246,7 +254,7 @@ export default function SavedTripsPage() {
               My Saved Itineraries
             </h1>
             <p className="text-theme-text/70 font-medium mt-1">
-              You have {savedTrips.length} stored trips.
+              You have {savedTrips.length} saved trip{savedTrips.length !== 1 && "s"}. You can view, share, or delete itineraries here.
             </p>
           </div>
           <Link
@@ -282,7 +290,7 @@ export default function SavedTripsPage() {
                 className="bg-theme-surface rounded-2xl shadow-sm border border-theme-muted/30 overflow-hidden hover:shadow-md transition flex flex-col relative"
               >
                 {/* Visibility Badge/Dropdown overlay */}
-                <div className="absolute top-4 right-4 z-10 flex items-center bg-theme-bg/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
+                <button className="absolute top-4 right-4 z-10 flex items-center bg-theme-bg/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
                   {trip.visibility === "PRIVATE" ? (
                     <Lock size={12} className="text-theme-muted mr-1" />
                   ) : (
@@ -296,10 +304,10 @@ export default function SavedTripsPage() {
                     className="bg-transparent text-[10px] font-bold tracking-wider uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-text"
                   >
                     <option value="PRIVATE">Private</option>
-                    <option value="SHARED">Shared</option>
                     <option value="PUBLIC">Public</option>
                   </select>
-                </div>
+            
+                </button>
 
                 <div className="p-6 flex-grow mt-4">
                   <div className="flex justify-between items-start mb-2 pr-24">
@@ -388,7 +396,7 @@ export default function SavedTripsPage() {
                       onClick={() => handleDelete(trip.id)}
                       className="flex-1 flex justify-center items-center bg-theme-surface border border-red-200 text-red-500 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition"
                     >
-                      <X size={18} />
+                      <Trash size={18} />
                     </button>
                   </div>
                 </div>

@@ -22,7 +22,7 @@ interface NavbarProps {
 const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
   <>
     {/* Mobile & Tablet Logo (Icon + Text, Less Wide Smile, Min Height) */}
-    <svg viewBox="0 20 1500 160" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} lg:hidden`}>
+    <svg viewBox="0 20 1600 160" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} lg:hidden`}>
       <defs>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
@@ -36,6 +36,7 @@ const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
       <text x="320" y="150" className="logo-text" textAnchor="start">
         <tspan className="font-bold fill-[#012C23]">Minute</tspan>
         <tspan className="font-bold fill-[#012C23]">Bound</tspan>
+        <tspan className="font-bold fill-[#0E9C4C]">USA</tspan>
       </text>
       <rect x="0" y="0" width="300" height="350" fill="" rx="20" ry="20" transform="rotate(-10 70 140)" />
       <g transform="translate(20,-30) scale(1)">
@@ -62,7 +63,7 @@ const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
     </svg>
 
      {/* Desktop Logo (Icon + Text) */}
-    <svg viewBox="10 20 1300 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} hidden lg:block`}>
+    <svg viewBox="10 20 1600 200" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} hidden lg:block`}>
       <defs>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
@@ -76,16 +77,17 @@ const MinuteboundLogo = ({ className = "" }: { className?: string }) => (
       <text x="350" y="160" className="logo-text" textAnchor="start">
         <tspan className="font-bold fill-[#012C23]">Minute</tspan>
         <tspan className="font-bold fill-[#012C23]">Bound</tspan>
+        <tspan className="font-bold fill-[#0E9C4C]">USA</tspan>
       </text>
       <rect x="0" y="0" width="300" height="300" fill="" rx="20" ry="20" transform="rotate(-10 70 140)" />
       <g transform="translate(10,-30) scale(1.2)">
         <path
           d="M 20 160 C 100 40, 90 40, 120 120"
-          className="fill-[#0E9C4C]"
+          className="fill-[#012C23]"
         />
         <path
           d="M 120 120 C 180 20, 180 20, 200 140"
-          className="fill-[#0E9C4C]"
+          className="fill-[#012C23]"
         />  
       </g>
 
@@ -149,7 +151,7 @@ export default function Navbar({
   return (
     <nav className="sticky top-0 w-full flex-shrink-0 z-[999] bg-theme-bg shadow-sm border-b border-theme-text/10">
       <div 
-        className="w-full lg:w-[90%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-text relative z-[999] transition-all duration-300 h-[60px]"
+        className="w-full lg:w-[85%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-text relative z-[999] transition-all duration-300 h-[60px]"
       >
         {/* LEFT SECTION - Logo */}
         <div className="flex items-center flex-shrink-0 h-full">

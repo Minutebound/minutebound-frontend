@@ -305,7 +305,7 @@ export default function LoginPage() {
                 size={32}
                 strokeWidth={2.5}
               />
-              WanderPlan <span className="text-theme-primary">US</span>
+              MinuteBound<span className="text-theme-primary">US</span>
             </Link>
           </div>
 
@@ -324,7 +324,7 @@ export default function LoginPage() {
                 ? isVerifyMode
                   ? "Enter the code sent to your email address."
                   : isLogin
-                  ? "Enter your details to access your trips."
+                  ? "Enter your details to access your s."
                   : "Start planning your dream vacation today."
                 : "Follow the steps to regain access to your account."}
             </p>

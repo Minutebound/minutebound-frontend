@@ -77,7 +77,7 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
         {data && !loading && (
           <button
             onClick={onOpenItinerary}
-            className="flex items-center gap-2 px-4 py-2 bg-theme-text hover:bg-theme-text/90 text-sm font-bold rounded-xl transition-all shadow-md active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-theme-text hover:bg-theme-text/90 text-theme-bg text-sm font-bold rounded-xl transition-all shadow-md active:scale-95"
           >
             Generate Itinerary
           </button>

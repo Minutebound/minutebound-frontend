@@ -18,7 +18,7 @@ import {
   PlaneTakeoff,
 } from "lucide-react";
 
-interface SharedTrip {
+interface SharedItinerary {
   id: string;
   destination: string;
   data: any;
@@ -29,18 +29,18 @@ export default function SharedItineraryPage() {
   const params = useParams();
   const shareToken = params.share_token as string;
 
-  const [trip, setTrip] = useState<SharedTrip | null>(null);
+  const [trip, setTrip] = useState<SharedItinerary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSharedTrip = async () => {
+    const fetchSharedItinerary = async () => {
       if (!shareToken) return;
       try {
         const data = await travelApi.getSharedItinerary(shareToken);
         setTrip(data);
       } catch (err: any) {
-        console.error("Failed to fetch shared trip:", err);
+        console.error("Failed to fetch shared itinerary:", err);
         setError(
           err.response?.data?.detail ||
             "This itinerary is private, invalid, or no longer exists."
@@ -49,7 +49,7 @@ export default function SharedItineraryPage() {
         setLoading(false);
       }
     };
-    fetchSharedTrip();
+    fetchSharedItinerary();
   }, [shareToken]);
 
   // --- FORMATTING HELPERS ---
@@ -160,15 +160,11 @@ export default function SharedItineraryPage() {
             href="/"
             className="flex items-center gap-2 text-xl font-black text-theme-text hover:opacity-80 transition"
           >
-            <PlaneTakeoff
-              className="text-theme-primary"
-              size={24}
-              strokeWidth={2.5}
-            />
-            WanderPlan <span className="text-theme-primary">US</span>
+
+            MinuteBound<span className="text-theme-primary">US</span>
           </Link>
           <div className="flex items-center gap-2 text-xs font-bold text-theme-secondary bg-theme-secondary/10 px-3 py-1.5 rounded-full border border-theme-secondary/20">
-            <Globe size={14} /> Shared Itinerary
+            <Globe size={14} /> MinuteBound US is in early access.
           </div>
         </div>
       </nav>
@@ -420,7 +416,7 @@ export default function SharedItineraryPage() {
               Want to plan a trip like this?
             </h2>
             <p className="text-white/80 font-medium mb-8 max-w-lg mx-auto">
-              WanderPlan US uses smart technology to build perfect, custom
+              MinuteBound US uses smart technology to build perfect, custom
               itineraries in seconds.
             </p>
             <Link

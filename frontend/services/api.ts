@@ -202,35 +202,35 @@ export const travelApi = {
 
   // --- UPDATED ITINERARY ENDPOINTS ---
 
-  saveTrip: async (tripData: any, visibility: "PRIVATE" | "SHARED" | "PUBLIC" = "PRIVATE") => {
+  saveTrip: async (tripData: any, visibility: "PRIVATE" | "PUBLIC" = "PRIVATE") => {
     // Formats the payload to match the backend ItineraryCreate schema
     const payload = {
       destination: tripData.destination || "My Trip",
       data: tripData,
       visibility: visibility
     };
-    const response = await axios.post(`${API_BASE_URL}/trips/save`, payload, {
+    const response = await axios.post(`${API_BASE_URL}/itineraries/save`, payload, {
       headers: getAuthHeaders()
     });
     return response.data;
   },
 
   getMyTrips: async () => {
-    const response = await axios.get(`${API_BASE_URL}/trips/me`, {
+    const response = await axios.get(`${API_BASE_URL}/itineraries/me`, {
       headers: getAuthHeaders()
     });
     return response.data;
   },
 
   deleteTrip: async (itineraryId: string) => {
-    const response = await axios.delete(`${API_BASE_URL}/trips/${itineraryId}`, {
+    const response = await axios.delete(`${API_BASE_URL}/itineraries/${itineraryId}`, {
       headers: getAuthHeaders()
     });
     return response.data;
   },
 
-  updateItineraryVisibility: async (itineraryId: string, visibility: "PRIVATE" | "SHARED" | "PUBLIC") => {
-    const response = await axios.patch(`${API_BASE_URL}/trips/${itineraryId}/visibility`, 
+  updateItineraryVisibility: async (itineraryId: string, visibility: "PRIVATE" | "PUBLIC") => {
+    const response = await axios.patch(`${API_BASE_URL}/itineraries/${itineraryId}/visibility`, 
       { visibility }, 
       { headers: getAuthHeaders() }
     );
@@ -238,12 +238,12 @@ export const travelApi = {
   },
 
   getSharedItinerary: async (shareToken: string) => {
-    const response = await axios.get(`${API_BASE_URL}/trips/shared/${shareToken}`);
+    const response = await axios.get(`${API_BASE_URL}/itineraries/shared/${shareToken}`);
     return response.data;
   },
 
   shareItineraryEmail: async (itineraryId: string, email: string, message?: string) => {
-    const response = await axios.post(`${API_BASE_URL}/trips/${itineraryId}/share-email`, 
+    const response = await axios.post(`${API_BASE_URL}/itineraries/${itineraryId}/share-email`, 
       { email, message }, 
       { headers: getAuthHeaders() }
     );
@@ -254,7 +254,7 @@ export const travelApi = {
   sharePdf: async (data: any, email: string, signal?: AbortSignal) => {
     try {
       const payload = { ...data, email };
-      const response = await axios.post(`${API_BASE_URL}/trips/share-pdf`, payload, {
+      const response = await axios.post(`${API_BASE_URL}/itineraries/share-pdf`, payload, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -269,7 +269,7 @@ export const travelApi = {
 
   exportPdf: async (data: any, signal?: AbortSignal) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/trips/generate-pdf`, data, {
+      const response = await axios.post(`${API_BASE_URL}/itineraries/generate-pdf`, data, {
         responseType: 'blob', 
         headers: {
           'Content-Type': 'application/json'

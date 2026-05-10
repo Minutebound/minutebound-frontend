@@ -240,6 +240,7 @@ export default function SearchBar({
   const minEndDate = dates.start ? new Date(new Date(dates.start + "T12:00:00").getTime() + 86400000) : new Date();
   const totalTravellers = adults + children;
 
+  //SearchboxContent
 const renderFullSearchContent = () => (
     <div className="relative w-full z-30 flex flex-col items-center justify-center">
       
@@ -267,7 +268,7 @@ const renderFullSearchContent = () => (
       />
 
       {/* FOREGROUND COMPONENT */}
-      <div className={`relative z-10 max-w-full mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 w-full ${isCompact ? 'pt-8 lg:pt-8' : ''}`}>
+      <div className={`relative z-10 max-w-full md:max-w-[90%] lg:max-w-[80%] mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 w-full ${isCompact ? 'pt-8 lg:pt-8' : ''}`}>
         
         {/* Travel Mode Pills */}
         <div className="mb-4 flex">
@@ -288,7 +289,7 @@ const renderFullSearchContent = () => (
         </div>
 
         {/* MAIN WHITE CONTAINER */}
-        <div className="bg-theme-bg rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
+        <div className="bg-theme-bg w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
           
           {/* MAIN INPUT ROW: Labels are completely outside the input borders now */}
           <div className="flex flex-col lg:flex-row w-full gap-4 lg:gap-3 overflow-visible relative z-20">
@@ -305,7 +306,7 @@ const renderFullSearchContent = () => (
               <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
                 
                 {/* Origin */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1.5rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
                   <LocationAutocomplete
                     id="source-input"
                     placeholder="Origin City"
@@ -321,7 +322,7 @@ const renderFullSearchContent = () => (
                 </div>
 
                 {/* Destination */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[2rem] hover:bg-theme-secondary/5 transition-colors">
                   <LocationAutocomplete
                     placeholder="Destination City"
                     value={destination}
@@ -530,18 +531,18 @@ const renderFullSearchContent = () => (
 
  return (
     <>
-      {/* 1. Summary Bar (Only displays when isCompact is true) */}
+ {/* 1. Summary Bar (Only displays when isCompact is true) */}
       {isCompact && (
-        <div className="w-full bg-theme-bg/95 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
+        <div className="w-full bg-theme-bg/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
-          <div className="flex items-center w-full max-w-[750px] mx-auto justify-center">
+          <div className="flex items-center w-full max-w-full lg:max-w-[800px] mx-auto">
             
             {/* THE COMPACT PILL */}
             <button
               onClick={() => setIsOverlayOpen(true)}
               className="w-full bg-theme-bg border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-1.5 sm:p-2 transition-all duration-300 cursor-pointer group"
             >
-          {/* MOBILE: Stacked Text Content (Now on the left, taking full width) */}
+              {/* MOBILE: Stacked Text Content (Now on the left, taking full width) */}
               <div className="flex flex-col sm:hidden flex-1 text-left overflow-hidden pl-4 py-1">
                 <span className="font-bold text-[13px] text-theme-text truncate">
                   {source || 'Anywhere'} {destination ? `to ${destination}` : ''}
@@ -621,9 +622,11 @@ const renderFullSearchContent = () => (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 px-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
           
-          <div className="relative w-full max-w-6xl animate-in slide-in-from-top-4 fade-in duration-200 z-50">
+          {/* UPDATED: w-full for mobile/tablet, lg:w-[80%] for desktop */}
+          <div className="relative w-full lg:w-[80%] animate-in slide-in-from-top-4 fade-in duration-200 z-50">
             {/* The Expanded Searchbar - overflow-visible fixes the clipping issue! */}
-            <div className="bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
+            {/* UPDATED: Changed from w-[100%] to w-full for cleaner syntax */}
+            <div className="w-full bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
               {renderFullSearchContent()}
             </div>
           </div>

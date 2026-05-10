@@ -194,7 +194,7 @@ export default function LocationAutocomplete({
             ${
               !isSearching && query.length === 0 && showGPS
                 ? "pr-10" // Spacing for the GPS button
-                : "pr-10"           // Spacing for the X or Loader
+                : "pr-5"           // Spacing for the X or Loader
             }`}
           placeholder={placeholder}
           value={query}
@@ -226,7 +226,7 @@ export default function LocationAutocomplete({
               setIsOpen(false);
               setResults([]);
             }}
-            className="absolute right-[-10px] p-1 rounded-lg transition-colors text-theme-text/50 hover:text-theme-text hover:bg-theme-secondary/10"
+            className="absolute right-[-8px] p-1 rounded-lg transition-colors text-theme-text/50 hover:text-theme-text hover:bg-theme-secondary/10"
           >
             <X size={16} />
           </button>
@@ -236,7 +236,7 @@ export default function LocationAutocomplete({
             onClick={handleGPS}
             disabled={gpsLoading}
             title="Use current location"
-            className={`absolute right-0 px-1.5 py-1.5 rounded-lg transition-all duration-300 text-[11px] font-black tracking-wider flex items-center gap-1.5
+            className={`absolute right-[-8px] p-1 rounded-lg transition-all duration-300 text-[11px] font-black tracking-wider flex items-center gap-1.5
               ${gpsLoading ? "opacity-60 cursor-not-allowed" : ""}
               bg-theme-secondary/10 hover:bg-theme-secondary text-theme-secondary hover:text-theme-bg border border-transparent hover:border-theme-secondary`}
           >
