@@ -242,7 +242,7 @@ export default function SearchBar({
 
   //SearchboxContent
 const renderFullSearchContent = () => (
-    <div className="relative w-full z-30 flex flex-col items-center justify-center">
+    <div className="relative w-full z-30 flex flex-col items-center justify-center ">
       
       {/* COMPACT MODAL CLOSE BUTTON (INSIDE THE SEARCHBAR) */}
       {isCompact && (
@@ -255,7 +255,7 @@ const renderFullSearchContent = () => (
       )}
 
       {/* BACKGROUND: h-full and rounded if compact, otherwise standard 60% height */}
-      <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-text to-theme-text/95 shadow-inner ${isCompact ? 'h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
+      <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-text to-theme-text/95 shadow-inner ${isCompact ? 'w-full max-w-[100%] h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
 
       {/* --- DOTTED/SPOTTED BACKGROUND TEXTURE --- */}
       <div 
@@ -267,9 +267,8 @@ const renderFullSearchContent = () => (
         }} 
       />
 
-      {/* FOREGROUND COMPONENT */}
-      <div className={`relative z-10 max-w-full md:max-w-[90%] lg:max-w-[80%] mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 w-full ${isCompact ? 'pt-8 lg:pt-8' : ''}`}>
-        
+{/* FOREGROUND COMPONENT */}
+      <div className={`relative z-10 mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 ${isCompact ? 'w-full max-w-[100%] pt-8 lg:pt-8' : 'w-full max-w-full md:max-w-[90%] lg:max-w-[80%]'}`}>        
         {/* Travel Mode Pills */}
         <div className="mb-4 flex">
           <div className="flex bg-theme-text/20 p-1 rounded-full border border-theme-bg/10 backdrop-blur-md shadow-sm">
@@ -535,7 +534,7 @@ const renderFullSearchContent = () => (
       {isCompact && (
         <div className="w-full bg-theme-bg/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
-          <div className="flex items-center w-full max-w-full lg:max-w-[800px] mx-auto">
+          <div className="flex items-center max-w-[800px] lg:max-w-[850px] mx-auto">
             
             {/* THE COMPACT PILL */}
             <button
@@ -622,11 +621,10 @@ const renderFullSearchContent = () => (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 px-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
           
-          {/* UPDATED: w-full for mobile/tablet, lg:w-[80%] for desktop */}
-          <div className="relative w-full lg:w-[80%] animate-in slide-in-from-top-4 fade-in duration-200 z-50">
+          {/* UPDATED: w-full for mobile/tablet, lg:w-[70%] for desktop */}
+          <div className="relative max-w-full lg:max-w-[70%] animate-in slide-in-from-top-4 fade-in duration-200 z-50">
             {/* The Expanded Searchbar - overflow-visible fixes the clipping issue! */}
-            {/* UPDATED: Changed from w-[100%] to w-full for cleaner syntax */}
-            <div className="w-full bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
+            <div className="max-w-full  bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
               {renderFullSearchContent()}
             </div>
           </div>
