@@ -37,7 +37,7 @@ export default function ToursCard({ tours }) {
               <div>
                 <h4 className="font-black text-theme-text text-2xl leading-tight mb-3">{tour.name}</h4>
                 <p className="text-sm text-theme-text/70 line-clamp-3 leading-relaxed font-medium">
-                  {tour.short_description || "Experience the best of the local culture and sights with this guided activity."}
+                  {tour.short_description || "Experience the best of the local culture and sights with this guided tour."}
                 </p>
               </div>
               

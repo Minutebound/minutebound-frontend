@@ -91,12 +91,6 @@ export default function Results() {
         weatherData={tripData?.weather}
       />
 
-      {/* Map props removed from Navbar entirely */}
-      <Navbar
-        onMenuClick={() => setSearchOpen(!searchOpen)}
-        menuOpen={searchOpen}
-      />
-
       <div className="w-full z-[60] flex-shrink-0 relative">
         <SearchBar
           onSearch={handleSearch}

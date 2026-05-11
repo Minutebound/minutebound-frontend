@@ -9,7 +9,6 @@ import {
   XCircle, 
   Clock, 
   RefreshCw, 
-  Activity,
   AlertTriangle,
   Timer,
   Info,
@@ -22,7 +21,8 @@ import {
   Compass,
   Sparkles,
   Database,
-  Monitor
+  Monitor,
+  ActivityIcon
 } from "lucide-react";
 
 interface HealthReport {
@@ -120,7 +120,6 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-theme-bg text-theme-text font-sans">
-      <Navbar onMenuClick={() => setNavOpen(!navOpen)} menuOpen={navOpen} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 sm:px-6 flex flex-col gap-6 animate-in fade-in duration-500">
         
@@ -128,7 +127,7 @@ export default function StatusPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-surface/50 p-5 rounded-2xl border border-theme-muted/20 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-theme-primary/10 rounded-xl text-theme-primary hidden sm:block">
-              <Activity size={28} />
+              <ActivityIcon size={28} />
             </div>
             <div>
               <h1 className="text-2xl font-black">System Status</h1>

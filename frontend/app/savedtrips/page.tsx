@@ -245,8 +245,6 @@ export default function SavedTripsPage() {
 
   return (
     <div className="min-h-screen bg-theme-bg relative pb-20">
-      <Navbar />
-
       <main className="max-w-6xl mx-auto p-8">
         <header className="mb-8 flex justify-between items-end">
           <div>

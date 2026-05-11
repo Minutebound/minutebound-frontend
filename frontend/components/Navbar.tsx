@@ -180,7 +180,7 @@ export default function Navbar({
               >
                 {/* FULL-HEIGHT BUTTON */}
                 <button
-                  className="cursor-pointer flex items-center gap-3 px-4 h-full border-b-[3px] border-transparent hover:border-theme-primary hover:bg-theme-surface/40 transition-colors active:bg-theme-surface/60 text-theme-text"
+                  className="cursor-pointer flex items-center gap-3 px-4 h-full border-b-[3px] border-transparent hover:border-theme-primary transition-colors active:bg-theme-surface/60 text-theme-text"
                 >
                   {/* Profile Picture or Fallback Icon */}
                   {avatarUrl ? (
@@ -191,7 +191,7 @@ export default function Navbar({
                     />
                   ) : (
                     <div className="bg-theme-primary/10 p-1.5 rounded-full">
-                      <UserIcon size={16} className="text-theme-primary" />
+                      <UserIcon size={20} className="text-theme-primary" />
                     </div>
                   )}
 

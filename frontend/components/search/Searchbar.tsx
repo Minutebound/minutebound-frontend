@@ -267,20 +267,20 @@ const renderFullSearchContent = () => (
         }} 
       />
 
-{/* FOREGROUND COMPONENT */}
+    {/* FOREGROUND COMPONENT */}
       <div className={`relative z-10 mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 ${isCompact ? 'w-full max-w-[100%] pt-8 lg:pt-8' : 'w-full max-w-full md:max-w-[90%] lg:max-w-[80%]'}`}>        
         {/* Travel Mode Pills */}
         <div className="mb-4 flex">
           <div className="flex bg-theme-text/20 p-1 rounded-full border border-theme-bg/10 backdrop-blur-md shadow-sm">
             <button 
               onClick={() => setTravelMode("fly")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-bg shadow-sm text-theme-text" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-primary shadow-sm text-theme-bg" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
             >
               <Plane size={16} /> Flights
             </button>
             <button 
               onClick={() => setTravelMode("drive")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-bg shadow-sm text-theme-text" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-primary shadow-sm text-theme-bg" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
             >
               <Car size={16} /> Drive
             </button>
@@ -305,7 +305,7 @@ const renderFullSearchContent = () => (
               <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
                 
                 {/* Origin */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1.5rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
                   <LocationAutocomplete
                     id="source-input"
                     placeholder="Origin City"
@@ -321,7 +321,7 @@ const renderFullSearchContent = () => (
                 </div>
 
                 {/* Destination */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[2rem] hover:bg-theme-secondary/5 transition-colors">
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
                   <LocationAutocomplete
                     placeholder="Destination City"
                     value={destination}
@@ -370,7 +370,7 @@ const renderFullSearchContent = () => (
                 </div>
 
                 {/* Return */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-full hover:bg-theme-secondary/5 transition-colors">
+                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
                   <Calendar size={14} className="text-theme-primary/80 shrink-0 mr-1.5" />
                   <DatePicker
                     selected={dates.end ? new Date(dates.end + "T12:00:00") : null}
@@ -421,13 +421,12 @@ const renderFullSearchContent = () => (
                 >
                   <Users size={16} className="text-theme-primary/80 shrink-0" />
                   <span>{totalTravellers} <span>Guest{totalTravellers !== 1 ? 's' : ''}</span></span>
-                  <ChevronDown size={14} className="text-theme-text/60 shrink-0" />
+                  <ChevronDown size={16} className="text-theme-text/60 shrink-0" />
                 </button>
                 
                 {/* POPUP MENU */}
                 {showTravellerDropdown && (
-                  <div className="relative top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-bg text-theme-text rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">
-                    <div className="flex items-center justify-between mb-5">
+                  <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-bg text-theme-text rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    <div className="flex items-center justify-between mb-5">
                       <div>
                         <div className="font-bold text-[15px]">Adults</div>
                         <div className="text-[11px] text-theme-muted uppercase tracking-wider">Ages 12+</div>
@@ -456,7 +455,7 @@ const renderFullSearchContent = () => (
                   <option value="budget">Budget</option>
                   <option value="Premium">Premium</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-text/60" />
+                <ChevronDown size={16} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-text/60" />
               </div>
 
               {/* Sleek Radius Input */}
@@ -534,7 +533,7 @@ const renderFullSearchContent = () => (
       {isCompact && (
         <div className="w-full bg-theme-bg/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
-          <div className="flex items-center max-w-[800px] lg:max-w-[850px] mx-auto">
+          <div className="flex items-center max-w-[800px] mx-auto">
             
             {/* THE COMPACT PILL */}
             <button

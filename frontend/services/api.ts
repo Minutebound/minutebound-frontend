@@ -40,7 +40,7 @@ export interface UserCreatePayload {
   suffix?: string;
   phone_country_code?: string;
   phone_number?: string;
-  gender?: string; // Added gender
+  gender?: string;
 }
 
 export interface VerifyEmailOTP {
@@ -53,7 +53,7 @@ export interface VerifyPhoneOTP {
   phone_code: string;
 }
 
-export interface Activity {
+export interface Tour {
   id: string;
   name: string;
   short_description?: string;
@@ -149,7 +149,6 @@ export interface WeatherSummary {
   days: WeatherDay[];
 }
 
-// --- EXISTING INTERFACES ---
 
 export interface LocationResult {
   city?: string;
@@ -176,6 +175,7 @@ export interface TripSearchParams {
   interests: string[];
 }
 
+
 export const travelApi = {
   searchLocations: async (keyword: string, lat?: number, lon?: number): Promise<LocationResult[]> => {
     try {
@@ -199,8 +199,6 @@ export const travelApi = {
       return null;
     }
   },
-
-  // --- UPDATED ITINERARY ENDPOINTS ---
 
   saveTrip: async (tripData: any, visibility: "PRIVATE" | "PUBLIC" = "PRIVATE") => {
     // Formats the payload to match the backend ItineraryCreate schema
@@ -358,10 +356,108 @@ export const travelApi = {
     return response.data;
   },
 
-  // --- TRAVEL DATA ENDPOINTS ---
+  //DESTINATIONS
+  getDestinations: async (skip: number = 0, limit: number = 50) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/destinations/`, {
+        params: { skip, limit }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch destinations list:", error);
+      return [];
+    }
+  },
+  
+  getTopDestinations: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/destinations/top?limit=12`);
+      return response.data; 
+    } catch (error) {
+      console.error("Top destinations fetch failed:", error);
+      return []; // Returns empty array to prevent map/carousel crashes
+    }
+  },
 
-  getDestinationData: async (params: any) => ({ lat: params?.destination?.lat, lon: params?.destination?.lon }),
+  searchDestinations: async (params?: { category?: string; query?: string }) => {
+    try {
+      // Prevents sending { category: "All" } which might confuse strict backends
+      const cleanParams = params?.category === 'All' ? {} : params;
+      const response = await axios.get(`${API_BASE_URL}/destinations/search`, { params: cleanParams });
+      return response.data;
+    } catch (error) {
+      console.error("Destination search failed:", error);
+      return [];
+    }
+  },
 
+  getDestinationDetails: async (destinationId: string | number) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/destinations/${destinationId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch details for destination ${destinationId}:`, error);
+      return null;
+    }
+  },
+
+  createDestination: async (destinationData: any) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/destinations/`, destinationData, {
+        headers: getAuthHeaders() // Requires admin/auth privileges
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create destination:", error);
+      throw error;
+    }
+  },
+
+  //EVENTS  
+  getTopEvents: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/events/top?limit=12`);
+      return response.data;
+    } catch (error) {
+      console.error("Top events fetch failed:", error);
+      return [];
+    }
+  },
+
+  searchEvents: async (params?: { category?: string; query?: string }) => {
+    try {
+      const cleanParams = params?.category === 'All' ? {} : params;
+      const response = await axios.get(`${API_BASE_URL}/events/search`, { params: cleanParams });
+      return response.data;
+    } catch (error) {
+      console.error("Events search failed:", error);
+      return [];
+    }
+  },
+
+  getEventDetails: async (eventId: string | number) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/events/${eventId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch details for event ${eventId}:`, error);
+      return null;
+    }
+  },
+
+  createEvent: async (eventData: any) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/events/`, eventData, {
+        headers: getAuthHeaders() // Requires admin/auth privileges
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create event:", error);
+      throw error;
+    }
+  },
+
+  //FLIGHTS
   getFlights: async (params: TripSearchParams, signal?: AbortSignal): Promise<FlightOffer[]> => {
     try {
       let originIata = params.source.iata;
@@ -410,6 +506,7 @@ export const travelApi = {
     }
   },
 
+  //DRIVING
   getDriving: async (params: TripSearchParams, signal?: AbortSignal) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/driving/route`, {
@@ -429,11 +526,12 @@ export const travelApi = {
     }
   },
 
+  //STAYS
   getStays: async (params: TripSearchParams, signal?: AbortSignal): Promise<HotelOffer[]> => {
     try {
       const radiusKm = Math.round(params.radius * 1.60934); 
-      const response = await axios.get(`${API_BASE_URL}/hotels/nearby`, {
-        params: {
+      const response = await axios.get(`${API_BASE_URL}/stays/nearby`, {
+      params: {
           lat: params.destination.lat,
           lon: params.destination.lon,
           check_in_date: params.startDate,
@@ -454,9 +552,9 @@ export const travelApi = {
     }
   },
 
-  getHotelOffer: async (hotelId: string, params: any, signal?: AbortSignal): Promise<HotelOffer | { error: boolean } | null> => {
+  getStayOffer: async (hotelId: string, params: any, signal?: AbortSignal): Promise<HotelOffer | { error: boolean } | null> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/hotels/offer`, {
+      const response = await axios.get(`${API_BASE_URL}/stays/offer`, {
         params: {
           hotel_id: hotelId,
           check_in_date: params.startDate,
@@ -472,6 +570,7 @@ export const travelApi = {
     }
   },
 
+  //WEATHER
   getWeather: async (dest: any, dates: any, signal?: AbortSignal): Promise<WeatherSummary | null> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/weather/forecast`, {
@@ -491,6 +590,7 @@ export const travelApi = {
     }
   },
 
+  //ATTRACTIONS
   getAttractions: async (dest: any, radiusMiles: number, signal?: AbortSignal, retries = 2): Promise<Attraction[]> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/attractions/nearby`, {
@@ -520,9 +620,10 @@ export const travelApi = {
     }
   },
 
-  getTours: async (dest: any, radiusMiles: number, signal?: AbortSignal): Promise<Activity[]> => {
+  //TOURS
+  getTours: async (dest: any, radiusMiles: number, signal?: AbortSignal): Promise<Tour[]> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/activities/nearby`, {
+      const response = await axios.get(`${API_BASE_URL}/tours/nearby`, {
         params: {
           lat: dest.lat,
           lon: dest.lon,
@@ -539,18 +640,4 @@ export const travelApi = {
       return [];
     }
   },
-
-  getTopDestinations: async (signal?: AbortSignal): Promise<any[]> => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/destinations/top`, {
-        signal
-      });
-      const responseData = response.data;
-      return Array.isArray(responseData) ? responseData : (responseData?.data || []);
-    } catch (error) {
-      if (axios.isCancel(error)) return [];
-      console.error("Failed to fetch top destinations:", error);
-      return [];
-    }
-  }
 };

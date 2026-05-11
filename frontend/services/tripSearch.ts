@@ -42,7 +42,7 @@ export async function fetchTripData(params: TripSearchParams) {
         chunk.map((stay: any) => {
           const hId = stay.hotel_id || stay.hotelId || stay.id;
           return travelApi
-            .getHotelOffer(hId, params)
+            .getStayOffer(hId, params)
             .catch(() => ({ unavailable: true }));
         })
       );

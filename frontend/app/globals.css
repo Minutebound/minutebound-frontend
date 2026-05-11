@@ -15,12 +15,13 @@
   --color-theme-primary: #0E9C4C;   
   --color-theme-secondary: #012C23; 
   --color-theme-muted: #8FB87A;     
-  --color-theme-accent: #f9d625;    
+  --color-theme-accent: #E7DED9;    
   --color-theme-bg: #FFFFFF;        
   --color-theme-surface: #FFF9EE;  
   --color-theme-error: #E63946;
   --color-theme-success: #2A9D8F;
   --color-theme-footer: #011c38; 
+  --color-theme-orange: #F97316;
 
   /* FONT MAPPINGS */
   /* This maps the Inter variable to Tailwind's default font-sans utility */

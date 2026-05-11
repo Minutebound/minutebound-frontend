@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans, Ubuntu} from "next/font/google"; // <-- Import all fonts here
+import { Inter, DM_Sans, Ubuntu} from "next/font/google"; 
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import ClientInit from "../components/ClientInIt";
 import Chatbot from "../components/Chatbot";
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 // Configure Inter (Your Default)
@@ -58,7 +59,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ClientInit />
-          
+          <Navbar/>
           <div className="flex-1 flex flex-col min-h-screen">
             {children}
           </div>

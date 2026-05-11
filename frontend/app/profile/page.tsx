@@ -126,7 +126,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-theme-bg relative flex flex-col">
-      <Navbar />
       <ProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

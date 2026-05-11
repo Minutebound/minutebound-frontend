@@ -53,7 +53,6 @@ export default function LoginPage() {
     { value: "PREFER_NOT_TO_SAY", label: "Prefer not to say" },
     { value: "MALE", label: "Male" },
     { value: "FEMALE", label: "Female" },
-    { value: "NON_BINARY", label: "Non-Binary" },
     { value: "OTHER", label: "Other" },
   ];
 
