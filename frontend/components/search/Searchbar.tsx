@@ -533,7 +533,7 @@ const renderFullSearchContent = () => (
       {isCompact && (
         <div className="w-full bg-theme-bg/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
-          <div className="flex items-center max-w-[800px] mx-auto">
+          <div className="flex items-center max-w-[700px] md:max-w-[800px] mx-auto">
             
             {/* THE COMPACT PILL */}
             <button

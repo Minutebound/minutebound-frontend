@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { Sparkles, Plane, Car, BedDouble, Map as MapIcon } from "lucide-react";
 import FlightCard from "./FlightCard";
 import StaysCard from "./StayCard";
 import DrivingCard from "./DriveCard";
@@ -28,7 +29,7 @@ const LoadingState = () => {
           </g>
         </svg>
       </div>
-      <p className="text-theme-muted font-bold uppercase tracking-widest text-xs text-center mt-6">
+      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-theme-text/70 text-center mt-6">
         Curating your journey...
       </p>
     </div>
@@ -52,37 +53,37 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
   const handleTabChange = (tabId: TabOption) => {
     setActiveTab(tabId);
     sessionStorage.setItem("active_tab", tabId);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const transportTab = showFlights && hasFlights
-    ? { id: "flights", label: "Flights", icon: "✈️" }
-    : { id: "drive", label: "Drive", icon: "🚗" };
+    ? { id: "flights", label: "Flights", icon: <Plane size={18} /> }
+    : { id: "drive", label: "Drive", icon: <Car size={18} /> };
 
   const tabs = [
-    { id: "summary", label: "Summary", icon: "✨" },
+    { id: "summary", label: "Summary", icon: <Sparkles size={18} /> },
     transportTab,
-    { id: "stays", label: "Stays", icon: "🏨" },
-    { id: "tours", label: "Tours", icon: "🗺️" },
+    { id: "stays", label: "Stays", icon: <BedDouble size={18} /> },
+    { id: "tours", label: "Tours", icon: <MapIcon size={18} /> },
   ];
 
   return (
-    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* HEADER SECTION */}
-      <div className="flex justify-between items-center mb-4 md:mb-6">
-        <h1 className="text-2xl md:text-3xl font-black text-theme-text tracking-tight">
-          Trip Planner
-        </h1>
+<div className="sticky top-0 z-30 bg-theme-bg/95 backdrop-blur-md pt-4 md:pt-6">      
+  {/* THE HEADER SECTION */}
+  <div className="flex justify-between items-center mb-6">
+    <h1 className="text-2xl md:text-3xl font-black text-theme-text tracking-tight">
+      Trip Planner
+    </h1>
 
-        {data && !loading && (
-          <button
-            onClick={onOpenItinerary}
-            className="flex items-center gap-2 px-4 py-2 bg-theme-text hover:bg-theme-text/90 text-theme-bg text-sm font-bold rounded-xl transition-all shadow-md active:scale-95"
-          >
-            Generate Itinerary
-          </button>
-        )}
-      </div>
+    {data && !loading && (
+      <button
+        onClick={onOpenItinerary}
+        className="flex items-center gap-2 px-5 py-2.5 bg-theme-text hover:bg-theme-text/90 text-theme-bg text-xs font-bold rounded-full transition-all shadow-md active:scale-95"
+      >
+        Generate Itinerary
+      </button>
+    )}
+  </div>
 
       {/* ERROR SECTION */}
       {error && (
@@ -95,30 +96,38 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
       {loading ? (
         <LoadingState />
       ) : !data ? (
-        <div className="flex flex-col items-center justify-center py-24 md:py-32 border-2 border-dashed border-theme-surface bg-theme-bg w-full rounded-2xl shadow-sm">
-          <p className="text-theme-muted font-bold uppercase tracking-widest text-xs text-center px-4">
+        <div className="flex flex-col items-center justify-center py-24 md:py-32 border border-theme-text/10 bg-theme-bg/50 w-full rounded-2xl shadow-sm">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-theme-text/70 text-center px-4">
             Awaiting your search details...
           </p>
         </div>
       ) : (
         <>
-          <div className="sticky top-0 z-20 bg-theme-bg backdrop-blur-sm pt-1 mb-4 border-b border-theme-surface">
-            <div className="flex w-full overflow-x-auto hide-scrollbar">
+          {/* INDUSTRY STANDARD UNDERLINE TABS */}
+          <div className="w-full relative z-20 mb-8 sticky top-0 bg-theme-bg/95 backdrop-blur-md pt-2">
+            <div className="flex flex-row w-full border-b border-theme-secondary/20 overflow-x-auto no-scrollbar gap-6 md:gap-8 px-1 justify-around lg:justify-start">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
+                
                 return (
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id as TabOption)}
-                    className={`flex-1 min-w-[70px] flex flex-col items-center py-3 transition-all relative group`}
+                    className={`relative flex items-center justify-center gap-2 pb-3 pt-2 transition-colors whitespace-nowrap group outline-none
+                      ${isActive ? "text-theme-primary" : "text-theme-text/50 hover:text-theme-text/90"}
+                    `}
                   >
-                    <span className={`text-lg mb-1 group-hover:scale-110 transition-transform ${isActive ? "grayscale-0" : "grayscale opacity-70"}`}>
+                    <span className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
                       {tab.icon}
                     </span>
-                    <span className={`text-[10px] sm:text-xs font-black uppercase tracking-widest ${isActive ? "text-theme-primary" : "text-theme-muted"}`}>
+                    <span className="text-[12px] md:text-[14px] lg:text-[18px] font-bold tracking-wide">
                       {tab.label}
                     </span>
-                    {isActive && <div className="absolute bottom-[-1px] left-0 right-0 h-[3px] bg-theme-primary rounded-t-full" />}
+                    
+                    {/* Bottom active indicator */}
+                    {isActive && (
+                       <div className="absolute bottom-[0px] left-0 right-0 h-[3.5px] bg-theme-primary rounded-t-full" />
+                    )}
                   </button>
                 );
               })}
@@ -126,12 +135,12 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
           </div>
 
           <div className="w-full pb-8">
-            {activeTab === "summary" && <SummaryCard data={data} />}
+          {activeTab === "summary" && (<SummaryCard data={data} onNavigateTab={handleTabChange} />)}
             {activeTab === "flights" && <FlightCard flights={data?.flightData || []} />}
             {activeTab === "drive" && (
               <div className="flex flex-col gap-4">
                 {showFlights && !hasFlights && (
-                  <div className="p-4 bg-theme-muted/20 text-theme-primary rounded-xl border border-theme-muted flex items-center gap-3">
+                  <div className="p-4 bg-theme-bg text-theme-primary rounded-[2rem] border border-theme-primary/20 shadow-sm flex items-center gap-3">
                     <span className="text-xl">ℹ️</span>
                     <p className="text-sm font-medium">We couldn't find any flights, so we're showing you the best driving route instead!</p>
                   </div>
