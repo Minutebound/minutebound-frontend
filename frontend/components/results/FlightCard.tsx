@@ -1,12 +1,27 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
-import { Plane, ArrowRight, Clock, Info, CheckCircle2, ChevronDown } from 'lucide-react';
+import { 
+  Plane, 
+  Clock, 
+  CheckCircle2, 
+  ChevronDown, 
+  ShieldCheck, 
+  Gift, 
+  Wifi, 
+  Zap, 
+  Utensils, 
+  Briefcase,
+  ArrowRight
+} from 'lucide-react';
 
-type SortOption = 'price_asc' | 'price_desc' | 'duration_asc' | 'duration_desc';
+type SortOption = 'price_asc' | 'duration_asc';
 
-export default function FlightCard({ flights, loading }: { flights: any[], loading?: boolean }) {
+export default function FlightCard({ flights, loading, searchParams }: { flights: any[], loading?: boolean, searchParams?: any }) {
   const [sortBy, setSortBy] = useState<SortOption>('price_asc');
   const [selectedFlightKeys, setSelectedFlightKeys] = useState<string[]>([]);
+  const [expandedFlightKey, setExpandedFlightKey] = useState<string | null>(null);
+
+  const travelerCount = (searchParams?.adults || 1) + (searchParams?.children || 0);
 
   useEffect(() => {
     const tripStateStr = localStorage.getItem('trip_state');
@@ -24,7 +39,8 @@ export default function FlightCard({ flights, loading }: { flights: any[], loadi
     }
   }, [flights]);
 
-  const toggleFlightSelection = (flight: any, uniqueKey: string) => {
+  const toggleFlightSelection = (flight: any, uniqueKey: string, e: React.MouseEvent) => {
+    e.stopPropagation(); 
     const tripStateStr = localStorage.getItem('trip_state');
     let tripState = tripStateStr ? JSON.parse(tripStateStr) : {};
     const isSelected = selectedFlightKeys.includes(uniqueKey);
@@ -42,238 +58,220 @@ export default function FlightCard({ flights, loading }: { flights: any[], loadi
     window.dispatchEvent(new Event("trip_state_changed"));
   };
 
-  const formatTime = (timeString: string) => {
-    if (!timeString) return 'TBA';
-    return new Date(timeString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatDate = (timeString: string) => {
-    if (!timeString) return '';
-    return new Date(timeString).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
-  };
-
-  const formatDuration = (durationString?: string) => {
-    if (!durationString) return '';
-    return durationString.toLowerCase().replace('h', 'h ').replace('m', 'm');
-  };
-
-  const getLayoverDuration = (arrivalTime: string, nextDepartureTime: string) => {
-    if (!arrivalTime || !nextDepartureTime) return '';
-    const arr = new Date(arrivalTime).getTime();
-    const dep = new Date(nextDepartureTime).getTime();
-    const diffMins = Math.floor((dep - arr) / (1000 * 60));
-    if (diffMins <= 0) return '';
-    const hours = Math.floor(diffMins / 60);
-    const minutes = diffMins % 60;
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-  };
-
   const getPrice = (f: any) => {
     const rawPrice = f.price?.grandTotal || f.price?.total || f.price || 0;
     if (typeof rawPrice === 'number') return rawPrice;
     return parseFloat(String(rawPrice).replace(/[^\d.-]/g, '')) || 0;
   };
 
-  const getDuration = (f: any) => {
-    if (!f.itineraries) return 0;
-    return f.itineraries.reduce((sum: number, itin: any) => {
-      const cleanStr = (itin.duration || '').toUpperCase().replace('PT', '');
-      let hours = 0, minutes = 0;
-      const hMatch = cleanStr.match(/(\d+)H/);
-      const mMatch = cleanStr.match(/(\d+)M/);
-      if (hMatch) hours = parseInt(hMatch[1], 10);
-      if (mMatch) minutes = parseInt(mMatch[1], 10);
-      return sum + (hours * 60) + minutes;
-    }, 0);
-  };
-
   const sortedFlights = useMemo(() => {
     if (!flights || !Array.isArray(flights)) return [];
     return [...flights].sort((a, b) => {
-      const priceA = getPrice(a);
-      const priceB = getPrice(b);
-      const durA = getDuration(a);
-      const durB = getDuration(b);
-      switch (sortBy) {
-        case 'price_asc': return priceA - priceB;
-        case 'price_desc': return priceB - priceA;
-        case 'duration_asc': return durA - durB;
-        case 'duration_desc': return durB - durA;
-        default: return 0;
-      }
+      if (sortBy === 'price_asc') return getPrice(a) - getPrice(b);
+      return 0;
     });
   }, [flights, sortBy]);
 
-  if (loading) return null; 
-
-  if (!flights || !Array.isArray(flights) || flights.length === 0) {
-    return (
-      <div className="p-12 text-center bg-theme-bg border border-dashed border-theme-secondary/30 rounded-[2rem] text-theme-text/70 animate-in fade-in">
-        <div className="w-16 h-16 bg-theme-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Plane size={32} className="text-theme-text/30" />
-        </div>
-        <h3 className="text-lg font-black text-theme-text uppercase tracking-widest">No flights found</h3>
-        <p className="text-sm font-medium opacity-60">Try adjusting your search dates or locations.</p>
-      </div>
-    );
-  }
-
-  const SortBtn = ({ id, label }: { id: SortOption, label: string }) => {
-    const isActive = sortBy === id;
-    return (
-      <button
-        onClick={() => setSortBy(id)}
-        className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-all border ${
-          isActive ? 'bg-theme-text text-theme-bg border-theme-text shadow-md' : 'bg-theme-bg text-theme-text/60 border-theme-secondary/20 hover:border-theme-primary/40 hover:text-theme-text'
-        }`}
-      >
-        {label}
-      </button>
-    );
-  };
+  if (loading) return null;
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* FILTER/SORT HEADER */}
-      <div className="flex flex-col xl:flex-row justify-between xl:items-center gap-4 bg-theme-secondary/5 p-4 rounded-[1.5rem] border border-theme-secondary/10">
-        <div>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-text/40">Results</span>
-          <p className="text-sm font-bold text-theme-text">
-            {Math.min(flights.length, 12)} of {flights.length} options found
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <SortBtn id="price_asc" label="Lowest Price" />
-          <SortBtn id="duration_asc" label="Shortest" />
-          <SortBtn id="price_desc" label="Premium" />
+    <div className="flex flex-col gap-4 animate-in fade-in duration-500">
+      
+      {/* HEADER */}
+      <div className="flex justify-between items-center px-2">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+          {flights.length} Flight options available
+        </span>
+        
+        <div className="relative group">
+          <button className="flex items-center gap-2 px-4 py-2 bg-theme-light-blue text-theme-secondary rounded-sm text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all">
+            Sort: {sortBy === 'price_asc' ? 'Lowest Price' : 'Fastest'}
+            <ChevronDown size={12} />
+          </button>
+          
+          <div className="absolute right-0 mt-2 w-48 bg-theme-light-blue border border-theme-secondary/20 rounded-sm shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+            <button onClick={() => setSortBy('price_asc')} className="w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-theme-blue/10 text-theme-secondary border-b border-theme-secondary/5">
+              Lowest Price (Average)
+            </button>
+            <button onClick={() => setSortBy('duration_asc')} className="w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-theme-blue/10 text-theme-secondary">
+              Fastest (Average)
+            </button>
+          </div>
         </div>
       </div>
-      
-      {sortedFlights.slice(0, 12).map((flight, flightIndex) => {
+
+      {sortedFlights.map((flight, flightIndex) => {
         const uniqueKey = flight.id ? `${flight.id}-${flightIndex}` : `flight-${flightIndex}`;
         const isSelected = selectedFlightKeys.includes(uniqueKey);
+        const isExpanded = expandedFlightKey === uniqueKey;
 
         return (
           <div 
             key={uniqueKey} 
-            className={`rounded-[2rem] overflow-hidden transition-all duration-300 border-[1.5px] ${
-              isSelected ? 'border-theme-primary bg-theme-primary/[0.02] shadow-xl' : 'border-theme-secondary/20 bg-theme-bg hover:border-theme-primary/40 hover:shadow-lg'
-            }`}
+            onClick={() => setExpandedFlightKey(isExpanded ? null : uniqueKey)}
+            className={`rounded-[1rem] border-[1px] cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? 'border-theme-blue bg-theme-blue/20' : 'border-theme-secondary/10 bg-theme-white hover:border-theme-blue'}`}
           >
-            {/* TOP INFO BAR */}
-            <div className={`px-6 py-5 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${isSelected ? 'bg-theme-primary/5 border-theme-primary/20' : 'bg-transparent border-theme-secondary/10'}`}>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white rounded-2xl border border-theme-secondary/10 flex items-center justify-center p-2 shadow-sm">
-                  <img src={`https://images.kiwi.com/airlines/64/${flight.airline_code}.png`} alt={flight.airline_code} className="w-full h-full object-contain" />
+            {/* MAIN CARD VIEW - MOBILE OPTIMIZED */}
+            <div className="p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8 relative">
+              
+              {/* Airline Branding */}
+              <div className="flex flex-row lg:flex-col items-center gap-3 lg:gap-1 shrink-0 w-full lg:w-auto">
+                <div className="w-16 h-16 bg-white rounded-sm border border-theme-secondary/10 p-1.5 shadow-sm">
+                  <img src={`https://images.kiwi.com/airlines/64/${flight.airline_code}.png`} className="w-full h-full object-contain" alt="airline" />
                 </div>
-                <div>
-                  <h4 className="font-black text-lg text-theme-text leading-tight">{flight.airline_name || flight.airline_code}</h4>
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-theme-primary bg-theme-primary/10 px-2 py-0.5 rounded-md">
-                    {flight.cabin_class}
-                  </span>
+                <span className="font-black text-theme-secondary/60 uppercase">{flight.airline_name || flight.airline_code}</span>
+              </div>
+
+              {/* ROUTE SUMMARY */}
+              <div className="flex-1 w-full space-y-4 lg:space-y-6">
+                {flight.itineraries?.slice(0, 2).map((itin, i) => (
+                  <div key={i} className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex-1 flex items-center gap-2 sm:gap-4">
+                      <div className="text-right min-w-[40px] sm:min-w-[45px]">
+                        <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[0].departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[0].departure_airport}</p>
+                      </div>
+                      
+                      <div className="flex-1 flex flex-col items-center gap-1 px-1 sm:px-2">
+                         <div className="w-6 sm:w-8 text-[10px] align-center font-bold uppercase text-theme-secondary/50">{i === 0 ? 'DEPART' : 'RETURN'}</div>
+                        <div className="w-full h-[2px] bg-theme-secondary/20 relative rounded-full overflow-hidden">
+                           <div className="absolute inset-y-0 left-0 bg-theme-blue/20 w-full opacity-40" />
+                        </div>
+                        <span className={`text-[10px] font-black uppercase ${itin.stops === 0 ? 'text-theme-success' : 'text-theme-error'} tracking-tighter text-center line-clamp-1`}>
+                          {itin.duration.replace('PT','').toLowerCase()} • {itin.stops === 0 ? 'Direct' : `${itin.stops} stop`}
+                        </span>
+                      </div>
+
+                      <div className="min-w-[40px] sm:min-w-[45px]">
+                        <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[itin.segments.length-1].arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[itin.segments.length-1].arrival_airport}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* DETAILS TOGGLE (Centered flow, no absolute positioning for mobile) */}
+              <div className="flex justify-center w-auto lg:w-auto py-2 ">
+                <div className="flex flex-col items-center gap-1 group">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-theme-blue transition-colors">Details</span>
+                  <ChevronDown size={14} className={`text-theme-secondary/30 group-hover:text-theme-blue transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-8">
-                <div className="text-left sm:text-right">
-                  <p className="text-3xl font-black text-theme-text tracking-tighter">
-                    ${getPrice(flight).toFixed(2)} 
+              {/* PRICE & ACTION (Stacks horizontally on mobile, vertically on desktop) */}
+              <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
+                <div className="text-left lg:text-right">
+                  <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none"><>US$</>{getPrice(flight).toFixed(0)}</p>
+                  <p className="text-[8px] sm:text-[10px] uppercase text-theme-secondary/30 tracking-widest mt-1">
+                    Roundtrip / {travelerCount} {travelerCount > 1 ? 'persons' : 'person'}
                   </p>
-                  <span className="text-[10px] text-theme-text/40 font-black uppercase tracking-widest">{flight.currency} total</span>
                 </div>
-
                 <button 
-                  onClick={() => toggleFlightSelection(flight, uniqueKey)} 
-                  className={`flex items-center gap-2 px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-md active:scale-95 ${
-                    isSelected 
-                      ? 'bg-theme-primary text-theme-bg' 
-                      : 'bg-theme-text text-theme-bg hover:opacity-90'
-                  }`}
+                  onClick={(e) => toggleFlightSelection(flight, uniqueKey, e)}
+                  className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-[100px] font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 whitespace-nowrap ${isSelected ? 'bg-theme-secondary text-theme-light-blue' : 'bg-theme-blue text-theme-light-blue hover:bg-theme-blue/90'}`}
                 >
                   {isSelected ? <CheckCircle2 size={16} /> : null}
-                  {isSelected ? 'Selected' : 'Select'}
+                  {isSelected ? 'Selected' : 'Select Flight'}
                 </button>
               </div>
             </div>
 
-            {/* ITINERARIES */}
-            <div className="flex flex-col lg:flex-row w-full divide-y lg:divide-y-0 lg:divide-x divide-theme-secondary/10">
-              {flight.itineraries?.map((itinerary: any, itinIndex: number) => {
-                const isOutbound = itinIndex === 0;
-                const departureDate = itinerary.segments?.[0]?.departure_time;
+            {/* EXPANDED DETAILS */}
+            {isExpanded && (
+  <div className="bg-theme-surface border-t border-theme-secondary/10 p-5 lg:p-8 animate-in slide-in-from-top-1 duration-300">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <div className="lg:col-span-8 space-y-8">
+        {flight.itineraries?.map((itin, idx) => (
+          <div key={idx} className="space-y-4">
+            
+            {/* Outbound / Inbound Header */}
+            <div className="flex items-center gap-2">
+               <div className="h-[2px] w-3 bg-theme-blue" />
+               <span className="font-black uppercase tracking-widest text-theme-blue text-sm">
+                 {idx === 0 ? 'Outbound' : 'Inbound'}
+               </span>
+            </div>
+            
+            {/* Simplified Vertical Timeline */}
+            <div className="relative pl-5 border-l-2 border-theme-secondary/10 space-y-6 ml-1.5">
+              {itin.segments.map((seg, sIdx) => (
+                <div key={sIdx} className="relative">
+                  
+                  {/* Timeline Dot */}
+                  <div className="absolute -left-[25px] top-1.5 w-2 h-2 rounded-full bg-theme-white/50 border-2 border-theme-blue" />
+                  
+                  {/* Flight Segment Details */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 bg-theme-white p-3 rounded-lg border border-theme-secondary/5">
+                    
+                    {/* Departure */}
+                    <div className="flex flex-col">
+                      <span className="font-black text-theme-secondary">{seg.departure_airport_name || seg.departure_airport}</span>
+                      <span className="font-bold text-theme-secondary/60">
+                        {new Date(seg.departure_time).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
 
-                return (
-                  <div key={itinIndex} className="flex-1 p-6 md:p-8 bg-transparent">
-                    <div className="flex justify-between items-center mb-6">
-                      <div className="flex flex-col">
-                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${isOutbound ? 'text-theme-primary' : 'text-theme-secondary'}`}>
-                          {isOutbound ? 'Departure' : 'Return'}
-                        </span>
-                        <span className="text-sm font-bold text-theme-text opacity-70">{formatDate(departureDate)}</span>
-                      </div>
-                      <div className="text-right flex flex-col items-end">
-                        <div className="flex items-center gap-1.5 text-theme-text font-black text-xs">
-                          <Clock size={14} /> {formatDuration(itinerary.duration)}
+                    {/* Simple Directional Arrow */}
+                    <ArrowRight size={16} className="text-theme-secondary/20 hidden sm:block shrink-0" />
+                  
+                    {/* Arrival */}
+                    <div className="flex flex-col sm:text-right mt-1 sm:mt-0">
+                      <span className="font-black text-theme-secondary">{seg.arrival_airport_name || seg.arrival_airport}</span>
+                      <span className="font-bold text-theme-secondary/60">
+                        {new Date(seg.arrival_time).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+          </div>
+        ))}
+      </div>
+      
+{/* POLICIES & AMENITIES*/}
+                  <div className="lg:col-span-4 space-y-6">
+                    <div className="space-y-3">
+                      <h5 className="font-black uppercase tracking-[0.2em] text-theme-blue flex items-center gap-2"><ShieldCheck size={12}/> Policies</h5>
+                      <div className="space-y-1">
+                        <div className="p-2.5 bg-theme-white rounded-sm border border-theme-secondary/5 flex justify-between items-center font-black uppercase">
+                          <span className="text-theme-secondary/40 flex items-center gap-2"><Briefcase size={16}/> Baggage</span>
+                          <span className="text-theme-secondary">Standard</span>
                         </div>
-                        <span className={`text-[10px] uppercase font-black tracking-widest mt-1 ${itinerary.stops === 0 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                          {itinerary.stops === 0 ? 'Non-stop' : `${itinerary.stops} Stop(s)`}
-                        </span>
+                        <div className="p-2.5 bg-theme-white rounded-sm border border-theme-secondary/5 flex justify-between items-center font-black uppercase">
+                          <span className="text-theme-secondary/40">Changes</span>
+                          <span className="text-emerald-500">Allowed</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-4 relative">
-                      {itinerary.segments?.map((seg: any, segIndex: number) => {
-                        const isLast = segIndex === itinerary.segments.length - 1;
-                        const nextSeg = itinerary.segments[segIndex + 1];
-
-                        return (
-                          <React.Fragment key={segIndex}>
-                            <div className="relative z-10 bg-theme-secondary/5 rounded-[1.5rem] border border-theme-secondary/10 p-5 group/seg">
-                              <div className="flex justify-between items-center">
-                                <div>
-                                  <p className="text-2xl font-black text-theme-text tracking-tighter">{formatTime(seg.departure_time)}</p>
-                                  <p className="text-[11px] font-black text-theme-text/50 uppercase tracking-widest mt-1">
-                                    {seg.departure_airport}
-                                  </p>
-                                </div>
-                                
-                                <div className="flex flex-col items-center flex-1 px-4">
-                                  <span className="text-[9px] text-theme-text/30 font-black tracking-[0.2em] uppercase mb-2">
-                                    {seg.carrier_code} {seg.flight_number}
-                                  </span>
-                                  <div className="w-full max-w-[100px] h-[2px] bg-theme-secondary/20 relative">
-                                    <Plane size={12} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-theme-secondary" />
-                                  </div>
-                                </div>
-
-                                <div className="text-right">
-                                  <p className="text-2xl font-black text-theme-text tracking-tighter">{formatTime(seg.arrival_time)}</p>
-                                  <p className="text-[11px] font-black text-theme-text/50 uppercase tracking-widest mt-1">
-                                    {seg.arrival_airport}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* LAYOVER INDICATOR */}
-                            {!isLast && nextSeg && (
-                              <div className="flex items-center justify-center -my-2 relative z-20">
-                                <div className="bg-theme-text text-theme-bg text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm border border-theme-text/10">
-                                   Layover: {getLayoverDuration(seg.arrival_time, nextSeg.departure_time)}
-                                </div>
-                              </div>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
+                    <div className="space-y-3">
+                      <h5 className="font-black uppercase tracking-[0.2em] text-theme-blue flex items-center gap-2"><Gift size={12}/> Amenities</h5>
+                      <div className="grid grid-cols-2 gap-2">
+                        <BenefitIcon icon={<Wifi size={16} />} label="WiFi" />
+                        <BenefitIcon icon={<Zap size={16} />} label="Power" />
+                      </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function BenefitIcon({ icon, label }: { icon: React.ReactNode, label: string }) {
+  return (
+    <div className="flex items-center gap-2 p-2 bg-theme-white rounded-sm border border-theme-secondary/5">
+      <div className="text-theme-blue">{icon}</div>
+      <span className="font-black uppercase text-theme-secondary/50">{label}</span>
     </div>
   );
 }

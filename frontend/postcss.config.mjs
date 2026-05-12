@@ -6,9 +6,9 @@ const config = {
 
 const colors ={
         theme: {
-          bg: "rgb(var(--theme-bg) / <alpha-value>)",
+          bg: "rgb(var(--theme-white) / <alpha-value>)",
           surface: "rgb(var(--theme-surface) / <alpha-value>)",
-          text: "rgb(var(--theme-text) / <alpha-value>)",
+          text: "rgb(var(--theme-secondary) / <alpha-value>)",
           muted: "rgb(var(--theme-muted) / <alpha-value>)",
           primary: "rgb(var(--theme-primary) / <alpha-value>)",
           secondary: "rgb(var(--theme-secondary) / <alpha-value>)",

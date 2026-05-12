@@ -229,13 +229,13 @@ export default function SavedTripsPage() {
 
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-theme-bg">
-        <h1 className="text-2xl font-bold text-theme-text mb-4">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-theme-white">
+        <h1 className="text-2xl font-bold text-theme-secondary mb-4">
           Please login to view your saved trips
         </h1>
         <Link
           href="/auth"
-          className="bg-theme-primary text-theme-bg px-6 py-2 rounded-lg hover:bg-theme-secondary transition-colors"
+          className="bg-theme-primary text-theme-white px-6 py-2 rounded-lg hover:bg-theme-secondary transition-colors"
         >
           Go to Login
         </Link>
@@ -244,14 +244,14 @@ export default function SavedTripsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-theme-bg relative pb-20">
+    <div className="min-h-screen bg-theme-white relative pb-20">
       <main className="max-w-6xl mx-auto p-8">
         <header className="mb-8 flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-black text-theme-text tracking-tight">
+            <h1 className="text-3xl font-black text-theme-secondary tracking-tight">
               My Saved Itineraries
             </h1>
-            <p className="text-theme-text/70 font-medium mt-1">
+            <p className="text-theme-secondary/70 font-medium mt-1">
               You have {savedTrips.length} saved trip{savedTrips.length !== 1 && "s"}. You can view, share, or delete itineraries here.
             </p>
           </div>
@@ -270,12 +270,12 @@ export default function SavedTripsPage() {
         ) : savedTrips.length === 0 ? (
           <div className="bg-theme-surface p-12 rounded-2xl shadow-sm text-center border border-theme-muted/30">
             <div className="text-6xl mb-4">🗺️</div>
-            <h3 className="text-xl font-bold text-theme-text mb-2">
+            <h3 className="text-xl font-bold text-theme-secondary mb-2">
               No trips planned yet
             </h3>
             <Link
               href="/"
-              className="bg-theme-primary text-theme-bg px-6 py-3 rounded-xl font-bold hover:bg-theme-secondary transition-colors"
+              className="bg-theme-primary text-theme-white px-6 py-3 rounded-xl font-bold hover:bg-theme-secondary transition-colors"
             >
               Create Your First Itinerary
             </Link>
@@ -288,7 +288,7 @@ export default function SavedTripsPage() {
                 className="bg-theme-surface rounded-2xl shadow-sm border border-theme-muted/30 overflow-hidden hover:shadow-md transition flex flex-col relative"
               >
                 {/* Visibility Badge/Dropdown overlay */}
-                <button className="absolute top-4 right-4 z-10 flex items-center bg-theme-bg/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
+                <button className="absolute top-4 right-4 z-10 flex items-center bg-theme-white/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
                   {trip.visibility === "PRIVATE" ? (
                     <Lock size={12} className="text-theme-muted mr-1" />
                   ) : (
@@ -299,7 +299,7 @@ export default function SavedTripsPage() {
                     onChange={(e) =>
                       handleVisibilityChange(trip.id, e.target.value as any)
                     }
-                    className="bg-transparent text-[10px] font-bold tracking-wider uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-text"
+                    className="bg-transparent text-[10px] font-bold tracking-wider uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-secondary"
                   >
                     <option value="PRIVATE">Private</option>
                     <option value="PUBLIC">Public</option>
@@ -310,7 +310,7 @@ export default function SavedTripsPage() {
                 <div className="p-6 flex-grow mt-4">
                   <div className="flex justify-between items-start mb-2 pr-24">
                     <h2
-                      className="text-xl font-black text-theme-text line-clamp-2 leading-tight"
+                      className="text-xl font-black text-theme-secondary line-clamp-2 leading-tight"
                       title={getTripTitle(trip)}
                     >
                       {getTripTitle(trip)}
@@ -326,7 +326,7 @@ export default function SavedTripsPage() {
                     )}
                   </span>
 
-                  <div className="space-y-3 text-sm text-theme-text/80 mb-4 font-medium">
+                  <div className="space-y-3 text-sm text-theme-secondary/80 mb-4 font-medium">
                     <div className="flex items-center gap-2">
                       {trip.data.flight ? (
                         <Plane size={16} className="text-theme-muted" />
@@ -356,7 +356,7 @@ export default function SavedTripsPage() {
                 </div>
 
                 {/* --- UPDATED FOOTER WITH SHARING CONTROLS --- */}
-                <div className="p-4 bg-theme-bg border-t border-theme-muted/30 flex flex-col gap-2">
+                <div className="p-4 bg-theme-white border-t border-theme-muted/30 flex flex-col gap-2">
                   {trip.visibility !== "PRIVATE" && trip.share_token && (
                     <button
                       onClick={() => handleCopyLink(trip.share_token!)}
@@ -369,7 +369,7 @@ export default function SavedTripsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setSelectedTrip(trip)}
-                      className="flex-[2] text-center bg-theme-surface border border-theme-muted/50 text-theme-text py-2 rounded-xl text-sm font-bold hover:bg-theme-muted/20 active:scale-95 transition"
+                      className="flex-[2] text-center bg-theme-surface border border-theme-muted/50 text-theme-secondary py-2 rounded-xl text-sm font-bold hover:bg-theme-muted/20 active:scale-95 transition"
                     >
                       View Details
                     </button>
@@ -408,18 +408,18 @@ export default function SavedTripsPage() {
       {emailModal.isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-theme-text/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-theme-secondary/60 backdrop-blur-sm"
             onClick={() =>
               !emailModal.loading &&
               setEmailModal((prev) => ({ ...prev, isOpen: false }))
             }
           />
-          <div className="relative bg-theme-bg w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 p-6">
-            <h3 className="text-xl font-black text-theme-text flex items-center gap-2 mb-1">
+          <div className="relative bg-theme-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 p-6">
+            <h3 className="text-xl font-black text-theme-secondary flex items-center gap-2 mb-1">
               <Share2 size={20} className="text-theme-primary" /> Share
               Itinerary
             </h3>
-            <p className="text-xs font-medium text-theme-text/70 mb-5">
+            <p className="text-xs font-medium text-theme-secondary/70 mb-5">
               Send a beautiful PDF copy of this trip to a friend via email.
             </p>
 
@@ -430,7 +430,7 @@ export default function SavedTripsPage() {
             ) : (
               <form onSubmit={handleSendEmail} className="flex flex-col gap-4">
                 <div>
-                  <label className="text-xs font-bold text-theme-text uppercase tracking-wider mb-1 block">
+                  <label className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-1 block">
                     Friend's Email
                   </label>
                   <input
@@ -448,7 +448,7 @@ export default function SavedTripsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-theme-text uppercase tracking-wider mb-1 block">
+                  <label className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-1 block">
                     Personal Message (Optional)
                   </label>
                   <textarea
@@ -470,14 +470,14 @@ export default function SavedTripsPage() {
                     onClick={() =>
                       setEmailModal((prev) => ({ ...prev, isOpen: false }))
                     }
-                    className="flex-1 py-3 text-sm font-bold text-theme-text bg-theme-surface rounded-xl hover:bg-theme-muted/20 transition"
+                    className="flex-1 py-3 text-sm font-bold text-theme-secondary bg-theme-surface rounded-xl hover:bg-theme-muted/20 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={emailModal.loading}
-                    className="flex-1 py-3 text-sm font-bold text-theme-bg bg-theme-primary rounded-xl flex justify-center items-center gap-2 hover:bg-theme-secondary transition disabled:opacity-70"
+                    className="flex-1 py-3 text-sm font-bold text-theme-white bg-theme-primary rounded-xl flex justify-center items-center gap-2 hover:bg-theme-secondary transition disabled:opacity-70"
                   >
                     {emailModal.loading ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -498,17 +498,17 @@ export default function SavedTripsPage() {
       {selectedTrip && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-theme-text/60 backdrop-blur-sm animate-in fade-in duration-200"
+            className="absolute inset-0 bg-theme-secondary/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setSelectedTrip(null)}
           />
-          <div className="relative bg-theme-bg w-full max-w-2xl max-h-[85vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="relative bg-theme-white w-full max-w-2xl max-h-[85vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="px-6 py-5 border-b border-theme-surface flex justify-between items-center bg-theme-surface/50">
               <div>
-                <h2 className="text-xl font-black text-theme-text line-clamp-1">
+                <h2 className="text-xl font-black text-theme-secondary line-clamp-1">
                   {getTripTitle(selectedTrip)}
                 </h2>
-                <p className="text-xs font-bold text-theme-text/60 uppercase tracking-widest mt-1">
+                <p className="text-xs font-bold text-theme-secondary/60 uppercase tracking-widest mt-1">
                   <Calendar size={12} className="inline mr-1 mb-0.5" />
                   {formatDate(
                     selectedTrip.data.check_in_date ||
@@ -527,14 +527,14 @@ export default function SavedTripsPage() {
               </div>
               <button
                 onClick={() => setSelectedTrip(null)}
-                className="p-2 hover:bg-theme-surface rounded-full transition bg-theme-bg text-theme-text/70"
+                className="p-2 hover:bg-theme-surface rounded-full transition bg-theme-white text-theme-secondary/70"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-theme-bg">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-theme-white">
               {/* Total Estimated Cost */}
               <div className="bg-theme-secondary/10 border border-theme-secondary/20 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-theme-secondary">
@@ -551,7 +551,7 @@ export default function SavedTripsPage() {
               {/* Transportation Info */}
               {(selectedTrip.data.flight || selectedTrip.data.drive) && (
                 <div>
-                  <h3 className="text-sm font-black text-theme-text/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
                     {selectedTrip.data.flight ? (
                       <Plane size={16} className="text-theme-primary" />
                     ) : (
@@ -562,7 +562,7 @@ export default function SavedTripsPage() {
                   {selectedTrip.data.flight ? (
                     <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4 space-y-4">
                       <div className="flex justify-between items-center">
-                        <p className="font-bold text-theme-text">
+                        <p className="font-bold text-theme-secondary">
                           {selectedTrip.data.flight.airline_name}
                         </p>
                         <span className="font-black text-theme-primary">
@@ -579,7 +579,7 @@ export default function SavedTripsPage() {
                             return (
                               <div
                                 key={idx}
-                                className="bg-theme-bg p-3 rounded-lg border border-theme-surface/60"
+                                className="bg-theme-white p-3 rounded-lg border border-theme-surface/60"
                               >
                                 <div className="flex justify-between items-center mb-2 pb-1 border-b border-theme-surface/40">
                                   <span className="text-[10px] uppercase font-bold text-theme-muted tracking-wider">
@@ -620,9 +620,9 @@ export default function SavedTripsPage() {
                                               </span>
                                             </div>
                                           )}
-                                          <div className="flex items-center gap-3 text-sm text-theme-text/80">
+                                          <div className="flex items-center gap-3 text-sm text-theme-secondary/80">
                                             <div className="flex-1">
-                                              <p className="font-black text-theme-text">
+                                              <p className="font-black text-theme-secondary">
                                                 {seg.departure_airport}
                                               </p>
                                               <p className="text-[10px] font-bold text-theme-muted">
@@ -631,7 +631,7 @@ export default function SavedTripsPage() {
                                             </div>
                                             <span className="text-xs">✈️</span>
                                             <div className="flex-1 text-right">
-                                              <p className="font-black text-theme-text">
+                                              <p className="font-black text-theme-secondary">
                                                 {seg.arrival_airport}
                                               </p>
                                               <p className="text-[10px] font-bold text-theme-muted">
@@ -653,7 +653,7 @@ export default function SavedTripsPage() {
                   ) : (
                     <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4">
                       <div className="flex justify-between items-center mb-2">
-                        <p className="font-bold text-theme-text">
+                        <p className="font-bold text-theme-secondary">
                           Road Trip Journey
                         </p>
                         <span className="font-black text-theme-primary">
@@ -663,7 +663,7 @@ export default function SavedTripsPage() {
                           ).toFixed(2)}
                         </span>
                       </div>
-                      <p className="text-xs text-theme-text/70 font-medium">
+                      <p className="text-xs text-theme-secondary/70 font-medium">
                         Duration: {selectedTrip.data.drive?.duration} |
                         Distance: {selectedTrip.data.drive?.distance}
                       </p>
@@ -675,17 +675,17 @@ export default function SavedTripsPage() {
               {/* Hotel Info */}
               {selectedTrip.data.hotel && (
                 <div>
-                  <h3 className="text-sm font-black text-theme-text/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
                     <Hotel size={16} className="text-theme-primary" />{" "}
                     Accommodation
                   </h3>
                   <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-bold text-theme-text">
+                        <p className="font-bold text-theme-secondary">
                           {selectedTrip.data.hotel.name}
                         </p>
-                        <p className="text-xs text-theme-text/60 mt-1 flex items-center gap-1">
+                        <p className="text-xs text-theme-secondary/60 mt-1 flex items-center gap-1">
                           <MapPin size={12} />{" "}
                           {selectedTrip.data.hotel.address?.lines?.join(", ") ||
                             "Address unavailable"}
@@ -703,7 +703,7 @@ export default function SavedTripsPage() {
               {selectedTrip.data.attractions &&
                 selectedTrip.data.attractions.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-black text-theme-text/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
                       <Map size={16} className="text-theme-secondary" /> Planned
                       Attractions
                     </h3>
@@ -711,7 +711,7 @@ export default function SavedTripsPage() {
                       {selectedTrip.data.attractions.map((attr, idx) => (
                         <div
                           key={idx}
-                          className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-text/80 flex items-start gap-2"
+                          className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-secondary/80 flex items-start gap-2"
                         >
                           <span className="text-theme-secondary mt-0.5">•</span>{" "}
                           {attr.name}
@@ -725,7 +725,7 @@ export default function SavedTripsPage() {
               {selectedTrip.data.activities &&
                 selectedTrip.data.activities.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-black text-theme-text/80 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
                       <Ticket size={16} className="text-theme-secondary" />{" "}
                       Tours & Activities
                     </h3>
@@ -734,7 +734,7 @@ export default function SavedTripsPage() {
                         (tour: any, idx: number) => (
                           <div
                             key={idx}
-                            className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-text/80 flex items-start gap-2"
+                            className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-secondary/80 flex items-start gap-2"
                           >
                             <span className="text-theme-secondary mt-0.5">
                               •
@@ -752,7 +752,7 @@ export default function SavedTripsPage() {
             <div className="p-4 border-t border-theme-surface bg-theme-surface/30">
               <button
                 onClick={() => setSelectedTrip(null)}
-                className="w-full bg-theme-text text-theme-bg font-bold py-3 rounded-xl hover:bg-theme-text/80 transition"
+                className="w-full bg-theme-secondary text-theme-white font-bold py-3 rounded-xl hover:bg-theme-secondary/80 transition"
               >
                 Close Details
               </button>

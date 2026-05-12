@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { CheckCircle2, ChevronDown, ArrowRight, Car } from "lucide-react";
 
 export default function DrivingCard({ drivingData }: { drivingData?: any }) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  const [showIntermediates, setShowIntermediates] = useState<boolean>(true);
+  const [showIntermediates, setShowIntermediates] = useState<boolean>(false); // Changed default to false to match details tabs
 
   useEffect(() => {
     const savedState = sessionStorage.getItem("drive_intermediates_open");
@@ -47,8 +48,7 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
       ? { selected: true, data: drivingData }
       : null;
     localStorage.setItem("trip_state", JSON.stringify(tripState));
-    // Event this to show on the Map
-window.dispatchEvent(new Event("trip_state_changed"));
+    window.dispatchEvent(new Event("trip_state_changed"));
   };
 
   const toggleIntermediates = () => {
@@ -60,128 +60,142 @@ window.dispatchEvent(new Event("trip_state_changed"));
   if (!drivingData || !drivingData.geometry) return null;
 
   const fuel = calculateFuel(drivingData.distance_km);
-
   const passedCities = drivingData.passedCities || [];
   const sName = drivingData.sourceName || "Origin";
   const dName = drivingData.destinationName || "Destination";
 
   return (
-    <div className="flex flex-col gap-4">
-      <div
-        className={`bg-theme-bg rounded-xl overflow-hidden border p-5 sm:p-6 transition-all duration-200 ${
-          isSelected
-            ? "border-theme-primary ring-2 ring-theme-primary bg-theme-primary/5"
-            : "border-theme-surface shadow-sm hover:border-theme-muted hover:shadow-lg"
+    <div className="flex flex-col gap-4 animate-in fade-in duration-500">
+      
+      {/* HEADER ALIGNMENT */}
+      <div className="flex justify-between items-center px-2">
+        <span className=" font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+          Road Trip Details
+        </span>
+      </div>
+
+      <div 
+        onClick={toggleDriveSelection}
+        className={`rounded-[1rem] border-[1px] transition-all duration-300 overflow-hidden cursor-pointer ${
+          isSelected ? 'border-theme-primary bg-theme-primary/10' : 'border-theme-secondary/10 bg-theme-white hover:border-theme-primary'
         }`}
       >
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h3 className="text-2xl font-black text-theme-text tracking-tight leading-none mb-3">
-              Road Trip Journey
-            </h3>
-            <div className="flex items-center gap-3 text-sm font-bold">
-              <span className="bg-theme-secondary/10 text-theme-secondary border border-theme-secondary/20 px-3 py-1.5 rounded-lg shadow-sm">
-                {sName}
-              </span>
-              <span className="text-theme-muted text-lg">➔</span>
-              <span className="bg-theme-primary/10 text-theme-primary border border-theme-primary/20 px-3 py-1.5 rounded-lg shadow-sm">
-                {dName}
-              </span>
+        <div className="p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-8 relative">
+          
+          {/* IDENTIFIER BLOCK */}
+          <div className="flex flex-row lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0 w-full lg:w-auto">
+            <div className="w-12 h-12 bg-theme-light-blue rounded-sm p-2 flex items-center justify-center shadow-sm text-theme-secondary">
+              <Car size={24} />
+            </div>
+            <div className="flex flex-col lg:hidden">
+               <h4 className="font-black text-lg text-theme-secondary leading-tight">Drive</h4>
             </div>
           </div>
 
-          <button
-            onClick={toggleDriveSelection}
-            className={`px-8 py-3 rounded-xl font-black text-sm transition-all shadow-sm shrink-0 active:scale-95 w-full sm:w-auto ${
-              isSelected
-                ? "bg-theme-primary text-theme-bg"
-                : "bg-theme-secondary text-theme-bg hover:bg-theme-secondary/90"
-            }`}
-          >
-            {isSelected ? "Selected" : "Select Route"}
-          </button>
-        </div>
+          {/* ROUTE & STATS SUMMARY */}
+          <div className="flex-1 w-full space-y-4">
+             {/* Origin to Destination */}
+             <div className="flex items-center gap-3">
+               <span className="font-black text-theme-secondary text-[16px] ">{sName}</span>
+               <ArrowRight size={14} className="text-theme-secondary/30" />
+               <span className="font-black text-theme-secondary text-[16px] ">{dName}</span>
+             </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-theme-surface/30 p-5 rounded-xl border border-theme-surface shadow-sm flex flex-col justify-center">
-            <span className="text-[10px] uppercase font-black text-theme-muted block mb-1 tracking-widest">
-              Distance
-            </span>
-            <span className="text-2xl font-black text-theme-text">
-              {fuel.miles} Mi
-            </span>
-            <span className="text-xs text-theme-text/60 font-bold leading-tight mt-1">
-              {drivingData.distance_km} km
-            </span>
-          </div>
-          <div className="bg-theme-surface/30 p-5 rounded-xl border border-theme-surface shadow-sm flex flex-col justify-center">
-            <span className="text-[10px] uppercase font-black text-theme-muted block mb-1 tracking-widest">
-              Drive Time
-            </span>
-            <span className="text-2xl font-black text-theme-text">
-              {Math.floor(drivingData.duration_mins / 60)}h{" "}
-              {Math.round(drivingData.duration_mins % 60)}m
-            </span>
-          </div>
-          <div className="bg-theme-primary/10 p-5 rounded-xl border border-theme-primary/20 shadow-sm flex flex-col justify-center">
-            <span className="text-[10px] uppercase font-black text-theme-primary block mb-1 tracking-widest">
-              Fuel Estimate
-            </span>
-            <span className="text-2xl font-black text-theme-secondary">
-              ${fuel.cost}
-            </span>
-            <span className="text-xs text-theme-secondary/70 font-bold leading-tight mt-1">
-              {fuel.gallons} Gal
-            </span>
-          </div>
-        </div>
+             {/* Stats Grid */}
+             <div className="flex flex-wrap lg:flex-nowrap gap-4 sm:gap-8">
+               <div className="flex flex-col">
+                  <span className=" uppercase font-black text-theme-secondary/40 tracking-widest">Distance</span>
+                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{fuel.miles} mi</span>
+                  <span className="font-bold text-theme-secondary/40">{drivingData.distance_km} km</span>
+               </div>
+               
+               <div className="w-px h-8 bg-theme-secondary/10 hidden sm:block"></div>
 
-        <div className="border-t border-theme-surface pt-5">
-          <button
-            onClick={toggleIntermediates}
-            className="w-full flex justify-between items-center group mb-2"
-          >
-            <span className="text-xs font-black text-theme-primary uppercase tracking-widest group-hover:underline">
-              {showIntermediates
-                ? "▼ Hide Route List"
-                : "▶ View All Passing Cities"}
-            </span>
-          </button>
-
-          {showIntermediates && (
-            <div className="mt-4 bg-theme-surface/20 rounded-xl p-6 border border-theme-surface shadow-inner">
-              <div className="relative flex flex-col gap-6 ml-2">
-                <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-theme-muted/50"></div>
-
-                <div className="relative z-10 flex items-center gap-4">
-                  <div className="w-4 h-4 rounded-full bg-theme-secondary border-[3px] border-theme-bg shadow-sm ring-2 ring-theme-secondary/30 shrink-0"></div>
-                  <span className="text-base font-black text-theme-text">
-                    {sName}
+               <div className="flex flex-col">
+                  <span className=" uppercase font-black text-theme-secondary/40 tracking-widest">Drive Time</span>
+                  <span className="text-[16px] font-black text-theme-secondary leading-tight">
+                    {Math.floor(drivingData.duration_mins / 60)}h {Math.round(drivingData.duration_mins % 60)}m
                   </span>
+               </div>
+
+               <div className="w-px h-8 bg-theme-secondary/10 hidden sm:block"></div>
+
+               <div className="flex flex-col">
+                  <span className=" uppercase font-black text-theme-primary tracking-widest">Fuel Estimate</span>
+                  <span className="text-[16px] font-black text-theme-primary leading-tight">${fuel.cost}</span>
+                  <span className=" font-bold text-theme-primary/60">{fuel.gallons} Gal</span>
+               </div>
+             </div>
+          </div>
+
+          {/* ACTION BLOCK */}
+          <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
+             <div className="text-left lg:text-right">
+                <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none">${fuel.cost}</p>
+                <p className="text-[8px] sm:text-[10px] uppercase text-theme-secondary/30 tracking-widest mt-1">Est. Gas Total</p>
+             </div>
+             <button 
+                onClick={(e) => { e.stopPropagation(); toggleDriveSelection(); }}
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-[100px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 whitespace-nowrap ${isSelected ? "bg-theme-secondary text-theme-light-blue" : "bg-theme-primary text-theme-light-blue hover:bg-theme-primary/90"}`}
+             >
+                {isSelected ? <CheckCircle2 size={20} /> : null}
+                {isSelected ? "Selected" : "Select Route"}
+             </button>
+          </div>
+        </div>
+
+        {/* DETAILS TOGGLE STRIP */}
+        <div 
+           className="flex justify-center w-full py-2 border-t border-theme-secondary/5 hover:bg-theme-secondary/[0.02] transition-colors"
+           onClick={(e) => { e.stopPropagation(); toggleIntermediates(); }}
+        >
+          <div className="flex flex-col items-center gap-1 group">
+             <span className="text-[10px] font-bold uppercase tracking-widest text-theme-primary transition-colors">
+               Route Details
+             </span>
+             <ChevronDown size={14} className={`text-theme-secondary/30 group-hover:text-theme-primary transition-transform ${showIntermediates ? 'rotate-180' : ''}`} />
+          </div>
+        </div>
+
+{/* EXPANDED ROUTE DETAILS (Industry Standard Timeline) */}
+        {showIntermediates && (
+          <div className="bg-theme-surface/80 border-t border-theme-secondary/10 p-5 lg:p-8 animate-in slide-in-from-top-1 duration-300">
+            <div className="flex items-center gap-2 mb-6">
+               <div className="h-[2px] w-3 bg-theme-primary" />
+               <span className="font-black uppercase tracking-widest text-theme-primary">
+                 Route list
+               </span>
+            </div>
+
+            <div className="relative ml-2">
+              {/* Origin Node */}
+              <div className="relative pl-6 border-l-2 border-theme-secondary/20 pb-6">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-light-blue border-4 border-theme-primary flex items-center justify-center shadow-sm" />
+                <div className="flex flex-col -mt-1">
+                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{sName}</span>
+                  <span className="font-bold text-theme-secondary/40 uppercase tracking-widest mt-0.5">Source</span>
                 </div>
+              </div>
 
-                {passedCities.map((city: string, idx: number) => (
-                  <div
-                    key={idx}
-                    className="relative z-10 flex items-center gap-4"
-                  >
-                    <div className="w-3 h-3 ml-[2px] rounded-full bg-theme-bg border-[3px] border-theme-muted shadow-sm shrink-0"></div>
-                    <span className="text-sm font-bold text-theme-text/80">
-                      {city}
-                    </span>
-                  </div>
-                ))}
+              {/* Waypoint Nodes */}
+              {passedCities.map((city: string, idx: number) => (
+                <div key={idx} className="relative pl-6 border-l-2 border-theme-secondary/20 pb-6">
+                  <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-theme-white border-2 border-theme-secondary/30" />
+                  <span className="font-bold text-theme-secondary/70">{city}</span>
+                </div>
+              ))}
 
-                <div className="relative z-10 flex items-center gap-4">
-                  <div className="w-4 h-4 rounded-full bg-theme-primary border-[3px] border-theme-bg shadow-sm ring-2 ring-theme-primary/30 shrink-0"></div>
-                  <span className="text-base font-black text-theme-text">
-                    {dName}
-                  </span>
+              {/* Destination Node */}
+              <div className="relative pl-6">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-secondary border-[3px] border-theme-light-blue flex items-center justify-center shadow-sm" />
+                <div className="flex flex-col -mt-1">
+                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{dName}</span>
+                  <span className="font-bold text-theme-secondary/40 uppercase tracking-widest mt-0.5">Destination</span>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

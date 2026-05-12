@@ -42,14 +42,14 @@ window.dispatchEvent(new Event("trip_state_changed"));
 
   if (!attractions || attractions.length === 0) {
     return (
-      <div className="p-8 text-center bg-theme-surface border border-dashed border-theme-muted rounded-2xl text-theme-text/70 font-bold italic">
+      <div className="p-8 text-center bg-theme-surface border border-dashed border-theme-muted rounded-2xl text-theme-secondary/70 font-bold italic">
         No attractions found within the requested radius.
       </div>
     );
   }
 
   return (
-    <div className="bg-theme-bg rounded-xl p-2">
+    <div className="bg-theme-white rounded-xl p-2">
       <div className="flex flex-col gap-3">
         {attractions.slice(0, 12).map((poi, idx) => {
           const uniqueKey = poi.id || `attraction-${idx}`;
@@ -61,11 +61,11 @@ window.dispatchEvent(new Event("trip_state_changed"));
             <div 
               key={uniqueKey} 
               className={`border rounded-xl p-4 sm:p-5 transition-all duration-300 ease-in-out origin-center flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                isSelected ? 'border-theme-primary ring-2 ring-theme-primary bg-theme-primary/5 shadow-sm' : 'border-theme-surface bg-theme-bg hover:border-theme-muted hover:shadow-md'
+                isSelected ? 'border-theme-primary ring-2 ring-theme-primary bg-theme-primary/5 shadow-sm' : 'border-theme-surface bg-theme-white hover:border-theme-muted hover:shadow-md'
               }`}
             >
               <div className="flex flex-col gap-2">
-                <h4 className="font-extrabold text-lg text-theme-text leading-tight" title={name}>{name}</h4>
+                <h4 className="font-extrabold text-lg text-theme-secondary leading-tight" title={name}>{name}</h4>
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="inline-block bg-theme-surface text-theme-secondary text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
                     {category.replace(/_/g, ' ')}
@@ -83,8 +83,8 @@ window.dispatchEvent(new Event("trip_state_changed"));
                 onClick={() => toggleAttractionSelection(poi, uniqueKey)} 
                 className={`px-6 py-2.5 rounded-xl font-black text-sm transition-all shadow-sm shrink-0 active:scale-95 w-full sm:w-auto ${
                   isSelected 
-                    ? "bg-theme-primary text-theme-bg" 
-                    : "bg-theme-secondary text-theme-bg hover:bg-theme-secondary/90"
+                    ? "bg-theme-primary text-theme-white" 
+                    : "bg-theme-secondary text-theme-white hover:bg-theme-secondary/90"
                 }`}
               >
                 {isSelected ? 'Selected' : 'Select'}

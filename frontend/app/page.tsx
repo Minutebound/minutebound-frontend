@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     // Removed h-screen, w-screen, and overflow-hidden to allow natural page scrolling
-    <div className="flex flex-col flex-1 w-full bg-theme-bg">
+    <div className="flex flex-col flex-1 w-full bg-theme-white">
       <div 
         className={`w-full z-20 flex-shrink-0 static transition-all duration-300 ease-in-out lg:max-h-[1200px] lg:opacity-100 lg:overflow-visible lg:border-b lg:border-theme-surface ${
           searchOpen ? 'max-h-[800px] opacity-100 border-b border-theme-surface' : 'max-h-0 opacity-0 overflow-hidden'

@@ -83,7 +83,7 @@ export default function Results() {
 
   
   return (
-    <div className="flex flex-col h-screen w-screen bg-theme-bg overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-theme-white overflow-hidden">
       <ItineraryModal
         isOpen={isItineraryOpen}
         onClose={() => setIsItineraryOpen(false)}
@@ -105,7 +105,7 @@ export default function Results() {
         />
       </div>
 
-      <main className="flex-1 flex overflow-hidden min-w-0 bg-theme-bg/20">
+      <main className="flex-1 flex overflow-hidden min-w-0 bg-theme-white/20">
         <div className={`flex-1 h-full overflow-y-auto custom-scrollbar ${mapOpen && !loading ? "hidden md:block" : ""}`}>
           <div className="p-4 md:p-6 w-full relative max-w-[1200px] mx-auto">
             <TripResults 
@@ -118,7 +118,7 @@ export default function Results() {
         </div>
 
         {!loading && tripData && (
-          <div className={`h-full border-l border-theme-surface bg-theme-bg ${mapOpen ? "flex-1 w-full" : "hidden"} md:flex md:flex-none md:w-[40vw] lg:w-[35vw]`}>
+          <div className={`h-full border-l border-theme-surface bg-theme-white ${mapOpen ? "flex-1 w-full" : "hidden"} md:flex md:flex-none md:w-[40vw] lg:w-[35vw]`}>
             <div className="w-full h-full relative">
               <DynamicMap mapData={tripData?.rawParams?.destination} tripData={tripData} />            
             </div>

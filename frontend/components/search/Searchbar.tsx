@@ -248,14 +248,14 @@ const renderFullSearchContent = () => (
       {isCompact && (
         <button 
           onClick={() => setIsOverlayOpen(false)}
-          className="absolute top-4 right-4 md:top-6 md:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-theme-bg/10 border border-theme-bg/20 text-theme-bg rounded-full flex items-center justify-center hover:bg-theme-bg/20 transition-all z-[100] active:scale-90 backdrop-blur-md cursor-pointer"
+          className="absolute top-4 right-4 md:top-6 md:right-6 w-9 h-9 sm:w-10 sm:h-10 bg-theme-white/10 border border-theme-white/20 text-theme-white rounded-full flex items-center justify-center hover:bg-theme-white/20 transition-all z-[100] active:scale-90 backdrop-blur-md cursor-pointer"
         >
           <X size={20} />
         </button>
       )}
 
       {/* BACKGROUND: h-full and rounded if compact, otherwise standard 60% height */}
-      <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-text to-theme-text/95 shadow-inner ${isCompact ? 'w-full max-w-[100%] h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
+      <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-secondary to-theme-secondary/95 shadow-inner ${isCompact ? 'w-full max-w-[100%] h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
 
       {/* --- DOTTED/SPOTTED BACKGROUND TEXTURE --- */}
       <div 
@@ -271,16 +271,16 @@ const renderFullSearchContent = () => (
       <div className={`relative z-10 mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 ${isCompact ? 'w-full max-w-[100%] pt-8 lg:pt-8' : 'w-full max-w-full md:max-w-[90%] lg:max-w-[80%]'}`}>        
         {/* Travel Mode Pills */}
         <div className="mb-4 flex">
-          <div className="flex bg-theme-text/20 p-1 rounded-full border border-theme-bg/10 backdrop-blur-md shadow-sm">
+          <div className="flex bg-theme-secondary/20 p-1 rounded-full border border-theme-white/10 backdrop-blur-md shadow-sm">
             <button 
               onClick={() => setTravelMode("fly")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-primary shadow-sm text-theme-bg" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
             >
               <Plane size={16} /> Flights
             </button>
             <button 
               onClick={() => setTravelMode("drive")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-primary shadow-sm text-theme-bg" : "text-theme-bg/80 hover:text-theme-bg hover:bg-theme-bg/10"}`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
             >
               <Car size={16} /> Drive
             </button>
@@ -288,7 +288,7 @@ const renderFullSearchContent = () => (
         </div>
 
         {/* MAIN WHITE CONTAINER */}
-        <div className="bg-theme-bg w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
+        <div className="bg-theme-white w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
           
           {/* MAIN INPUT ROW: Labels are completely outside the input borders now */}
           <div className="flex flex-col lg:flex-row w-full gap-4 lg:gap-3 overflow-visible relative z-20">
@@ -297,12 +297,12 @@ const renderFullSearchContent = () => (
             <div className="flex flex-col flex-[1.2] w-full">
               {/* LABELS OUTSIDE */}
               <div className="flex w-full px-2 lg:px-4 mb-1.5">
-                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60">From?</label>
-                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60 pl-4 lg:pl-8">To?</label>
+                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60">From?</label>
+                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60 pl-4 lg:pl-8">To?</label>
               </div>
 
               {/* CONNECTED BORDER PILL */}
-              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
+              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-white rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
                 
                 {/* Origin */}
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
@@ -341,12 +341,12 @@ const renderFullSearchContent = () => (
             <div className="flex flex-col flex-[1] w-full relative z-10">
               {/* LABELS OUTSIDE */}
               <div className="flex w-full px-2 lg:px-4 mb-1.5">
-                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60">Depart</label>
-                 <label className="flex-1 text-[10px] lg:text-[11px] uppercase font-black tracking-widest text-theme-text/60 pl-2 lg:pl-4">Return</label>
+                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60">Depart</label>
+                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60 pl-2 lg:pl-4">Return</label>
               </div>
 
               {/* CONNECTED BORDER PILL */}
-              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-bg rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm">
+              <div className="relative flex flex-row h-12 lg:h-14 bg-theme-white rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm">
                 
                 {/* Depart */}
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
@@ -364,7 +364,7 @@ const renderFullSearchContent = () => (
                     }}
                     minDate={new Date()}
                     placeholderText="Add date"
-                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-text outline-none border-none cursor-pointer placeholder-theme-text/40"
+                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40"
                   />
                   {errors.start && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.start}</span>}
                 </div>
@@ -381,7 +381,7 @@ const renderFullSearchContent = () => (
                     }}
                     minDate={minEndDate}
                     placeholderText="Add date"
-                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-text outline-none border-none cursor-pointer placeholder-theme-text/40"
+                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40"
                   />
                   {errors.end && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.end}</span>}
                 </div>
@@ -393,14 +393,14 @@ const renderFullSearchContent = () => (
               <div className="hidden lg:block h-[18px] mb-1.5"></div> {/* Spacer aligns button with inputs */}
               {!isWorking ? (
                 <button
-                  className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary text-theme-bg text-[16px] font-black tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all px-8 shadow-lg active:scale-95 border-none"
+                  className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary text-theme-white text-[16px] font-black tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all px-8 shadow-lg active:scale-95 border-none"
                   onClick={handleSearchSubmit}
                 >
                   <Search size={18} strokeWidth={3} /> Search
                 </button>
               ) : (
-                <div className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary/80 text-theme-bg/80 font-black flex items-center justify-center gap-2 px-8 shadow-inner cursor-not-allowed border-none">
-                  <Loader2 size={20} className="animate-spin text-theme-bg" />
+                <div className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary/80 text-theme-white/80 font-black flex items-center justify-center gap-2 px-8 shadow-inner cursor-not-allowed border-none">
+                  <Loader2 size={20} className="animate-spin text-theme-white" />
                 </div>
               )}
             </div>
@@ -417,16 +417,16 @@ const renderFullSearchContent = () => (
               <div className="relative z-50 shrink-0" ref={travellerRef}>
                 <button 
                   onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}
-                  className="flex items-center gap-1.5 sm:gap-2 font-bold text-[12px] sm:text-[13px] text-theme-text hover:text-theme-primary transition-colors py-1 px-1.5 sm:px-2 rounded-lg hover:bg-theme-secondary/10 whitespace-nowrap"
+                  className="flex items-center gap-1.5 sm:gap-2 font-bold text-[12px] sm:text-[13px] text-theme-secondary hover:text-theme-primary transition-colors py-1 px-1.5 sm:px-2 rounded-lg hover:bg-theme-secondary/10 whitespace-nowrap"
                 >
                   <Users size={16} className="text-theme-primary/80 shrink-0" />
                   <span>{totalTravellers} <span>Guest{totalTravellers !== 1 ? 's' : ''}</span></span>
-                  <ChevronDown size={16} className="text-theme-text/60 shrink-0" />
+                  <ChevronDown size={16} className="text-theme-secondary/60 shrink-0" />
                 </button>
                 
                 {/* POPUP MENU */}
                 {showTravellerDropdown && (
-                  <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-bg text-theme-text rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    <div className="flex items-center justify-between mb-5">
+                  <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-white text-theme-secondary rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    <div className="flex items-center justify-between mb-5">
                       <div>
                         <div className="font-bold text-[15px]">Adults</div>
                         <div className="text-[11px] text-theme-muted uppercase tracking-wider">Ages 12+</div>
@@ -450,27 +450,27 @@ const renderFullSearchContent = () => (
                 <select 
                   value={budget} 
                   onChange={(e) => setBudget(e.target.value as "budget" | "Premium")}
-                  className="appearance-none bg-transparent font-bold text-[12px] sm:text-[13px] text-theme-text cursor-pointer outline-none pr-4 sm:pr-5 hover:text-theme-primary transition-colors border-none"
+                  className="appearance-none bg-transparent font-bold text-[12px] sm:text-[13px] text-theme-secondary cursor-pointer outline-none pr-4 sm:pr-5 hover:text-theme-primary transition-colors border-none"
                 >
                   <option value="budget">Budget</option>
                   <option value="Premium">Premium</option>
                 </select>
-                <ChevronDown size={16} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-text/60" />
+                <ChevronDown size={16} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-secondary/60" />
               </div>
 
               {/* Sleek Radius Input */}
               <div className="flex items-center gap-1 sm:gap-2 py-1 px-1 sm:px-2 whitespace-nowrap shrink-0 ml-auto sm:ml-0">
-                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-text/50 hidden sm:inline">Radius:</span>
-                 <span className="text-[10px] font-black uppercase tracking-wider text-theme-text/50 sm:hidden">Rad:</span>
+                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-secondary/50 hidden sm:inline">Radius:</span>
+                 <span className="text-[10px] font-black uppercase tracking-wider text-theme-secondary/50 sm:hidden">Rad:</span>
                  <input
                     type="number"
                     min={1} 
                     max={100}
                     value={radius}
                     onChange={(e) => setRadius(parseInt(e.target.value) || 1)}
-                    className="w-[42px] sm:w-[52px] bg-theme-secondary/5 border border-theme-secondary/20 rounded-md px-1 py-1 text-[12px] sm:text-[13px] font-bold text-theme-text outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all text-center hide-arrows"
+                    className="w-[42px] sm:w-[52px] bg-theme-secondary/5 border border-theme-secondary/20 rounded-md px-1 py-1 text-[12px] sm:text-[13px] font-bold text-theme-secondary outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all text-center hide-arrows"
                   />
-                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-text/50">mi</span>
+                 <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-secondary/50">mi</span>
               </div>
             </div>
 
@@ -480,7 +480,7 @@ const renderFullSearchContent = () => (
                 {/* Sticky Label */}
                 <div className="flex items-center gap-1.5 shrink-0 pr-3">
                    <TrendingUp size={16} className="text-theme-primary" />
-                   <span className="text-[11px] font-black uppercase text-theme-text/60 tracking-wider">Trending:</span>
+                   <span className="text-[11px] font-black uppercase text-theme-secondary/60 tracking-wider">Trending:</span>
                 </div>
                 
                 {/* Scrollable Places */}
@@ -493,7 +493,7 @@ const renderFullSearchContent = () => (
                         setDestination(dest.full_name); setDestValid(true);
                         if (errors.destination) setErrors((prev) => ({ ...prev, destination: "" }));
                       }}
-                      className="px-4 py-1.5 rounded-full bg-theme-secondary/5 text-theme-text/80 text-[11px] font-bold hover:bg-theme-secondary/10 transition-all whitespace-nowrap border border-theme-secondary/10 shadow-sm shrink-0"
+                      className="px-4 py-1.5 rounded-full bg-theme-secondary/5 text-theme-secondary/80 text-[11px] font-bold hover:bg-theme-secondary/10 transition-all whitespace-nowrap border border-theme-secondary/10 shadow-sm shrink-0"
                     >
                       {dest.city}
                     </button>
@@ -531,21 +531,21 @@ const renderFullSearchContent = () => (
     <>
  {/* 1. Summary Bar (Only displays when isCompact is true) */}
       {isCompact && (
-        <div className="w-full bg-theme-bg/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
+        <div className="w-full bg-theme-white/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
           <div className="flex items-center max-w-[700px] md:max-w-[800px] mx-auto">
             
             {/* THE COMPACT PILL */}
             <button
               onClick={() => setIsOverlayOpen(true)}
-              className="w-full bg-theme-bg border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-1.5 sm:p-2 transition-all duration-300 cursor-pointer group"
+              className="w-full bg-theme-white border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-1.5 sm:p-2 transition-all duration-300 cursor-pointer group"
             >
               {/* MOBILE: Stacked Text Content (Now on the left, taking full width) */}
               <div className="flex flex-col sm:hidden flex-1 text-left overflow-hidden pl-4 py-1">
-                <span className="font-bold text-[13px] text-theme-text truncate">
+                <span className="font-bold text-[13px] text-theme-secondary truncate">
                   {source || 'Anywhere'} {destination ? `to ${destination}` : ''}
                 </span>
-                <div className="flex items-center text-[11px] text-theme-text/60 gap-1 mt-[2px] truncate font-medium">
+                <div className="flex items-center text-[11px] text-theme-secondary/60 gap-1 mt-[2px] truncate font-medium">
                   <span>{dates.start ? `${dates.start}` : 'Any dates'}</span>
                   <span>•</span>
                    <span>{dates.end ? `${dates.end}` : 'Any dates'}</span>
@@ -557,7 +557,7 @@ const renderFullSearchContent = () => (
               </div>
 
               {/* MOBILE: Right Edit Icon */}
-              <div className="sm:hidden bg-theme-primary text-theme-bg p-2 rounded-full shadow-sm mr-1 shrink-0">
+              <div className="sm:hidden bg-theme-primary text-theme-white p-2 rounded-full shadow-sm mr-1 shrink-0">
                 <PenBoxIcon size={16} strokeWidth={2.5} />
               </div>
 
@@ -566,28 +566,28 @@ const renderFullSearchContent = () => (
                 <div className="flex items-center flex-1">
                   
                   {/* Location Segment */}
-                  <div className="font-bold text-[14px] text-theme-text px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[200px] lg:max-w-[320px]">
+                  <div className="font-bold text-[14px] text-theme-secondary px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[200px] lg:max-w-[320px]">
                     {source || 'Anywhere'} {destination ? `→ ${destination}` : ''}
                   </div>
                   
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
                   
                   {/* Dates Segment */}
-                  <div className="font-medium text-[13px] text-theme-text/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
+                  <div className="font-medium text-[13px] text-theme-secondary/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
                     {dates.start ? `${dates.start} - ${dates.end || '?'}` : 'Any week'}
                   </div>
 
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
                   
                   {/* Guests Segment */}
-                  <div className="font-medium text-[13px] text-theme-text/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
+                  <div className="font-medium text-[13px] text-theme-secondary/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
                     {adults + children} Guest{adults + children !== 1 ? 's' : ''}
                   </div>
 
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
 
                   {/* Mode Indicator */}
-                  <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-[10px] text-theme-primary font-black bg-theme-primary/10 px-2 py-1 rounded-md shrink-0">
+                  <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-[10px] text-theme-secondary font-black bg-theme-primary/10 px-2 py-1 rounded-md shrink-0">
                     {travelMode === 'fly' ? <Plane size={12}/> : <Car size={12}/>}
                     {travelMode === 'fly' ? 'Flights' : 'Drive'}
                   </div>
@@ -595,7 +595,7 @@ const renderFullSearchContent = () => (
                 </div>
                 
                 {/* DESKTOP: Right Edit Button */}
-                <div className="bg-theme-primary text-theme-bg p-2.5 rounded-full shadow-sm group-hover:scale-105 transition-transform ml-2 shrink-0">
+                <div className="bg-theme-white text-theme-secondary p-2.5 rounded-full shadow-sm group-hover:scale-105 transition-transform ml-2 shrink-0">
                   <PenBoxIcon size={16} strokeWidth={3} />
                 </div>
               </div>
@@ -605,9 +605,9 @@ const renderFullSearchContent = () => (
             {onMapToggle && (
               <button
                 onClick={onMapToggle}
-                className="ml-3 p-3 rounded-full bg-theme-bg text-theme-text border border-theme-secondary/30 hover:bg-theme-secondary/10 hover:border-theme-primary/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
+                className="ml-3 p-3 rounded-full bg-theme-white text-theme-secondary border border-theme-secondary/30 hover:bg-theme-secondary/10 hover:border-theme-primary/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
               >
-                {mapOpen ? <X size={18} className="text-theme-primary" /> : <Map size={18} className="text-theme-primary" />}
+                {mapOpen ? <X size={18} className="text-theme-secondary" /> : <Map size={18} className="text-theme-secondary" />}
               </button>
             )}
 
@@ -642,14 +642,14 @@ function SbCounter({ value, min, max, onChange }: { value: number; min: number; 
     <div className="flex items-center gap-3 bg-theme-secondary/5 rounded-full p-1 border border-theme-secondary/20">
       <button 
         type="button" 
-        className="w-8 h-8 rounded-full bg-theme-bg shadow-sm text-theme-text hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
+        className="w-8 h-8 rounded-full bg-theme-white shadow-sm text-theme-secondary hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
       >−</button>
-      <span className="font-black text-[15px] text-theme-text text-center w-4">{value}</span>
+      <span className="font-black text-[15px] text-theme-secondary text-center w-4">{value}</span>
       <button 
         type="button" 
-        className="w-8 h-8 rounded-full bg-theme-bg shadow-sm text-theme-text hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
+        className="w-8 h-8 rounded-full bg-theme-white shadow-sm text-theme-secondary hover:text-theme-primary flex items-center justify-center font-bold text-lg disabled:opacity-40 transition-all active:scale-90" 
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
       >+</button>

@@ -119,7 +119,7 @@ export default function StatusPage() {
   const isAnyLoading = loading || isRefreshingAll || refreshingApi !== null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-theme-bg text-theme-text font-sans">
+    <div className="min-h-screen flex flex-col bg-theme-white text-theme-secondary font-sans">
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 sm:px-6 flex flex-col gap-6 animate-in fade-in duration-500">
         
@@ -153,7 +153,7 @@ export default function StatusPage() {
             disabled={isAnyLoading}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-black shadow-md transition-all active:scale-95 flex-shrink-0 ${
               isAnyLoading
-                ? "bg-theme-muted/50 text-theme-text/50 cursor-not-allowed" 
+                ? "bg-theme-muted/50 text-theme-secondary/50 cursor-not-allowed" 
                 : "bg-theme-primary text-white hover:bg-theme-secondary hover:shadow-lg hover:-translate-y-0.5"
             }`}
           >
@@ -170,14 +170,14 @@ export default function StatusPage() {
         )}
 
         {loading ? (
-          <div className="h-96 w-full bg-theme-text/10 rounded-3xl animate-pulse"></div>
+          <div className="h-96 w-full bg-theme-secondary/10 rounded-3xl animate-pulse"></div>
         ) : (
           /* UNIFIED DARK SECTION */
-          <section className="bg-theme-text text-theme-bg rounded-3xl shadow-xl overflow-hidden flex flex-col">
+          <section className="bg-theme-secondary text-theme-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
             
             {/* INTERNAL DIVIDER HEADER */}
-            <div className="px-6 py-5 border-b border-theme-bg/10 flex items-center gap-3 bg-white/5">
-              <Server className="text-theme-bg/70" size={22} />
+            <div className="px-6 py-5 border-b border-theme-white/10 flex items-center gap-3 bg-white/5">
+              <Server className="text-theme-white/70" size={22} />
               <h2 className="text-lg font-bold tracking-wide">Internal Core Services</h2>
             </div>
             
@@ -211,12 +211,12 @@ export default function StatusPage() {
             </div>
 
             {/* EXTERNAL DIVIDER HEADER */}
-            <div className="px-6 py-5 border-y border-theme-bg/10 flex justify-between items-center bg-white/5 mt-2">
+            <div className="px-6 py-5 border-y border-theme-white/10 flex justify-between items-center bg-white/5 mt-2">
               <div className="flex items-center gap-3">
-                <Globe className="text-theme-bg/70" size={22} />
+                <Globe className="text-theme-white/70" size={22} />
                 <h2 className="text-lg font-bold tracking-wide">External API Integrations</h2>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-theme-bg/80 bg-theme-bg/10 px-3 py-1.5 rounded-lg border border-theme-bg/20">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-theme-white/80 bg-theme-white/10 px-3 py-1.5 rounded-lg border border-theme-white/20">
                 <Info size={14} /> TTL: 48h
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function StatusPage() {
                   />
                 ))
               ) : (
-                <div className="py-12 flex flex-col items-center justify-center text-theme-bg/50 font-medium border-2 border-dashed border-theme-bg/10 rounded-2xl">
+                <div className="py-12 flex flex-col items-center justify-center text-theme-white/50 font-medium border-2 border-dashed border-theme-white/10 rounded-2xl">
                   <Globe size={48} className="mb-4 opacity-50" />
                   <p>No external API records found.</p>
                 </div>
@@ -261,16 +261,16 @@ function StatusCard({
   const Icon = getApiIcon(internalKey);
   
   return (
-    <div className="relative flex flex-col p-5 bg-transparent rounded-2xl border border-theme-bg/15 hover:border-theme-bg/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[120px]">
+    <div className="relative flex flex-col p-5 bg-transparent rounded-2xl border border-theme-white/15 hover:border-theme-white/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[120px]">
       
       {/* Background Icon Watermark */}
-      <div className="absolute right-0 -bottom-4 opacity-[0.04] text-theme-bg pointer-events-none transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+      <div className="absolute right-0 -bottom-4 opacity-[0.04] text-theme-white pointer-events-none transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
         <Icon size={160} strokeWidth={1} />
       </div>
       
       {/* Background Text Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden">
-        <span className="text-8xl font-black uppercase whitespace-nowrap tracking-tighter text-theme-bg">
+        <span className="text-8xl font-black uppercase whitespace-nowrap tracking-tighter text-theme-white">
           {name}
         </span>
       </div>
@@ -278,8 +278,8 @@ function StatusCard({
       {/* Foreground Content */}
       <div className="relative z-10 flex justify-between items-start mb-auto gap-4">
         <div className="overflow-hidden">
-          <h3 className="font-bold text-lg text-theme-bg truncate">{name}</h3>
-          <p className="text-xs font-mono text-theme-bg/50 mt-1 truncate max-w-[250px] sm:max-w-full">
+          <h3 className="font-bold text-lg text-theme-white truncate">{name}</h3>
+          <p className="text-xs font-mono text-theme-white/50 mt-1 truncate max-w-[250px] sm:max-w-full">
             {endpoint || "Unknown endpoint"}
           </p>
         </div>
@@ -291,10 +291,10 @@ function StatusCard({
             disabled={disabled}
             className={`p-2.5 rounded-xl transition-all border active:scale-95 backdrop-blur-sm ${
               isRefreshing 
-                ? "bg-theme-bg/20 text-theme-bg border-theme-bg/40 shadow-inner" 
+                ? "bg-theme-white/20 text-theme-white border-theme-white/40 shadow-inner" 
                 : disabled 
-                  ? "bg-transparent text-theme-bg/30 border-transparent opacity-50 cursor-not-allowed" 
-                  : "bg-theme-bg/5 text-theme-bg/70 border-theme-bg/20 hover:bg-theme-bg/15 hover:text-theme-bg hover:border-theme-bg/40"
+                  ? "bg-transparent text-theme-white/30 border-transparent opacity-50 cursor-not-allowed" 
+                  : "bg-theme-white/5 text-theme-white/70 border-theme-white/20 hover:bg-theme-white/15 hover:text-theme-white hover:border-theme-white/40"
             }`}
           >
             <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
@@ -303,7 +303,7 @@ function StatusCard({
       </div>
       
       {/* Bottom Information Row */}
-      <div className="relative z-10 mt-5 pt-3 border-t border-theme-bg/10 flex flex-col gap-1.5">
+      <div className="relative z-10 mt-5 pt-3 border-t border-theme-white/10 flex flex-col gap-1.5">
         <div className="flex items-center gap-2 text-sm">
           {statusCode && (
             <span className={`font-black text-xs px-2 py-0.5 rounded ${
@@ -314,12 +314,12 @@ function StatusCard({
               {statusCode}
             </span>
           )}
-          <span className={`text-sm font-semibold leading-tight truncate ${status === 'DOWN' ? 'text-red-400' : 'text-theme-bg/90'}`}>
+          <span className={`text-sm font-semibold leading-tight truncate ${status === 'DOWN' ? 'text-red-400' : 'text-theme-white/90'}`}>
             {description || (status === "UP" ? "Operational" : "Connection Failed")}
           </span>
         </div>
         
-        <div className="flex items-center gap-1.5 text-xs text-theme-bg/50 font-mono tracking-tight mt-1">
+        <div className="flex items-center gap-1.5 text-xs text-theme-white/50 font-mono tracking-tight mt-1">
           <Clock size={12} /> 
           {formatTime(timestamp)}
         </div>
@@ -362,8 +362,8 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
   }
 
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-bg/10 text-theme-bg/70 border border-theme-bg/20 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
-      <RefreshCw size={14} className="animate-spin text-theme-bg/50" /> 
+    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-white/10 text-theme-white/70 border border-theme-white/20 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
+      <RefreshCw size={14} className="animate-spin text-theme-white/50" /> 
       <span className="hidden sm:inline">PENDING</span><span className="sm:hidden">WAIT</span>
     </div>
   );

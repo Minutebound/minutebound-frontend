@@ -186,11 +186,11 @@ export default function LocationAutocomplete({
     <div className="relative w-full" ref={wrapperRef}>
       <div className="relative flex items-center w-full">
         {/* MapPin at the far left edge */}
-        <MapPin className="size-5 text-theme-text/50 absolute left-0 pointer-events-none" />
+        <MapPin className="size-5 text-theme-secondary/50 absolute left-0 pointer-events-none" />
         
         {/* Input with proper pl-8 to clear the MapPin, and dynamic pr-* to clear the right buttons */}
         <input
-          className={`w-full h-full min-h-[40px] pl-8 outline-none transition-all duration-300 text-[15px] font-bold bg-transparent border-none shadow-none text-theme-text placeholder:text-theme-text/40 focus:ring-0
+          className={`w-full h-full min-h-[40px] pl-8 outline-none transition-all duration-300 text-[15px] font-bold bg-transparent border-none shadow-none text-theme-secondary placeholder:text-theme-secondary/40 focus:ring-0
             ${
               !isSearching && query.length === 0 && showGPS
                 ? "pr-10" // Spacing for the GPS button
@@ -226,7 +226,7 @@ export default function LocationAutocomplete({
               setIsOpen(false);
               setResults([]);
             }}
-            className="absolute right-[-8px] p-1 rounded-lg transition-colors text-theme-text/50 hover:text-theme-text hover:bg-theme-secondary/10"
+            className="absolute right-[-8px] p-1 rounded-lg transition-colors text-theme-secondary/50 hover:text-theme-secondary hover:bg-theme-secondary/10"
           >
             <X size={16} />
           </button>
@@ -238,7 +238,7 @@ export default function LocationAutocomplete({
             title="Use current location"
             className={`absolute right-[-8px] p-1 rounded-lg transition-all duration-300 text-[11px] font-black tracking-wider flex items-center gap-1.5
               ${gpsLoading ? "opacity-60 cursor-not-allowed" : ""}
-              bg-theme-secondary/10 hover:bg-theme-secondary text-theme-secondary hover:text-theme-bg border border-transparent hover:border-theme-secondary`}
+              bg-theme-secondary/10 hover:bg-theme-secondary text-theme-secondary hover:text-theme-white border border-transparent hover:border-theme-secondary`}
           >
             {gpsLoading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -252,7 +252,7 @@ export default function LocationAutocomplete({
       {isOpen && results.length > 0 && (
         <ul
           ref={listRef}
-          className={`absolute z-50 mt-4 border rounded-2xl shadow-2xl max-h-[220px] overflow-y-auto backdrop-blur-md bg-theme-bg border-theme-secondary/20 custom-scrollbar w-[220px] sm:w-[250px] md:w-[250px] lg:w-[250px]
+          className={`absolute z-50 mt-4 border rounded-2xl shadow-2xl max-h-[220px] overflow-y-auto backdrop-blur-md bg-theme-white border-theme-secondary/20 custom-scrollbar w-[220px] sm:w-[250px] md:w-[250px] lg:w-[250px]
             ${showGPS ? "left-0" : "right-0"}
           `}
         >
@@ -263,9 +263,9 @@ export default function LocationAutocomplete({
                 e.preventDefault();
                 handleSelect(loc);
               }}
-              className="p-4 flex items-center gap-4 cursor-pointer transition-colors duration-200 group hover:bg-theme-surface/50 border-b border-theme-surface last:border-0 text-theme-text"
+              className="p-4 flex items-center gap-4 cursor-pointer transition-colors duration-200 group hover:bg-theme-surface/50 border-b border-theme-surface last:border-0 text-theme-secondary"
             >
-              <div className="p-2 rounded-xl transition-all duration-300 group-hover:scale-110 bg-theme-primary/10 text-theme-primary group-hover:bg-theme-primary group-hover:text-theme-bg">
+              <div className="p-2 rounded-xl transition-all duration-300 group-hover:scale-110 bg-theme-primary/10 text-theme-primary group-hover:bg-theme-primary group-hover:text-theme-white">
                 <MapPin className="size-5" />
               </div>
               <div className="flex-1 text-sm overflow-hidden flex flex-col justify-center">

@@ -9,7 +9,6 @@ import Footer from "../components/Footer";
 
 // Configure Inter (Your Default)
 const inter = Inter({
-  weight: ['400'],
   subsets: ["latin"],
   variable: "--font-inter",
   display: 'swap', 
@@ -54,12 +53,14 @@ export default function RootLayout({
       </head>
       <body
         // Inject ALL font variables here, and apply 'font-sans' to set the default
-        className={`${inter.variable} ${dmSans.variable} font-sans antialiased min-h-screen flex flex-col`}
+        className={`${inter.variable} ${dmSans.variable} ${ubuntu.variable} font-sans antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <AuthProvider>
           <ClientInit />
-          <Navbar/>
+          <div className="sticky top-0 z-50">
+            <Navbar />
+          </div>
           <div className="flex-1 flex flex-col min-h-screen">
             {children}
           </div>
@@ -71,3 +72,4 @@ export default function RootLayout({
     </html>
   );
 }
+

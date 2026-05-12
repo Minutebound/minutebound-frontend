@@ -70,7 +70,7 @@ function EventsContent() {
     if (!loading && events.length > 0) {
       events.forEach((event) => {
         const el = document.createElement('div');
-        el.className = 'bg-theme-bg border border-theme-text/10 shadow-lg rounded-full px-3 py-1.5 text-[11px] font-black text-theme-text cursor-pointer transition-all hover:scale-110 hover:bg-theme-orange hover:text-white hover:border-theme-orange whitespace-nowrap';
+        el.className = 'bg-theme-white border border-theme-secondary/10 shadow-lg rounded-full px-3 py-1.5 text-[11px] font-black text-theme-secondary cursor-pointer transition-all hover:scale-110 hover:bg-theme-orange hover:text-white hover:border-theme-orange whitespace-nowrap';
         el.innerHTML = event.title.length > 15 ? event.title.substring(0, 15) + '...' : event.title;
 
         const marker = new maplibregl.Marker({ element: el })
@@ -89,16 +89,16 @@ function EventsContent() {
   }, [events, loading]);
 
   return (
-    <div className="w-full h-[calc(100vh)] relative bg-theme-bg overflow-hidden flex flex-col md:flex-row">
+    <div className="w-full h-[calc(100vh)] relative bg-theme-white overflow-hidden flex flex-col md:flex-row">
       <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.1]" style={{ backgroundImage: 'radial-gradient(circle, currentColor 2px, transparent 1.5px)', backgroundSize: '24px 24px', color: '#94a3b8' }} />
 
-      <div className="relative z-10 w-full md:w-[60%] lg:w-[60%] flex flex-col h-full border-r border-theme-surface bg-theme-bg/50 backdrop-blur-md">
-        <div className="p-6 pb-4 border-b border-theme-text/5">
+      <div className="relative z-10 w-full md:w-[60%] lg:w-[60%] flex flex-col h-full border-r border-theme-surface bg-theme-white/50 backdrop-blur-md">
+        <div className="p-6 pb-4 border-b border-theme-secondary/5">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 bg-theme-orange/10 rounded-xl">
               <Calendar className="text-theme-orange w-6 h-6" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-theme-text tracking-tight">Discover Events</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-theme-secondary tracking-tight">Discover Events</h2>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
@@ -109,37 +109,37 @@ function EventsContent() {
                 className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold tracking-wide transition-all border ${
                   activeCategory === cat
                     ? 'bg-theme-orange text-white border-theme-orange shadow-md'
-                    : 'bg-theme-bg text-theme-text/70 border-theme-text/10 hover:border-theme-orange/40 hover:text-theme-orange'
+                    : 'bg-theme-white text-theme-secondary/70 border-theme-secondary/10 hover:border-theme-orange/40 hover:text-theme-orange'
                 }`}
               >
                 {cat}
               </button>
             ))}
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-theme-text/70 mt-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-theme-secondary/70 mt-4">
             {loading ? 'Scanning Radar...' : `${events.length} Upcoming Experiences`}
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-theme-bg/50">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-theme-white/50">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <div className="w-8 h-8 border-4 border-theme-orange/20 border-t-theme-orange rounded-full animate-spin" />
             </div>
           ) : events.length === 0 ? (
             <div className="flex justify-center items-center h-32">
-              <p className="text-theme-text/50 font-bold text-sm">No events found in this category.</p>
+              <p className="text-theme-secondary/50 font-bold text-sm">No events found in this category.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-5">
               {events.map((event) => (
-                <div key={event.id} className="group flex flex-col sm:flex-row bg-theme-bg border border-theme-text/5 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-theme-orange/5 hover:border-theme-orange/30 transition-all duration-500 cursor-pointer">
+                <div key={event.id} className="group flex flex-col sm:flex-row bg-theme-white border border-theme-secondary/5 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-theme-orange/5 hover:border-theme-orange/30 transition-all duration-500 cursor-pointer">
                   
                   {/* Left Side: Image */}
                   <div className="w-full sm:w-2/5 h-48 sm:h-auto relative overflow-hidden">
                     <img src={event.image_url} alt={event.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                     <div className="absolute top-4 left-4 z-20">
-                      <span className="px-3 py-1 bg-theme-bg/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-theme-orange shadow-sm">
+                      <span className="px-3 py-1 bg-theme-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-theme-orange shadow-sm">
                         {event.category}
                       </span>
                     </div>
@@ -152,17 +152,17 @@ function EventsContent() {
                         <Calendar size={14} />
                         {new Date(event.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </div>
-                      <h3 className="text-xl font-black text-theme-text mb-2 tracking-tight leading-tight">{event.title}</h3>
-                      <p className="text-sm text-theme-text/60 font-medium leading-relaxed line-clamp-2 mb-4">{event.description}</p>
+                      <h3 className="text-xl font-black text-theme-secondary mb-2 tracking-tight leading-tight">{event.title}</h3>
+                      <p className="text-sm text-theme-secondary/60 font-medium leading-relaxed line-clamp-2 mb-4">{event.description}</p>
                     </div>
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-theme-text/5 mt-auto">
-                      <div className="flex items-center gap-2 text-theme-text/70">
+                    <div className="flex items-center justify-between pt-4 border-t border-theme-secondary/5 mt-auto">
+                      <div className="flex items-center gap-2 text-theme-secondary/70">
                         <MapPin size={14} />
                         <span className="text-xs font-bold">{event.venue_name}</span>
                       </div>
                       <div className="p-2.5 bg-theme-orange/60 rounded-xl group-hover:bg-theme-orange group-hover:text-white transition-colors">
-                        <ArrowRight size={18} className='text-theme-bg'/>
+                        <ArrowRight size={18} className='text-theme-white'/>
                       </div>
                     </div>
                   </div>
@@ -174,7 +174,7 @@ function EventsContent() {
         </div>
       </div>
 
-      <div className="hidden md:block w-full md:w-[40%] lg:w-[40%] bg-theme-bg relative z-10">
+      <div className="hidden md:block w-full md:w-[40%] lg:w-[40%] bg-theme-white relative z-10">
         <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
       </div>
     </div>
@@ -183,7 +183,7 @@ function EventsContent() {
 
 export default function EventsExplorer() {
   return (
-    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center bg-theme-bg">Loading Explorer...</div>}>
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center bg-theme-white">Loading Explorer...</div>}>
       <EventsContent />
     </Suspense>
   );

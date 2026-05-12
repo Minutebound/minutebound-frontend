@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { CheckCircle2 } from "lucide-react";
 
 const getNumNights = (start?: string, end?: string) => {
   if (!start || !end) return 1;
@@ -18,63 +19,81 @@ const StayRow = ({ stay, uniqueKey, isSelected, toggleStaySelection, searchParam
   const numNights = getNumNights(searchParams?.startDate, searchParams?.endDate);
 
   return (
-    <div className={`rounded-3xl overflow-hidden transition-all duration-200 border relative ${isSelected ? 'border-theme-primary ring-2 ring-theme-primary bg-theme-bg shadow-xl' : 'border-theme-surface bg-theme-bg hover:shadow-xl hover:border-theme-muted'}`}>
-      {isSelected && <div className="absolute top-0 left-0 w-2 h-full bg-theme-primary z-10"></div>}
+    <div className={`rounded-[1rem] border-[1px] transition-all duration-300 overflow-hidden cursor-pointer ${isSelected ? 'border-theme-violet bg-theme-violet/20' : 'border-theme-secondary/10 bg-theme-white hover:border-theme-violet'}`}
+         onClick={() => { if (!isUnavailable) toggleStaySelection(stay, uniqueKey); }}>
       
-      <div className={`p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-theme-surface ${isSelected ? 'bg-theme-primary/5' : 'bg-theme-surface/20'}`}>
-        <div className="flex flex-col">
-          <h4 className="font-black text-2xl text-theme-text leading-tight mb-2">
+      <div className="p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-8 relative">
+        
+        {/* INFO BLOCK */}
+        <div className="flex flex-col flex-1 gap-1.5">
+          <h4 className="font-black text-lg sm:text-xl text-theme-secondary leading-tight">
             {stay.name || stay.hotel?.name || "Hotel"}
           </h4>
-          <p className="text-[11px] text-theme-muted font-black uppercase tracking-widest">
+          <p className="text-[10px] text-theme-secondary/50 font-bold uppercase tracking-widest line-clamp-2">
             📍 {formatAddress(stay.address)}
           </p>
         </div>
 
-        <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+        {/* PRICE & ACTION BLOCK (Matches FlightCard Responsive Layout) */}
+        <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
             {!isUnavailable && offer ? (
-              <div className="text-right">
-                <p className="text-4xl font-black text-theme-primary tracking-tight">
-                  ${offer.price?.toFixed(2)}
+              <div className="text-left lg:text-right">
+                <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none">
+                  ${offer.price?.toFixed(0)}
                 </p>
-                <p className="text-[10px] text-theme-muted font-black uppercase tracking-widest mt-1">Total Stay</p>
+                <p className="text-[8px] sm:text-[10px] uppercase text-theme-secondary/30 tracking-widest mt-1">
+                  Total for {numNights} {numNights > 1 ? 'nights' : 'night'}
+                </p>
               </div>
             ) : (
-              <span className="text-theme-accent bg-theme-accent/10 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest border border-theme-accent/20">
-                Sold Out
-              </span>
+              <div className="text-left lg:text-right">
+                <span className="text-theme-error bg-theme-error/10 px-3 py-1.5 rounded-sm text-[10px] font-black uppercase tracking-widest border border-theme-error/20">
+                  Sold Out
+                </span>
+              </div>
             )}
+            
             <button 
               disabled={isUnavailable} 
-              onClick={() => { if (!isUnavailable) toggleStaySelection(stay, uniqueKey); }} 
-              className={`px-8 py-4 rounded-2xl font-black text-[15px] transition-all shadow-md shrink-0 active:scale-[0.98] ${isUnavailable ? "opacity-40 cursor-not-allowed bg-theme-surface text-theme-text/50" : isSelected ? "bg-theme-primary text-theme-bg" : "bg-theme-secondary text-theme-bg hover:opacity-90"}`}
+              onClick={(e) => { e.stopPropagation(); if (!isUnavailable) toggleStaySelection(stay, uniqueKey); }} 
+              className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-[100px] font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 whitespace-nowrap ${isUnavailable ? "opacity-40 cursor-not-allowed bg-theme-surface text-theme-secondary/50 shadow-none" : isSelected ? "bg-theme-secondary text-theme-light-blue" : "bg-theme-violet text-theme-light-blue hover:bg-theme-violet/90"}`}
             >
-              {isUnavailable ? "Unavailable" : isSelected ? "Selected" : "Select"}
+              {isSelected && !isUnavailable ? <CheckCircle2 size={16} /> : null}
+              {isUnavailable ? "Unavailable" : isSelected ? "Selected" : "Select Stay"}
             </button>
         </div>
       </div>
 
-      {offer?.rooms && !isUnavailable && (
-        <div className="p-4 flex flex-col gap-3 bg-theme-surface/10">
-          {offer.rooms.map((room: any, i: number) => (
-            <div key={i} className="flex flex-col sm:flex-row justify-between bg-theme-bg p-5 rounded-2xl border border-theme-surface shadow-sm gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-lg font-black text-theme-text">
-                  {room.category || "Standard Room"}
-                </p>
-                <div className="flex gap-2">
-                  <span className="bg-theme-surface px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-theme-text shadow-sm">{room.bed_type || "Standard Bed"}</span>
-                  <span className="bg-theme-surface px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-theme-text shadow-sm">{room.beds_count || 1} Bed(s)</span>
+      {/* EXPANDED ROOM DETAILS (Matches FlightCard Expansion UI) */}
+      {offer?.rooms && !isUnavailable && isSelected && (
+        <div className="bg-theme-surface/80 border-t border-theme-secondary/10 p-5 lg:p-8 animate-in slide-in-from-top-1 duration-300">
+          <div className="flex items-center gap-2 mb-4">
+             <div className="h-[2px] w-3 bg-theme-violet" />
+             <span className="font-black uppercase tracking-widest text-theme-violet text-[10px]">
+               Available Rooms
+             </span>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {offer.rooms.map((room: any, i: number) => (
+              <div key={i} className="flex flex-col sm:flex-row justify-between bg-theme-white/50 p-4 rounded-lg border border-theme-secondary/5 gap-4 items-start sm:items-center">
+                <div className="flex flex-col gap-2">
+                  <p className="text-[14px] font-black text-theme-secondary">
+                    {room.category || "Standard Room"}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-theme-light-blue border border-theme-secondary/10 px-2.5 py-1 rounded-sm text-[8px] font-black uppercase tracking-widest text-theme-secondary/60">{room.bed_type || "Standard Bed"}</span>
+                    <span className="bg-theme-light-blue border border-theme-secondary/10 px-2.5 py-1 rounded-sm text-[8px] font-black uppercase tracking-widest text-theme-secondary/60">{room.beds_count || 1} Bed(s)</span>
+                  </div>
+                </div>
+                <div className="text-left sm:text-right shrink-0">
+                    <p className="text-lg font-black text-theme-secondary tracking-tight">
+                      ${(room.price / numNights).toFixed(0)} <span className="text-[10px] text-theme-secondary/40 uppercase tracking-widest font-bold">/ night</span>
+                    </p>
                 </div>
               </div>
-              <div className="text-left sm:text-right shrink-0 flex flex-col justify-center">
-                  <p className="text-2xl font-black text-theme-secondary tracking-tight">
-                    ${(room.price / numNights).toFixed(2)}
-                  </p>
-                  <p className="text-[10px] text-theme-muted font-black uppercase tracking-widest mt-1">/ night</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -106,14 +125,13 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
       setSelectedStayKeys([uniqueKey]); 
     } 
     localStorage.setItem("trip_state", JSON.stringify(tripState)); 
-    // Event this to show on the Map
     window.dispatchEvent(new Event("trip_state_changed"));
   };
 
   if (!stays || stays.length === 0) {
     return (
-      <div className="p-10 border-2 border-dashed border-theme-surface bg-theme-surface/10 rounded-3xl text-center flex items-center justify-center min-h-[120px]">
-        <span className="text-xs text-theme-muted font-black tracking-widest uppercase">
+      <div className="p-10 border-2 border-dashed border-theme-secondary/20 bg-theme-secondary/5 rounded-[1rem] text-center flex items-center justify-center min-h-[120px]">
+        <span className="text-[10px] text-theme-secondary/40 font-black tracking-widest uppercase">
           No accommodations found for these dates.
         </span>
       </div>
@@ -121,9 +139,14 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4 animate-in fade-in duration-500">
+      <div className="flex justify-between items-center px-2">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+          {stays.length} Properties available
+        </span>
+      </div>
+      
       {stays.slice(0, 12).map((stay, idx) => {
-        // Updated to include stay.hotel?.hotelId for accurate mapping
         const uniqueKey = stay.hotel_id || stay.hotelId || stay.hotel?.hotelId || stay.id || `stay-${idx}`;
         return <StayRow key={uniqueKey} stay={stay} uniqueKey={uniqueKey} isSelected={selectedStayKeys.includes(uniqueKey)} toggleStaySelection={toggleStaySelection} searchParams={searchParams} />;
       })}

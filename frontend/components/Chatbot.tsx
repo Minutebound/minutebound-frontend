@@ -102,23 +102,23 @@ export default function Chatbot({
       {isOpen && (
         <div
           // Responsive width and height: w-full with a max width for mobile, h-400px for mobile up to 500px for desktop
-          className="bg-theme-bg rounded-2xl shadow-2xl w-[calc(100vw-2rem)] sm:w-80 md:w-96 flex flex-col overflow-hidden border border-theme-surface h-[400px] sm:h-[450px] md:h-[500px] max-h-[85vh] transition-all duration-300"
+          className="bg-theme-white rounded-2xl shadow-2xl w-[calc(100vw-2rem)] sm:w-80 md:w-96 flex flex-col overflow-hidden border border-theme-surface h-[400px] sm:h-[450px] md:h-[500px] max-h-[85vh] transition-all duration-300"
         >
           {/* Header */}
-          <div className="bg-theme-primary p-3 md:p-4 text-theme-bg flex justify-between items-center">
+          <div className="bg-theme-primary p-3 md:p-4 text-theme-white flex justify-between items-center">
             <h3 className="font-semibold flex items-center gap-2 text-sm md:text-base">
               <MessageCircle className="w-4 h-4 md:w-5 md:h-5" /> Travel Assistant
             </h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-theme-bg/80 hover:text-theme-bg transition-colors"
+              className="text-theme-white/80 hover:text-theme-white transition-colors"
             >
               <X className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 bg-theme-bg/50">
+          <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 bg-theme-white/50">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -129,8 +129,8 @@ export default function Chatbot({
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm shadow-sm ${
                     msg.role === "user"
-                      ? "bg-theme-primary text-theme-bg rounded-tr-none"
-                      : "bg-theme-surface text-theme-text border border-theme-surface rounded-tl-none"
+                      ? "bg-theme-primary text-theme-white rounded-tr-none"
+                      : "bg-theme-surface text-theme-secondary border border-theme-surface rounded-tl-none"
                   }`}
                 >
                   {msg.content}
@@ -148,19 +148,19 @@ export default function Chatbot({
           </div>
 
           {/* Input Area */}
-          <div className="p-2 md:p-3 bg-theme-bg border-t border-theme-surface flex items-center gap-2">
+          <div className="p-2 md:p-3 bg-theme-white border-t border-theme-surface flex items-center gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               placeholder="Ask about your destination..."
-              className="flex-1 bg-theme-surface text-theme-text placeholder:text-theme-muted border border-transparent rounded-full px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/50 transition-all shadow-inner"
+              className="flex-1 bg-theme-surface text-theme-secondary placeholder:text-theme-muted border border-transparent rounded-full px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/50 transition-all shadow-inner"
             />
             <button
               onClick={sendMessage}
               disabled={isLoading || !input.trim()}
-              className="bg-theme-primary text-theme-bg p-2 md:p-2.5 rounded-full hover:bg-theme-secondary disabled:opacity-50 transition-colors shadow-md flex-shrink-0"
+              className="bg-theme-primary text-theme-white p-2 md:p-2.5 rounded-full hover:bg-theme-secondary disabled:opacity-50 transition-colors shadow-md flex-shrink-0"
             >
               <Send className="w-4 h-4 md:w-5 md:h-5" />
             </button>
@@ -173,7 +173,7 @@ export default function Chatbot({
         <button
           onClick={() => setIsOpen(true)}
           // Smaller padding on mobile (p-3 vs p-4)
-          className="bg-theme-primary hover:bg-theme-secondary text-theme-bg p-3 md:p-4 rounded-full shadow-xl transition-transform transform hover:scale-105"
+          className="bg-theme-primary hover:bg-theme-secondary text-theme-white p-3 md:p-4 rounded-full shadow-xl transition-transform transform hover:scale-105"
         >
           {/* Smaller icon on mobile */}
           <MessageCircle className="w-6 h-6 md:w-7 md:h-7" />

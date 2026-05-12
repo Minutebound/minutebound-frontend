@@ -120,9 +120,9 @@ export default function SharedItineraryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-theme-bg flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-theme-white flex flex-col items-center justify-center">
         <Loader2 size={40} className="text-theme-primary animate-spin mb-4" />
-        <p className="text-theme-text font-bold animate-pulse">
+        <p className="text-theme-secondary font-bold animate-pulse">
           Loading itinerary...
         </p>
       </div>
@@ -131,17 +131,17 @@ export default function SharedItineraryPage() {
 
   if (error || !trip) {
     return (
-      <div className="min-h-screen bg-theme-bg flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-theme-white flex flex-col items-center justify-center p-6 text-center">
         <div className="bg-red-50 text-red-500 p-6 rounded-full mb-6 border border-red-100">
           <AlertCircle size={48} />
         </div>
-        <h1 className="text-2xl font-black text-theme-text mb-2">
+        <h1 className="text-2xl font-black text-theme-secondary mb-2">
           Trip Unavailable
         </h1>
         <p className="text-theme-muted font-medium mb-8 max-w-md">{error}</p>
         <Link
           href="/"
-          className="bg-theme-primary text-theme-bg px-8 py-3 rounded-xl font-bold hover:bg-theme-secondary transition-all shadow-lg active:scale-95"
+          className="bg-theme-primary text-theme-white px-8 py-3 rounded-xl font-bold hover:bg-theme-secondary transition-all shadow-lg active:scale-95"
         >
           Plan Your Own Trip
         </Link>
@@ -152,13 +152,13 @@ export default function SharedItineraryPage() {
   const tData = trip.data;
 
   return (
-    <div className="min-h-screen bg-theme-bg pb-20">
+    <div className="min-h-screen bg-theme-white pb-20">
       {/* Minimal Public Navbar */}
       <nav className="w-full bg-theme-surface/80 backdrop-blur-md border-b border-theme-surface sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-black text-theme-text hover:opacity-80 transition"
+            className="flex items-center gap-2 text-xl font-black text-theme-secondary hover:opacity-80 transition"
           >
 
             MinuteBound<span className="text-theme-primary">US</span>
@@ -172,10 +172,10 @@ export default function SharedItineraryPage() {
       <main className="max-w-3xl mx-auto p-6 mt-8">
         {/* Header Section */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-black text-theme-text tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-black text-theme-secondary tracking-tight mb-4">
             {getTripTitle()}
           </h1>
-          <p className="inline-flex items-center gap-2 text-sm font-bold text-theme-text/80 bg-theme-surface px-4 py-2 rounded-xl border border-theme-muted/20 shadow-sm">
+          <p className="inline-flex items-center gap-2 text-sm font-bold text-theme-secondary/80 bg-theme-surface px-4 py-2 rounded-xl border border-theme-muted/20 shadow-sm">
             <Calendar size={16} className="text-theme-primary" />
             {formatDate(
               tData.check_in_date ||
@@ -210,7 +210,7 @@ export default function SharedItineraryPage() {
           {/* Transportation */}
           {(tData.flight || tData.drive) && (
             <section>
-              <h3 className="text-lg font-black text-theme-text uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                 {tData.flight ? (
                   <Plane size={20} className="text-theme-primary" />
                 ) : (
@@ -220,9 +220,9 @@ export default function SharedItineraryPage() {
               </h3>
 
               {tData.flight ? (
-                <div className="bg-theme-bg border border-theme-surface rounded-2xl p-5 space-y-4">
+                <div className="bg-theme-white border border-theme-surface rounded-2xl p-5 space-y-4">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="font-black text-lg text-theme-text">
+                    <p className="font-black text-lg text-theme-secondary">
                       {tData.flight.airline_name}
                     </p>
                     <span className="font-black text-theme-primary">
@@ -280,9 +280,9 @@ export default function SharedItineraryPage() {
                                           </span>
                                         </div>
                                       )}
-                                      <div className="flex items-center gap-4 text-theme-text/80">
+                                      <div className="flex items-center gap-4 text-theme-secondary/80">
                                         <div className="flex-1">
-                                          <p className="font-black text-lg text-theme-text">
+                                          <p className="font-black text-lg text-theme-secondary">
                                             {seg.departure_airport}
                                           </p>
                                           <p className="text-xs font-bold text-theme-muted">
@@ -293,7 +293,7 @@ export default function SharedItineraryPage() {
                                           ✈️
                                         </div>
                                         <div className="flex-1 text-right">
-                                          <p className="font-black text-lg text-theme-text">
+                                          <p className="font-black text-lg text-theme-secondary">
                                             {seg.arrival_airport}
                                           </p>
                                           <p className="text-xs font-bold text-theme-muted">
@@ -313,23 +313,23 @@ export default function SharedItineraryPage() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-theme-bg border border-theme-surface rounded-2xl p-5">
+                <div className="bg-theme-white border border-theme-surface rounded-2xl p-5">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="font-black text-lg text-theme-text">
+                    <p className="font-black text-lg text-theme-secondary">
                       Road Trip Journey
                     </p>
                     <span className="font-black text-theme-primary">
                       ${safeFloat(tData.drive?.fuelEstimate).toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-sm text-theme-text/70 font-bold">
+                  <p className="text-sm text-theme-secondary/70 font-bold">
                     Estimated Duration:{" "}
-                    <span className="text-theme-text">
+                    <span className="text-theme-secondary">
                       {tData.drive?.duration}
                     </span>
                     <br />
                     Driving Distance:{" "}
-                    <span className="text-theme-text">
+                    <span className="text-theme-secondary">
                       {tData.drive?.distance}
                     </span>
                   </p>
@@ -341,13 +341,13 @@ export default function SharedItineraryPage() {
           {/* Accommodation */}
           {tData.hotel && (
             <section>
-              <h3 className="text-lg font-black text-theme-text uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Hotel size={20} className="text-theme-primary" /> Accommodation
               </h3>
-              <div className="bg-theme-bg border border-theme-surface rounded-2xl p-5">
+              <div className="bg-theme-white border border-theme-surface rounded-2xl p-5">
                 <div className="flex justify-between items-start gap-4">
                   <div>
-                    <p className="font-black text-lg text-theme-text">
+                    <p className="font-black text-lg text-theme-secondary">
                       {tData.hotel.name}
                     </p>
                     <p className="text-sm font-medium text-theme-muted mt-2 flex items-start gap-2">
@@ -367,7 +367,7 @@ export default function SharedItineraryPage() {
           {/* Attractions */}
           {tData.attractions && tData.attractions.length > 0 && (
             <section>
-              <h3 className="text-lg font-black text-theme-text uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Map size={20} className="text-theme-secondary" /> Planned
                 Attractions
               </h3>
@@ -375,7 +375,7 @@ export default function SharedItineraryPage() {
                 {tData.attractions.map((attr: any, idx: number) => (
                   <div
                     key={idx}
-                    className="bg-theme-bg border border-theme-surface p-4 rounded-xl text-sm font-bold text-theme-text/80 shadow-sm flex items-start gap-3"
+                    className="bg-theme-white border border-theme-surface p-4 rounded-xl text-sm font-bold text-theme-secondary/80 shadow-sm flex items-start gap-3"
                   >
                     <span className="text-theme-secondary mt-0.5">•</span>
                     <span className="leading-snug">{attr.name}</span>
@@ -388,7 +388,7 @@ export default function SharedItineraryPage() {
           {/* Activities */}
           {tData.activities && tData.activities.length > 0 && (
             <section>
-              <h3 className="text-lg font-black text-theme-text uppercase tracking-wider mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Ticket size={20} className="text-theme-secondary" /> Tours &
                 Activities
               </h3>
@@ -396,7 +396,7 @@ export default function SharedItineraryPage() {
                 {tData.activities.map((tour: any, idx: number) => (
                   <div
                     key={idx}
-                    className="bg-theme-bg border border-theme-surface p-4 rounded-xl text-sm font-bold text-theme-text/80 shadow-sm flex items-start gap-3"
+                    className="bg-theme-white border border-theme-surface p-4 rounded-xl text-sm font-bold text-theme-secondary/80 shadow-sm flex items-start gap-3"
                   >
                     <span className="text-theme-secondary mt-0.5">•</span>
                     <span className="leading-snug">

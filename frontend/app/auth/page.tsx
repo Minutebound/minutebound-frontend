@@ -266,23 +266,23 @@ export default function LoginPage() {
     };
 
   return (
-    <div className="min-h-screen flex w-full font-sans bg-theme-bg">
-      <div className="hidden lg:flex w-1/2 relative bg-theme-text overflow-hidden items-end justify-start pb-20 pl-16">
+    <div className="min-h-screen flex w-full font-sans bg-theme-white">
+      <div className="hidden lg:flex w-1/2 relative bg-theme-secondary overflow-hidden items-end justify-start pb-20 pl-16">
         <img
           src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
           alt="Beautiful travel destination"
           className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-[20s] hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-theme-text/95 via-theme-text/40 to-transparent"></div>
-        <div className="relative z-10 max-w-lg text-theme-bg animate-in fade-in slide-in-from-left-8 duration-1000 delay-300 fill-mode-both">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-theme-bg/10 backdrop-blur-md border border-theme-bg/20 text-xs font-bold uppercase tracking-widest mb-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-theme-secondary/95 via-theme-secondary/40 to-transparent"></div>
+        <div className="relative z-10 max-w-lg text-theme-white animate-in fade-in slide-in-from-left-8 duration-1000 delay-300 fill-mode-both">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-theme-white/10 backdrop-blur-md border border-theme-white/20 text-xs font-bold uppercase tracking-widest mb-6">
             <SparkleIcon /> Smart Planning
           </div>
           <h1 className="text-5xl font-black tracking-tight mb-4 leading-[1.1]">
             Your next great adventure,{" "}
             <span className="text-theme-accent">planned in seconds.</span>
           </h1>
-          <p className="text-lg text-theme-bg/80 font-medium">
+          <p className="text-lg text-theme-white/80 font-medium">
             Let us craft a perfect itinerary tailored to your unique travel
             style.
           </p>
@@ -297,7 +297,7 @@ export default function LoginPage() {
           <div className="lg:hidden text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-3xl font-extrabold text-theme-text tracking-tight"
+              className="inline-flex items-center gap-2 text-3xl font-extrabold text-theme-secondary tracking-tight"
             >
               <PlaneTakeoff
                 className="text-theme-primary"
@@ -309,7 +309,7 @@ export default function LoginPage() {
           </div>
 
           <div className="hidden lg:block mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-3xl font-extrabold text-theme-text tracking-tight">
+            <h2 className="text-3xl font-extrabold text-theme-secondary tracking-tight">
               {!isForgotMode
                 ? isVerifyMode
                   ? "Verify Email"
@@ -331,7 +331,7 @@ export default function LoginPage() {
 
           <div className="bg-theme-surface/60 backdrop-blur-xl rounded-[2rem] shadow-sm border border-theme-surface p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             {!isForgotMode && !isVerifyMode && (
-              <div className="flex bg-theme-bg p-1 rounded-2xl mb-8 relative border border-theme-surface">
+              <div className="flex bg-theme-white p-1 rounded-2xl mb-8 relative border border-theme-surface">
                 <div
                   className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-theme-surface rounded-xl shadow-sm transition-all duration-300 ease-out ${
                     isLogin ? "left-1" : "left-[calc(50%+2px)]"
@@ -346,8 +346,8 @@ export default function LoginPage() {
                   }}
                   className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${
                     isLogin
-                      ? "text-theme-text"
-                      : "text-theme-muted hover:text-theme-text"
+                      ? "text-theme-secondary"
+                      : "text-theme-muted hover:text-theme-secondary"
                   }`}
                 >
                   Sign In
@@ -361,8 +361,8 @@ export default function LoginPage() {
                   }}
                   className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-colors duration-300 z-10 ${
                     !isLogin
-                      ? "text-theme-text"
-                      : "text-theme-muted hover:text-theme-text"
+                      ? "text-theme-secondary"
+                      : "text-theme-muted hover:text-theme-secondary"
                   }`}
                 >
                   Sign Up
@@ -416,7 +416,7 @@ export default function LoginPage() {
                         placeholder="First Name"
                         value={firstName}
                         onChange={handleInputChange(setFirstName, "firstName")}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.firstName
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -435,7 +435,7 @@ export default function LoginPage() {
                         placeholder="Middle (Opt)"
                         value={middleName}
                         onChange={(e) => setMiddleName(e.target.value)}
-                        className="w-full px-4 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all"
+                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all"
                       />
                     </div>
                   </div>
@@ -447,7 +447,7 @@ export default function LoginPage() {
                         placeholder="Last Name"
                         value={lastName}
                         onChange={handleInputChange(setLastName, "lastName")}
-                        className={`w-full px-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                        className={`w-full px-4 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.lastName
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -463,7 +463,7 @@ export default function LoginPage() {
                       <select
                         value={suffix}
                         onChange={(e) => setSuffix(e.target.value)}
-                        className="w-full px-2 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                        className="w-full px-2 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
                       >
                         <option value="">Suffix</option>
                         {SUFFIXES.map((s) => (
@@ -481,7 +481,7 @@ export default function LoginPage() {
                       <select
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-4 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
                       >
                         <option value="" disabled>
                           Select Gender
@@ -520,7 +520,7 @@ export default function LoginPage() {
                           setPhoneCountryCode,
                           "phoneCountryCode"
                         )}
-                        className={`w-full px-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-center text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                        className={`w-full px-3 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-center text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.phoneCountryCode
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -544,7 +544,7 @@ export default function LoginPage() {
                           setPhoneNumber,
                           "phoneNumber"
                         )}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.phoneNumber
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -579,7 +579,7 @@ export default function LoginPage() {
                         value={email}
                         disabled={isForgotMode && resetStep === "verify"}
                         onChange={handleInputChange(setEmail, "email")}
-                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.email
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -616,7 +616,7 @@ export default function LoginPage() {
                           }
                           value={password}
                           onChange={handleInputChange(setPassword, "password")}
-                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-bg border rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-bg transition-all ${
+                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                             fieldErrors.password
                               ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                               : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -645,7 +645,7 @@ export default function LoginPage() {
                       placeholder="6-Digit Email Code"
                       value={emailOtp}
                       onChange={(e) => setEmailOtp(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
+                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
                       maxLength={6}
                     />
                   </div>
@@ -663,7 +663,7 @@ export default function LoginPage() {
                       placeholder="6-Digit Code from Email"
                       value={resetCode}
                       onChange={(e) => setResetCode(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3.5 bg-theme-bg border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-text placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
+                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl text-sm font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
                       maxLength={6}
                     />
                   </div>
@@ -688,7 +688,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3.5 px-4 bg-theme-primary hover:bg-theme-secondary text-theme-bg rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-theme-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
+                className="w-full mt-2 py-3.5 px-4 bg-theme-primary hover:bg-theme-secondary text-theme-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-theme-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {isLoading ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -722,7 +722,7 @@ export default function LoginPage() {
                       setEmailOtp("");
                       clearMessages();
                     }}
-                    className="text-xs font-bold text-theme-muted hover:text-theme-text transition-colors"
+                    className="text-xs font-bold text-theme-muted hover:text-theme-secondary transition-colors"
                   >
                     Back to login
                   </button>
@@ -742,7 +742,7 @@ export default function LoginPage() {
                 <div className="mt-6">
                   <button
                     type="button"
-                    className="w-full flex items-center justify-center gap-3 py-3 bg-theme-bg border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-xl text-sm font-bold text-theme-text transition-all shadow-sm active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-3 py-3 bg-theme-white border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-xl text-sm font-bold text-theme-secondary transition-all shadow-sm active:scale-[0.98]"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                       <path

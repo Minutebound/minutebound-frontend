@@ -218,21 +218,21 @@ export default function TripMap({ mapData }: TripMapProps) {
           const bedSvgSmall = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>`;
 
           if (isSelected) {
-            el.className = "w-8 h-8 bg-theme-primary text-theme-bg rounded-xl border-2 border-theme-primary flex items-center justify-center shadow-xl z-30 hover:z-[100] group relative cursor-pointer transition-all";
+            el.className = "w-8 h-8 bg-theme-primary text-theme-white rounded-xl border-2 border-theme-primary flex items-center justify-center shadow-xl z-30 hover:z-[100] group relative cursor-pointer transition-all";
             el.innerHTML = `
               ${bedSvg}
-              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-text text-theme-bg px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
+              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
                 <span class="font-black text-[11px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Selected Hotel"}</span>
-                <div class="w-2 h-2 bg-theme-text absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
+                <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
           } else {
-            el.className = "w-8 h-8 bg-theme-bg text-theme-primary rounded-xl border border-theme-primary/10 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300";
+            el.className = "w-8 h-8 bg-theme-white text-theme-primary rounded-xl border border-theme-primary/10 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300";
             el.innerHTML = `
               ${bedSvgSmall}
-              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-text text-theme-bg px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
+              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
                 <span class="font-black text-[11px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Hotel"}</span>
-                <div class="w-2 h-2 bg-theme-text absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
+                <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
           }
@@ -264,21 +264,21 @@ export default function TripMap({ mapData }: TripMapProps) {
           const name = attr.name || attr.tags?.name || "Attraction";
 
           if (isSelected) {
-            el.className = "w-8 h-8 bg-theme-accent text-theme-bg rounded-full border-2 border-theme-accent flex items-center justify-center shadow-xl z-30 hover:z-[100] group relative cursor-pointer transition-all";
+            el.className = "w-8 h-8 bg-theme-accent text-theme-white rounded-full border-2 border-theme-accent flex items-center justify-center shadow-xl z-30 hover:z-[100] group relative cursor-pointer transition-all";
             el.innerHTML = `
               ${cameraSvg}
-              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-text text-theme-bg px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
+              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
                 <span class="font-black text-[11px] uppercase tracking-widest">${name}</span>
-                <div class="w-2 h-2 bg-theme-text absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
+                <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
           } else {
-            el.className = "w-8 h-8 bg-theme-bg text-theme-accent rounded-full border border-theme-accent/20 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300";
+            el.className = "w-8 h-8 bg-theme-white text-theme-accent rounded-full border border-theme-accent/20 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300";
             el.innerHTML = `
               ${cameraSvgSmall}
-              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-text text-theme-bg px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
+              <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
                 <span class="font-black text-[11px] uppercase tracking-widest">${name}</span>
-                <div class="w-2 h-2 bg-theme-text absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
+                <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
           }
@@ -454,7 +454,7 @@ export default function TripMap({ mapData }: TripMapProps) {
   return (
     <div className="relative w-full h-full rounded-none overflow-hidden">
       {/* Search Radius UI */}
-      <div className="absolute bottom-6 left-6 z-40 bg-theme-bg px-2 py-1.5 rounded-2xl shadow-xl flex flex-col gap-1 border border-theme-surface">
+      <div className="absolute bottom-6 left-6 z-40 bg-theme-white px-2 py-1.5 rounded-2xl shadow-xl flex flex-col gap-1 border border-theme-surface">
         <label className="text-[10px] font-black uppercase tracking-widest text-theme-muted pl-1">
           Search Radius: {radiusValue} mi
         </label>

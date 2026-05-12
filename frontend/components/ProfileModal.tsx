@@ -106,13 +106,13 @@ export default function ProfileModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-theme-bg border border-theme-surface w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col text-theme-text animate-in fade-in zoom-in duration-200 h-[90vh]">
+      <div className="bg-theme-white border border-theme-surface w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col text-theme-secondary animate-in fade-in zoom-in duration-200 h-[90vh]">
         {/* Header */}
         <div className="p-4 border-b border-theme-surface flex justify-between items-center bg-theme-surface/50 shrink-0">
           <h2 className="text-lg font-bold">Profile Settings</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-theme-muted hover:text-theme-text hover:bg-theme-surface transition-colors"
+            className="p-1.5 rounded-lg text-theme-muted hover:text-theme-secondary hover:bg-theme-surface transition-colors"
           >
             <X size={20} />
           </button>
@@ -179,7 +179,7 @@ export default function ProfileModal({
                   type="text"
                   value={profile.first_name}
                   onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text"
+                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary"
                 />
               </div>
 
@@ -191,7 +191,7 @@ export default function ProfileModal({
                   type="text"
                   value={profile.last_name}
                   onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text"
+                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary"
                 />
               </div>
 
@@ -203,7 +203,7 @@ export default function ProfileModal({
                   type="text"
                   value={profile.middle_name}
                   onChange={(e) => setProfile({ ...profile, middle_name: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text"
+                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary"
                 />
               </div>
 
@@ -214,7 +214,7 @@ export default function ProfileModal({
                 <select
                   value={profile.suffix}
                   onChange={(e) => setProfile({ ...profile, suffix: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text appearance-none"
+                  className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary appearance-none"
                 >
                   <option value="">None</option>
                   {SUFFIXES.map((s) => (
@@ -232,7 +232,7 @@ export default function ProfileModal({
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text"
+                className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary"
               />
             </div>
 
@@ -244,18 +244,18 @@ export default function ProfileModal({
                 type="tel"
                 value={profile.mobile_number}
                 onChange={(e) => setProfile({ ...profile, mobile_number: e.target.value })}
-                className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-text"
+                className="w-full p-2.5 rounded-xl bg-theme-surface border border-theme-surface focus:border-theme-primary outline-none text-sm text-theme-secondary"
               />
             </div>
           </div>
         )}
 
         {/* Footer */}
-        <div className="p-4 border-t border-theme-surface bg-theme-bg shrink-0">
+        <div className="p-4 border-t border-theme-surface bg-theme-white shrink-0">
           <button
             onClick={handleSave}
             disabled={saving || loading}
-            className="w-full p-3 rounded-xl bg-theme-primary hover:bg-theme-secondary text-theme-bg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 shadow-md"
+            className="w-full p-3 rounded-xl bg-theme-primary hover:bg-theme-secondary text-theme-white font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 shadow-md"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
             {saving ? "SAVING..." : "SAVE PROFILE"}
