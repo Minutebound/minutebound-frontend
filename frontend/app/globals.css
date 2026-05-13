@@ -29,8 +29,10 @@
   --color-theme-cool-white:#F5F7FA;
   --color-theme-black: #000000;
   --color-theme-surface: #FFF9EE;  
+  --color-theme-error: #DC2626;
+  --color-theme-info:#2563EB;
   --color-theme-red: #DC2626;
-  --color-theme-success: #2A9D8F;
+  --color-theme-success: #059669;
   --color-theme-dark-blue: #01152b; 
   --color-theme-orange: #F97316;
   --color-theme-violet: #7C3AED;

@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 
 export default function WeatherCard({ weather }: { weather: any }) {
@@ -23,12 +24,11 @@ export default function WeatherCard({ weather }: { weather: any }) {
     );
   }
 
+  // UPDATED: Automatically handles rendering whether it's 1 day (One-Way) or 7 days (Round Trip)
   return (
     <div className="rounded-3xl border border-theme-surface bg-theme-white hover:shadow-xl hover:border-theme-muted transition-all duration-200 overflow-hidden">
-      
       <div className="p-6 md:p-8 flex justify-between items-center border-b border-theme-surface bg-theme-surface/20">
         <h3 className="text-3xl font-black text-theme-secondary tracking-tight">Trip Forecast</h3>
-        {/* Replaced the Select button with an auto-included badge */}
         <div className="px-4 py-2 bg-theme-primary/10 text-theme-primary rounded-xl font-black text-[10px] md:text-xs uppercase tracking-widest border border-theme-primary/20">
           ✨ Auto-Included in Itinerary
         </div>

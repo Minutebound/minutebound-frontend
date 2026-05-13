@@ -5,7 +5,7 @@ import { CheckCircle2, ChevronDown, ArrowRight, Car } from "lucide-react";
 
 export default function DrivingCard({ drivingData }: { drivingData?: any }) {
   const [isSelected, setIsSelected] = useState<boolean>(false);
-  const [showIntermediates, setShowIntermediates] = useState<boolean>(false); // Changed default to false to match details tabs
+  const [showIntermediates, setShowIntermediates] = useState<boolean>(false);
 
   useEffect(() => {
     const savedState = sessionStorage.getItem("drive_intermediates_open");
@@ -14,8 +14,9 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
     }
   }, []);
 
+  // UPDATED: Read from sessionStorage
   useEffect(() => {
-    const tripStateStr = localStorage.getItem("trip_state");
+    const tripStateStr = sessionStorage.getItem("selected_trip_state");
     if (tripStateStr) {
       try {
         const tripState = JSON.parse(tripStateStr);
@@ -23,7 +24,7 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
           setIsSelected(true);
         }
       } catch (e) {
-        console.error("Error parsing trip_state localStorage:", e);
+        console.error("Error parsing selected_trip_state:", e);
       }
     }
   }, []);
@@ -38,8 +39,9 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
     };
   };
 
+  // UPDATED: Write to sessionStorage and dispatch new event
   const toggleDriveSelection = () => {
-    const tripStateStr = localStorage.getItem("trip_state");
+    const tripStateStr = sessionStorage.getItem("selected_trip_state");
     let tripState = tripStateStr ? JSON.parse(tripStateStr) : {};
     const newSelected = !isSelected;
     setIsSelected(newSelected);
@@ -47,8 +49,8 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
     tripState.drive = newSelected
       ? { selected: true, data: drivingData }
       : null;
-    localStorage.setItem("trip_state", JSON.stringify(tripState));
-    window.dispatchEvent(new Event("trip_state_changed"));
+    sessionStorage.setItem("selected_trip_state", JSON.stringify(tripState));
+    window.dispatchEvent(new Event("selected_trip_state_changed"));
   };
 
   const toggleIntermediates = () => {
@@ -66,10 +68,8 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
 
   return (
     <div className="flex flex-col gap-4 animate-in fade-in duration-500">
-      
-      {/* HEADER ALIGNMENT */}
       <div className="flex justify-between items-center px-2">
-        <span className=" font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+        <span className="font-black uppercase tracking-[0.2em] text-theme-secondary/50">
           Road Trip Details
         </span>
       </div>
@@ -81,8 +81,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
         }`}
       >
         <div className="p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-8 relative">
-          
-          {/* IDENTIFIER BLOCK */}
           <div className="flex flex-row lg:flex-col items-center lg:items-start gap-3 lg:gap-2 shrink-0 w-full lg:w-auto">
             <div className="w-12 h-12 bg-theme-light-blue rounded-sm p-2 flex items-center justify-center shadow-sm text-theme-secondary">
               <Car size={24} />
@@ -92,16 +90,13 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
             </div>
           </div>
 
-          {/* ROUTE & STATS SUMMARY */}
           <div className="flex-1 w-full space-y-4">
-             {/* Origin to Destination */}
              <div className="flex items-center gap-3">
                <span className="font-black text-theme-secondary text-[16px] ">{sName}</span>
                <ArrowRight size={14} className="text-theme-secondary/30" />
                <span className="font-black text-theme-secondary text-[16px] ">{dName}</span>
              </div>
 
-             {/* Stats Grid */}
              <div className="flex flex-wrap lg:flex-nowrap gap-4 sm:gap-8">
                <div className="flex flex-col">
                   <span className=" uppercase font-black text-theme-secondary/40 tracking-widest">Distance</span>
@@ -128,7 +123,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
              </div>
           </div>
 
-          {/* ACTION BLOCK */}
           <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
              <div className="text-left lg:text-right">
                 <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none">${fuel.cost}</p>
@@ -144,7 +138,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
           </div>
         </div>
 
-        {/* DETAILS TOGGLE STRIP */}
         <div 
            className="flex justify-center w-full py-2 border-t border-theme-secondary/5 hover:bg-theme-secondary/[0.02] transition-colors"
            onClick={(e) => { e.stopPropagation(); toggleIntermediates(); }}
@@ -157,7 +150,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
           </div>
         </div>
 
-{/* EXPANDED ROUTE DETAILS (Industry Standard Timeline) */}
         {showIntermediates && (
           <div className="bg-theme-surface/80 border-t border-theme-secondary/10 p-5 lg:p-8 animate-in slide-in-from-top-1 duration-300">
             <div className="flex items-center gap-2 mb-6">
@@ -168,7 +160,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
             </div>
 
             <div className="relative ml-2">
-              {/* Origin Node */}
               <div className="relative pl-6 border-l-2 border-theme-secondary/20 pb-6">
                 <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-light-blue border-4 border-theme-primary flex items-center justify-center shadow-sm" />
                 <div className="flex flex-col -mt-1">
@@ -177,7 +168,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
                 </div>
               </div>
 
-              {/* Waypoint Nodes */}
               {passedCities.map((city: string, idx: number) => (
                 <div key={idx} className="relative pl-6 border-l-2 border-theme-secondary/20 pb-6">
                   <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-theme-white border-2 border-theme-secondary/30" />
@@ -185,7 +175,6 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
                 </div>
               ))}
 
-              {/* Destination Node */}
               <div className="relative pl-6">
                 <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-secondary border-[3px] border-theme-light-blue flex items-center justify-center shadow-sm" />
                 <div className="flex flex-col -mt-1">

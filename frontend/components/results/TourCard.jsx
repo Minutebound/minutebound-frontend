@@ -1,11 +1,13 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function ToursCard({ tours }) {
   const [selectedKeys, setSelectedKeys] = useState([]);
   
+  // UPDATED: Read from sessionStorage
   useEffect(() => { 
-    const tripStateStr = localStorage.getItem('trip_state'); 
+    const tripStateStr = sessionStorage.getItem('selected_trip_state'); 
     if (tripStateStr) { 
       try { 
         const t = JSON.parse(tripStateStr); 
@@ -14,8 +16,9 @@ export default function ToursCard({ tours }) {
     } 
   }, [tours]);
   
+  // UPDATED: Write to sessionStorage and dispatch new event
   const toggleTourSelection = (item, key) => { 
-    const tripStateStr = localStorage.getItem('trip_state'); 
+    const tripStateStr = sessionStorage.getItem('selected_trip_state'); 
     let t = tripStateStr ? JSON.parse(tripStateStr) : {}; 
     if (!t.tours) t.tours = []; 
     if (selectedKeys.includes(key)) { 
@@ -25,7 +28,8 @@ export default function ToursCard({ tours }) {
       t.tours.push({ ...item, _selectionKey: key }); 
       setSelectedKeys(p => [...p, key]); 
     } 
-    localStorage.setItem('trip_state', JSON.stringify(t)); 
+    sessionStorage.setItem('selected_trip_state', JSON.stringify(t)); 
+    window.dispatchEvent(new Event("selected_trip_state_changed"));
   };
 
   if (!tours || tours.length === 0) {
@@ -57,7 +61,6 @@ export default function ToursCard({ tours }) {
               onClick={() => toggleTourSelection(tour, uniqueKey)}
               className={`group border-[1px] rounded-[1rem] p-4 sm:p-6 transition-all duration-300 flex flex-col gap-5 cursor-pointer overflow-hidden ${isSelected ? 'border-theme-orange bg-theme-orange/20' : 'border-theme-secondary/10 bg-theme-white hover:border-theme-orange/20'}`}
             >
-              {/* IMAGE HEADER */}
               {tour.picture_url ? (
                 <div className="w-full h-48 sm:h-56 rounded-sm shrink-0 shadow-sm border border-theme-secondary/10 overflow-hidden relative">
                   <img src={tour.picture_url} alt={tour.name} className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out" />
@@ -66,7 +69,6 @@ export default function ToursCard({ tours }) {
                 <div className="w-full h-48 sm:h-56 bg-theme-surface text-theme-orange flex items-center justify-center rounded-sm shrink-0 text-5xl border border-theme-secondary/10">🎟️</div>
               )}
               
-              {/* CONTENT & ACTION FOOTER */}
               <div className="flex flex-col flex-1 justify-between gap-4">
                 <div>
                   <h4 className="font-black text-theme-secondary text-lg sm:text-xl leading-tight mb-2">{tour.name}</h4>

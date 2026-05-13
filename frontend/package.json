@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@protomaps/basemaps": "^5.7.1",
+    "@stripe/react-stripe-js": "^6.3.0",
+    "@stripe/stripe-js": "^9.5.0",
     "axios": "^1.13.6",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.576.0",

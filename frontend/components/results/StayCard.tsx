@@ -1,8 +1,10 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 
+// UPDATED: Added rigorous checks to default to 1 night for One-Way trips
 const getNumNights = (start?: string, end?: string) => {
-  if (!start || !end) return 1;
+  if (!start || !end || end.trim() === "") return 1;
   return Math.max(1, Math.ceil(Math.abs(new Date(end).getTime() - new Date(start).getTime()) / 86400000));
 };
 
@@ -23,8 +25,6 @@ const StayRow = ({ stay, uniqueKey, isSelected, toggleStaySelection, searchParam
          onClick={() => { if (!isUnavailable) toggleStaySelection(stay, uniqueKey); }}>
       
       <div className="p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-8 relative">
-        
-        {/* INFO BLOCK */}
         <div className="flex flex-col flex-1 gap-1.5">
           <h4 className="font-black text-lg sm:text-xl text-theme-secondary leading-tight">
             {stay.name || stay.hotel?.name || "Hotel"}
@@ -34,7 +34,6 @@ const StayRow = ({ stay, uniqueKey, isSelected, toggleStaySelection, searchParam
           </p>
         </div>
 
-        {/* PRICE & ACTION BLOCK (Matches FlightCard Responsive Layout) */}
         <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
             {!isUnavailable && offer ? (
               <div className="text-left lg:text-right">
@@ -64,7 +63,6 @@ const StayRow = ({ stay, uniqueKey, isSelected, toggleStaySelection, searchParam
         </div>
       </div>
 
-      {/* EXPANDED ROOM DETAILS (Matches FlightCard Expansion UI) */}
       {offer?.rooms && !isUnavailable && isSelected && (
         <div className="bg-theme-surface/80 border-t border-theme-secondary/10 p-5 lg:p-8 animate-in slide-in-from-top-1 duration-300">
           <div className="flex items-center gap-2 mb-4">
@@ -103,8 +101,9 @@ const StayRow = ({ stay, uniqueKey, isSelected, toggleStaySelection, searchParam
 export default function StaysCard({ stays, searchParams }: { stays: any[]; searchParams?: any; }) {
   const [selectedStayKeys, setSelectedStayKeys] = useState<string[]>([]);
   
+  // UPDATED: Read from sessionStorage
   useEffect(() => { 
-    const tripState = localStorage.getItem("trip_state"); 
+    const tripState = sessionStorage.getItem("selected_trip_state"); 
     if (tripState) { 
       try { 
         const parsed = JSON.parse(tripState); 
@@ -113,8 +112,9 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
     } 
   }, [stays]);
 
+  // UPDATED: Write to sessionStorage and dispatch new event
   const toggleStaySelection = (stay: any, uniqueKey: string) => { 
-    const tripStateStr = localStorage.getItem("trip_state"); 
+    const tripStateStr = sessionStorage.getItem("selected_trip_state"); 
     let tripState = tripStateStr ? JSON.parse(tripStateStr) : {}; 
     const isSelected = selectedStayKeys.includes(uniqueKey); 
     if (isSelected) { 
@@ -124,8 +124,8 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
       tripState.stays = [ { ...stay, _selectionKey: uniqueKey, offerDetails: stay.roomDetails } ]; 
       setSelectedStayKeys([uniqueKey]); 
     } 
-    localStorage.setItem("trip_state", JSON.stringify(tripState)); 
-    window.dispatchEvent(new Event("trip_state_changed"));
+    sessionStorage.setItem("selected_trip_state", JSON.stringify(tripState)); 
+    window.dispatchEvent(new Event("selected_trip_state_changed"));
   };
 
   if (!stays || stays.length === 0) {

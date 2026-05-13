@@ -49,7 +49,7 @@ export default function TripMap({ mapData }: TripMapProps) {
   useEffect(() => {
     const loadData = () => {
       // Load Local Storage (Selected Items)
-      const stateStr = localStorage.getItem("trip_state");
+      const stateStr = sessionStorage.getItem("selected_trip_state");
       if (stateStr) {
         try { setCurrentTripState(JSON.parse(stateStr)); } catch (e) {}
       } else {
@@ -66,11 +66,11 @@ export default function TripMap({ mapData }: TripMapProps) {
     };
     
     loadData();
-    window.addEventListener("trip_state_changed", loadData);
+    window.addEventListener("selected_trip_state_changed", loadData);
     window.addEventListener("current_trip_results_changed", loadData); 
 
     return () => {
-      window.removeEventListener("trip_state_changed", loadData);
+      window.removeEventListener("selected_trip_state_changed", loadData);
       window.removeEventListener("current_trip_results_changed", loadData);
     };
   }, []);

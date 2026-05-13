@@ -22,7 +22,6 @@ axios.interceptors.response.use(
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('email');
-        // Optional: redirect to login
         window.location.href = '/auth'; 
       }
     }
@@ -77,21 +76,38 @@ export interface Attraction {
   longitude: number;
 }
 
+export interface Amenities {
+  legroom?: string;
+  wifi?: boolean;
+  power_usb?: boolean;
+  food?: string;
+}
+
 export interface FlightSegment {
   departure_airport: string;
   departure_airport_name?: string;
+  departure_terminal?: string; 
   departure_lat?: number;
   departure_lon?: number;
   departure_time: string;
+  
   arrival_airport: string;
   arrival_airport_name?: string;
+  arrival_terminal?: string; 
   arrival_lat?: number;
   arrival_lon?: number;
   arrival_time: string;
+  
   carrier_code: string;
   carrier_name: string;
   flight_number: string;
+  
+  aircraft?: string; 
+  duration?: string; 
+  cabin_class?: string; 
   checked_bags?: number;
+  carry_on_bags?: number; 
+  amenities?: Amenities; 
 }
 
 export interface FlightItinerary {
@@ -107,6 +123,8 @@ export interface FlightOffer {
   airline_code: string;
   airline_name: string;
   cabin_class: string;
+  carbon_emissions_kg?: number; 
+  raw_offer_data?: any; // <--- ADD THIS LINE
   itineraries: FlightItinerary[];
 }
 
@@ -149,7 +167,6 @@ export interface WeatherSummary {
   days: WeatherDay[];
 }
 
-
 export interface LocationResult {
   city?: string;
   name?: string;
@@ -166,6 +183,7 @@ export interface TripSearchParams {
   destination: any;
   startDate: string;
   endDate: string;
+  tripType?: "round-trip" | "one-way"; // <-- Added this
   numNights: number;
   adults: number;
   children: number;
@@ -201,7 +219,6 @@ export const travelApi = {
   },
 
   saveTrip: async (tripData: any, visibility: "PRIVATE" | "PUBLIC" = "PRIVATE") => {
-    // Formats the payload to match the backend ItineraryCreate schema
     const payload = {
       destination: tripData.destination || "My Trip",
       data: tripData,
@@ -220,8 +237,9 @@ export const travelApi = {
     return response.data;
   },
 
-  deleteTrip: async (itineraryId: string) => {
-    const response = await axios.delete(`${API_BASE_URL}/itineraries/${itineraryId}`, {
+
+  deleteTrip: async (tripId: string) => {
+    const response = await axios.delete(`${API_BASE_URL}/itineraries/${tripId}`, {
       headers: getAuthHeaders()
     });
     return response.data;
@@ -248,7 +266,6 @@ export const travelApi = {
     return response.data;
   },
 
-  // --- LEGACY PDF SHARE (Kept for backwards compatibility if needed) ---
   sharePdf: async (data: any, email: string, signal?: AbortSignal) => {
     try {
       const payload = { ...data, email };
@@ -284,8 +301,6 @@ export const travelApi = {
       return null;
     }
   },
-
-  // --- AUTH ENDPOINTS ---
 
   signup: async (userData: UserCreatePayload) => {
     const { data } = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
@@ -356,7 +371,6 @@ export const travelApi = {
     return response.data;
   },
 
-  //DESTINATIONS
   getDestinations: async (skip: number = 0, limit: number = 50) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/destinations/`, {
@@ -375,13 +389,12 @@ export const travelApi = {
       return response.data; 
     } catch (error) {
       console.error("Top destinations fetch failed:", error);
-      return []; // Returns empty array to prevent map/carousel crashes
+      return [];
     }
   },
 
   searchDestinations: async (params?: { category?: string; query?: string }) => {
     try {
-      // Prevents sending { category: "All" } which might confuse strict backends
       const cleanParams = params?.category === 'All' ? {} : params;
       const response = await axios.get(`${API_BASE_URL}/destinations/search`, { params: cleanParams });
       return response.data;
@@ -404,7 +417,7 @@ export const travelApi = {
   createDestination: async (destinationData: any) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/destinations/`, destinationData, {
-        headers: getAuthHeaders() // Requires admin/auth privileges
+        headers: getAuthHeaders()
       });
       return response.data;
     } catch (error) {
@@ -413,7 +426,6 @@ export const travelApi = {
     }
   },
 
-  //EVENTS  
   getTopEvents: async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/events/top?limit=12`);
@@ -448,7 +460,7 @@ export const travelApi = {
   createEvent: async (eventData: any) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/events/`, eventData, {
-        headers: getAuthHeaders() // Requires admin/auth privileges
+        headers: getAuthHeaders() 
       });
       return response.data;
     } catch (error) {
@@ -457,7 +469,6 @@ export const travelApi = {
     }
   },
 
-  //FLIGHTS
   getFlights: async (params: TripSearchParams, signal?: AbortSignal): Promise<FlightOffer[]> => {
     try {
       let originIata = params.source.iata;
@@ -483,16 +494,23 @@ export const travelApi = {
         ? 'BUSINESS,FIRST' 
         : 'ECONOMY,PREMIUM_ECONOMY';
 
+      // Dynamically build the parameters to optionally exclude return_date
+      const searchParams: any = {
+        origin: originIata || 'JFK',
+        destination: destIata || 'LAX',
+        date: params.startDate,
+        adults: params.adults,
+        children: params.children,
+        travel_class: travelClasses
+      };
+
+      // Only attach return_date if it's a round trip and an endDate exists
+      if (params.tripType !== "one-way" && params.endDate) {
+        searchParams.return_date = params.endDate;
+      }
+
       const response = await axios.get(`${API_BASE_URL}/flights/search`, {
-        params: {
-          origin: originIata || 'JFK',
-          destination: destIata || 'LAX',
-          date: params.startDate,
-          return_date: params.endDate,
-          adults: params.adults,
-          children: params.children,
-          travel_class: travelClasses
-        },
+        params: searchParams,
         signal
       });
       
@@ -506,7 +524,44 @@ export const travelApi = {
     }
   },
 
-  //DRIVING
+  confirmFlightPrice: async (flightOffer: any) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/flights/price`, {
+        flight_offer: flightOffer
+      }, { headers: getAuthHeaders() });
+      return response.data;
+    } catch (error: any) {
+      console.error("Pricing confirmation failed:", error);
+      throw error.response?.data || { error: "Pricing failed" };
+    }
+  },
+
+  bookFlight: async (pricedOffer: any, travelers: any[]) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/flights/book`, {
+        priced_offer: pricedOffer,
+        travelers: travelers
+      }, { headers: getAuthHeaders() });
+      return response.data;
+    } catch (error: any) {
+      console.error("Booking failed:", error);
+      throw error.response?.data || { error: "Booking failed" };
+    }
+  },
+
+  createPaymentIntent: async (amount: number, currency: string = "USD") => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/flights/create-payment-intent`, {
+        amount,
+        currency
+      }, { headers: getAuthHeaders() });
+      return response.data;
+    } catch (error: any) {
+      console.error("Failed to create payment intent:", error);
+      throw error.response?.data || { error: "Payment setup failed" };
+    }
+  },
+
   getDriving: async (params: TripSearchParams, signal?: AbortSignal) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/driving/route`, {
@@ -526,16 +581,19 @@ export const travelApi = {
     }
   },
 
-  //STAYS
+// --- STAYS ---
   getStays: async (params: TripSearchParams, signal?: AbortSignal): Promise<HotelOffer[]> => {
     try {
+      // Calculate a 1-night stay if it's a one-way trip (endDate is missing)
+      const effectiveEndDate = params.endDate || (params.startDate ? new Date(new Date(params.startDate + "T12:00:00").getTime() + 86400000).toISOString().split("T")[0] : "");
       const radiusKm = Math.round(params.radius * 1.60934); 
+
       const response = await axios.get(`${API_BASE_URL}/stays/nearby`, {
-      params: {
+        params: {
           lat: params.destination.lat,
           lon: params.destination.lon,
           check_in_date: params.startDate,
-          check_out_date: params.endDate,
+          check_out_date: effectiveEndDate, // Use the fallback date
           adults: params.adults,
           radius: radiusKm || 50
         },
@@ -554,11 +612,14 @@ export const travelApi = {
 
   getStayOffer: async (hotelId: string, params: any, signal?: AbortSignal): Promise<HotelOffer | { error: boolean } | null> => {
     try {
+      // Calculate a 1-night stay if it's a one-way trip
+      const effectiveEndDate = params.endDate || (params.startDate ? new Date(new Date(params.startDate + "T12:00:00").getTime() + 86400000).toISOString().split("T")[0] : "");
+      
       const response = await axios.get(`${API_BASE_URL}/stays/offer`, {
         params: {
           hotel_id: hotelId,
           check_in_date: params.startDate,
-          check_out_date: params.endDate,
+          check_out_date: effectiveEndDate, // Use the fallback date
           adults: params.adults
         },
         signal
@@ -570,15 +631,18 @@ export const travelApi = {
     }
   },
 
-  //WEATHER
+  // --- WEATHER ---
   getWeather: async (dest: any, dates: any, signal?: AbortSignal): Promise<WeatherSummary | null> => {
     try {
+      // Calculate a 1-day forecast span if it's a one-way trip
+      const effectiveEndDate = dates.end || (dates.start ? new Date(new Date(dates.start + "T12:00:00").getTime() + 86400000).toISOString().split("T")[0] : "");
+      
       const response = await axios.get(`${API_BASE_URL}/weather/forecast`, {
         params: {
           lat: dest.lat,
           lon: dest.lon,
           check_in_date: dates.start,
-          check_out_date: dates.end
+          check_out_date: effectiveEndDate // Use the fallback date
         },
         signal
       });
@@ -590,7 +654,6 @@ export const travelApi = {
     }
   },
 
-  //ATTRACTIONS
   getAttractions: async (dest: any, radiusMiles: number, signal?: AbortSignal, retries = 2): Promise<Attraction[]> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/attractions/nearby`, {
@@ -620,7 +683,6 @@ export const travelApi = {
     }
   },
 
-  //TOURS
   getTours: async (dest: any, radiusMiles: number, signal?: AbortSignal): Promise<Tour[]> => {
     try {
       const response = await axios.get(`${API_BASE_URL}/tours/nearby`, {

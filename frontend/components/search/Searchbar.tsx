@@ -1,24 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Loader2, Calendar, TrendingUp, PenBoxIcon, Map, X, ArrowRightLeft, Users, ChevronDown, Plane, Car, Edit } from "lucide-react";
+import { Search, Loader2, Calendar, TrendingUp, PenBoxIcon, Map, X, Users, ChevronDown, Plane, Car } from "lucide-react";
 import LocationAutocomplete from "./LocationAutoComplete";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { travelApi } from "../../services/api";
-
-const stateAbbreviations: Record<string, string> = {
-  Alabama: "AL", Alaska: "AK", Arizona: "AZ", Arkansas: "AR", California: "CA", Colorado: "CO",
-  Connecticut: "CT", Delaware: "DE", Florida: "FL", Georgia: "GA", Hawaii: "HI", Idaho: "ID",
-  Illinois: "IL", Indiana: "IN", Iowa: "IA", Kansas: "KS", Kentucky: "KY", Louisiana: "LA",
-  Maine: "ME", Maryland: "MD", Massachusetts: "MA", Michigan: "MI", Minnesota: "MN",
-  Mississippi: "MS", Missouri: "MO", Montana: "MT", Nebraska: "NE", Nevada: "NV",
-  "New Hampshire": "NH", "New Jersey": "NJ", "New Mexico": "NM", "New York": "NY",
-  "North Carolina": "NC", "North Dakota": "ND", Ohio: "OH", Oklahoma: "OK", Oregon: "OR",
-  Pennsylvania: "PA", "Rhode Island": "RI", "South Carolina": "SC", "South Dakota": "SD",
-  Tennessee: "TN", Texas: "TX", Utah: "UT", Vermont: "VT", Virginia: "VA",
-  Washington: "WA", "West Virginia": "WV", Wisconsin: "WI", Wyoming: "WY",
-};
 
 interface SearchBarProps {
   onSearch: (params: any) => void;
@@ -48,6 +35,7 @@ export default function SearchBar({
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [travelMode, setTravelMode] = useState<"fly" | "drive">("fly");
+  const [tripType, setTripType] = useState<"round-trip" | "one-way">("round-trip");
   const [budget, setBudget] = useState<"budget" | "Premium">("budget");
   const [radius, setRadius] = useState(10);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -81,6 +69,7 @@ export default function SearchBar({
         setAdults(parsed.adults || 1);
         setChildren(parsed.children || 0);
         setTravelMode(parsed.travelMode || "fly");
+        setTripType(parsed.tripType || "round-trip");
         setBudget(parsed.budget || "budget");
         setRadius(parsed.radius || 10);
       } catch (e) {
@@ -99,15 +88,6 @@ export default function SearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (isOverlayOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [isOverlayOpen]);
-  
   const getCoordinates = async (locationName: string, isDestination: boolean = false) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -123,15 +103,6 @@ export default function SearchBar({
       console.error(`Failed to fetch coordinates for ${locationName}:`, err);
     }
     return null;
-  };
-
-  const handleSwapLocations = () => {
-    const tempSrc = source;
-    const tempSrcValid = sourceValid;
-    setSource(destination);
-    setSourceValid(destValid);
-    setDestination(tempSrc);
-    setDestValid(tempSrcValid);
   };
 
   const handleSearchSubmit = async () => {
@@ -169,19 +140,23 @@ export default function SearchBar({
     }
 
     if (!dates.start) newErrors.start = "Required";
-    if (!dates.end) newErrors.end = "Required";
+    
+    if (tripType === "round-trip" && !dates.end) newErrors.end = "Required";
 
-    if (dates.start && dates.end) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (dates.start) {
       const startDate = new Date(dates.start + "T12:00:00");
-      const endDate = new Date(dates.end + "T12:00:00");
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
       if (startDate < today) newErrors.start = "Past date";
-      if (startDate >= endDate) newErrors.end = "Must be after start";
-      else {
-        const diffDays = Math.ceil(Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (diffDays > 30) newErrors.end = "Max 30 days";
+      
+      if (tripType === "round-trip" && dates.end) {
+        const endDate = new Date(dates.end + "T12:00:00");
+        if (startDate >= endDate) newErrors.end = "Must be after start";
+        else {
+          const diffDays = Math.ceil(Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+          if (diffDays > 30) newErrors.end = "Max 30 days";
+        }
       }
     }
 
@@ -215,10 +190,11 @@ export default function SearchBar({
       source: { name: finalSource, ...srcCoords },
       destination: { name: finalDest, ...dstCoords },
       startDate: dates.start,
-      endDate: dates.end,
+      endDate: tripType === "one-way" ? "" : dates.end,
       adults,
       children,
       travelMode,
+      tripType,
       budget,
       radius,
       interests: [],
@@ -226,6 +202,23 @@ export default function SearchBar({
 
     localStorage.setItem("search_state", JSON.stringify(params));
     
+    // Sanitize selected_trip_state to prevent transport conflicts
+    const tripStateStr = sessionStorage.getItem("selected_trip_state");
+    if (tripStateStr) {
+      try {
+        const tripState = JSON.parse(tripStateStr);
+        if (travelMode === "drive") {
+          tripState.flights = []; 
+        } else if (travelMode === "fly") {
+          tripState.drive = null; 
+        }
+        sessionStorage.setItem("selected_trip_state", JSON.stringify(tripState));
+        window.dispatchEvent(new Event("selected_trip_state_changed")); 
+      } catch (e) {
+        console.error("Error sanitizing selected_trip_state:", e);
+      }
+    }
+
     setIsOverlayOpen(false); 
     onSearch(params);
   };
@@ -240,11 +233,8 @@ export default function SearchBar({
   const minEndDate = dates.start ? new Date(new Date(dates.start + "T12:00:00").getTime() + 86400000) : new Date();
   const totalTravellers = adults + children;
 
-  //SearchboxContent
-const renderFullSearchContent = () => (
+  const renderFullSearchContent = () => (
     <div className="relative w-full z-30 flex flex-col items-center justify-center ">
-      
-      {/* COMPACT MODAL CLOSE BUTTON (INSIDE THE SEARCHBAR) */}
       {isCompact && (
         <button 
           onClick={() => setIsOverlayOpen(false)}
@@ -254,10 +244,8 @@ const renderFullSearchContent = () => (
         </button>
       )}
 
-      {/* BACKGROUND: h-full and rounded if compact, otherwise standard 60% height */}
       <div className={`absolute top-0 w-full bg-gradient-to-b from-theme-secondary to-theme-secondary/95 shadow-inner ${isCompact ? 'w-full max-w-[100%] h-full rounded-[2.5rem]' : 'h-[69%]'}`}></div>
 
-      {/* --- DOTTED/SPOTTED BACKGROUND TEXTURE --- */}
       <div 
         className={`absolute inset-0 z-0 pointer-events-none opacity-[0.1] ${isCompact ? 'rounded-[2.5rem] overflow-hidden' : ''}`} 
         style={{ 
@@ -267,44 +255,61 @@ const renderFullSearchContent = () => (
         }} 
       />
 
-    {/* FOREGROUND COMPONENT */}
       <div className={`relative z-10 mx-auto px-6 md:px-6 lg:px-8 py-8 lg:py-12 ${isCompact ? 'w-full max-w-[100%] pt-8 lg:pt-8' : 'w-full max-w-full md:max-w-[90%] lg:max-w-[80%]'}`}>        
-        {/* Travel Mode Pills */}
-        <div className="mb-4 flex">
+        
+        {/* Travel Mode Pills (Outside the main input) */}
+        <div className="mb-4 flex flex-wrap items-center gap-4">
           <div className="flex bg-theme-secondary/20 p-1 rounded-full border border-theme-white/10 backdrop-blur-md shadow-sm">
             <button 
               onClick={() => setTravelMode("fly")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
+              className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold transition-all duration-300 ${travelMode === "fly" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
             >
               <Plane size={16} /> Flights
             </button>
             <button 
               onClick={() => setTravelMode("drive")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
+              className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold transition-all duration-300 ${travelMode === "drive" ? "bg-theme-primary shadow-sm text-theme-white" : "text-theme-white/80 hover:text-theme-white hover:bg-theme-white/10"}`}
             >
               <Car size={16} /> Drive
             </button>
           </div>
         </div>
 
-        {/* MAIN WHITE CONTAINER */}
-        <div className="bg-theme-white w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-5 w-full relative z-30">
+        {/* MAIN INPUT BOX */}
+        <div className="bg-theme-white w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 md:p-5 lg:p-6 flex flex-col gap-4 w-full relative z-30">
           
-          {/* MAIN INPUT ROW: Labels are completely outside the input borders now */}
+          {/* NEW: Trip Type Dropdown (Inside the box, above the inputs, always visible) */}
+          <div className="flex p-1">
+            <div className="relative group cursor-pointer flex items-center">
+              <select
+                value={tripType}
+                onChange={(e) => {
+                  setTripType(e.target.value as "round-trip" | "one-way");
+                  if (e.target.value === "one-way") setDates((d) => ({ ...d, end: "" }));
+                }}
+                className="appearance-none bg-theme-primary/10 text-theme-primary uppercase tracking-widest cursor-pointer outline-none py-1.5 pl-3 pr-8 rounded-lg border border-theme-primary/20 hover:bg-theme-primary/20 transition-all"
+              >
+                <option value="round-trip">Round Trip</option>
+                <option value="one-way">One Way</option>
+              </select>
+              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-theme-primary" />
+            </div>
+          </div>
+
           <div className="flex flex-col lg:flex-row w-full gap-4 lg:gap-3 overflow-visible relative z-20">
             
-            {/* 1. Location Block Container */}
+            {/* Origin & Destination */}
             <div className="flex flex-col flex-[1.2] w-full">
-              {/* LABELS OUTSIDE */}
-              <div className="flex w-full px-2 lg:px-4 mb-1.5">
-                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60">From?</label>
+              
+              {/* Labels */}
+              <div className="flex w-full px-2 lg:px-4 mb-1.5 items-center">
+                 <div className="flex-1 flex items-center gap-3">
+                     <label className="uppercase font-bold tracking-widest text-theme-secondary/60">From?</label>
+                 </div>
                  <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60 pl-4 lg:pl-8">To?</label>
               </div>
 
-              {/* CONNECTED BORDER PILL */}
               <div className="relative flex flex-row h-12 lg:h-14 bg-theme-white rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm group">
-                
-                {/* Origin */}
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
                   <LocationAutocomplete
                     id="source-input"
@@ -320,7 +325,6 @@ const renderFullSearchContent = () => (
                   {errors.source && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.source}</span>}
                 </div>
 
-                {/* Destination */}
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
                   <LocationAutocomplete
                     placeholder="Destination City"
@@ -337,18 +341,15 @@ const renderFullSearchContent = () => (
               </div>
             </div>
 
-            {/* 2. Dates Block Container */}
+            {/* Dates Container */}
             <div className="flex flex-col flex-[1] w-full relative z-10">
-              {/* LABELS OUTSIDE */}
-              <div className="flex w-full px-2 lg:px-4 mb-1.5">
+              <div className="flex w-full px-2 lg:px-4 mb-1.5 items-center">
                  <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60">Depart</label>
-                 <label className="flex-1 uppercase font-bold tracking-widest text-theme-secondary/60 pl-2 lg:pl-4">Return</label>
+                 <label className={`flex-1 uppercase font-bold tracking-widest text-theme-secondary/60 pl-2 lg:pl-4 ${tripType === 'one-way' ? 'opacity-30' : ''}`}>Return</label>
               </div>
 
-              {/* CONNECTED BORDER PILL */}
               <div className="relative flex flex-row h-12 lg:h-14 bg-theme-white rounded-[1rem] lg:rounded-l-[1rem] border-[1.5px] border-theme-secondary/30 focus-within:border-theme-primary/50 transition-colors shadow-sm">
                 
-                {/* Depart */}
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-l-[1rem] lg:rounded-l-[1rem] hover:bg-theme-secondary/5 transition-colors border-r border-theme-secondary/20">
                   <Calendar size={14} className="text-theme-primary/80 shrink-0 mr-1.5" />
                   <DatePicker
@@ -369,28 +370,27 @@ const renderFullSearchContent = () => (
                   {errors.start && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.start}</span>}
                 </div>
 
-                {/* Return */}
-                <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors">
-                  <Calendar size={14} className="text-theme-primary/80 shrink-0 mr-1.5" />
+                <div className={`flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-[1rem] transition-colors ${tripType === 'one-way' ? 'bg-theme-secondary/5 cursor-not-allowed' : 'hover:bg-theme-secondary/5'}`}>
+                  <Calendar size={14} className={`shrink-0 mr-1.5 ${tripType === 'one-way' ? 'text-theme-secondary/30' : 'text-theme-primary/80'}`} />
                   <DatePicker
                     selected={dates.end ? new Date(dates.end + "T12:00:00") : null}
                     onChange={(date: Date | null) => {
-                      if (!date) return;
+                      if (tripType === 'one-way' || !date) return;
                       setDates((d) => ({ ...d, end: formatDate(date) }));
                       if (errors.end) setErrors((prev) => ({ ...prev, end: "" }));
                     }}
                     minDate={minEndDate}
-                    placeholderText="Add date"
-                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40"
+                    disabled={tripType === 'one-way'}
+                    placeholderText={tripType === 'one-way' ? 'One Way' : 'Add date'}
+                    className="w-full bg-transparent font-bold text-[13px] md:text-[15px] text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40 disabled:cursor-not-allowed disabled:text-theme-secondary/40"
                   />
                   {errors.end && <span className="absolute -bottom-5 left-4 text-red-500 text-[10px] font-bold">{errors.end}</span>}
                 </div>
               </div>
             </div>
 
-            {/* 3. Search Button Component */}
             <div className="flex flex-col justify-end mt-2 lg:mt-0 lg:flex-shrink-0 relative z-10">
-              <div className="hidden lg:block h-[18px] mb-1.5"></div> {/* Spacer aligns button with inputs */}
+              <div className="hidden lg:block h-[18px] mb-1.5"></div>
               {!isWorking ? (
                 <button
                   className="w-full lg:w-auto h-12 lg:h-14 lg:min-w-[140px] rounded-[1rem] lg:rounded-full bg-theme-primary text-theme-white text-[16px] font-black tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all px-8 shadow-lg active:scale-95 border-none"
@@ -407,13 +407,9 @@ const renderFullSearchContent = () => (
             
           </div>
           
-          {/* BOTTOM ROW: Modifiers (Single line on Mobile) & Trending */}
           <div className="flex flex-col md:flex-row items-start lg:items-center justify-between gap-3 mt-1 px-1 relative z-50">
-            
-            {/* Buttons: Flexible Row on Mobile */}
             <div className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-between sm:justify-start gap-1 sm:gap-2 w-full xl:w-auto overflow-visible relative z-50">
               
-              {/* Traveller Dropdown */}
               <div className="relative z-50 shrink-0" ref={travellerRef}>
                 <button 
                   onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}
@@ -424,7 +420,6 @@ const renderFullSearchContent = () => (
                   <ChevronDown size={16} className="text-theme-secondary/60 shrink-0" />
                 </button>
                 
-                {/* POPUP MENU */}
                 {showTravellerDropdown && (
                   <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-white text-theme-secondary rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    <div className="flex items-center justify-between mb-5">
                       <div>
@@ -444,7 +439,6 @@ const renderFullSearchContent = () => (
                 )}
               </div>
 
-              {/* Budget Dropdown */}
               <div className="relative group cursor-pointer flex items-center gap-1 sm:gap-1.5 py-1 px-1.5 sm:px-2 rounded-lg hover:bg-theme-secondary/10 transition-colors whitespace-nowrap shrink-0">
                 <span className="text-base sm:text-lg">{budget === 'budget' ? '💰' : '✨'}</span>
                 <select 
@@ -458,7 +452,6 @@ const renderFullSearchContent = () => (
                 <ChevronDown size={16} className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 pointer-events-none text-theme-secondary/60" />
               </div>
 
-              {/* Sleek Radius Input */}
               <div className="flex items-center gap-1 sm:gap-2 py-1 px-1 sm:px-2 whitespace-nowrap shrink-0 ml-auto sm:ml-0">
                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-theme-secondary/50 hidden sm:inline">Radius:</span>
                  <span className="text-[10px] font-black uppercase tracking-wider text-theme-secondary/50 sm:hidden">Rad:</span>
@@ -474,16 +467,12 @@ const renderFullSearchContent = () => (
               </div>
             </div>
 
-            {/* Trending Context: Sticky Icon + Scrollable Places List */}
             {topDestinations.length > 0 && (
               <div className="flex flex-row items-center w-full xl:w-auto relative z-10 py-1">
-                {/* Sticky Label */}
                 <div className="flex items-center gap-1.5 shrink-0 pr-3">
                    <TrendingUp size={16} className="text-theme-primary" />
                    <span className="text-[11px] font-black uppercase text-theme-secondary/60 tracking-wider">Trending:</span>
                 </div>
-                
-                {/* Scrollable Places */}
                 <div className="flex flex-row items-center gap-2 overflow-x-auto no-scrollbar w-full">
                   {topDestinations.map((dest, idx) => (
                     <button
@@ -502,11 +491,9 @@ const renderFullSearchContent = () => (
               </div>
             )}
           </div>
-
         </div>
       </div>
       
-      {/* Utility CSS for Number Inputs and hiding scrollbars on mobile */}
       <style dangerouslySetInnerHTML={{__html: `
         .hide-arrows::-webkit-outer-spin-button,
         .hide-arrows::-webkit-inner-spin-button {
@@ -529,64 +516,56 @@ const renderFullSearchContent = () => (
 
  return (
     <>
- {/* 1. Summary Bar (Only displays when isCompact is true) */}
       {isCompact && (
         <div className="w-full bg-theme-white/50 backdrop-blur-xl py-3 px-4 md:px-6 flex items-center justify-center border-b border-theme-secondary/20 z-20 sticky top-0 shadow-sm transition-all duration-300">
           
           <div className="flex items-center max-w-[700px] md:max-w-[800px] mx-auto">
             
-            {/* THE COMPACT PILL */}
             <button
               onClick={() => setIsOverlayOpen(true)}
               className="w-full bg-theme-white border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-1.5 sm:p-2 transition-all duration-300 cursor-pointer group"
             >
-              {/* MOBILE: Stacked Text Content (Now on the left, taking full width) */}
               <div className="flex flex-col sm:hidden flex-1 text-left overflow-hidden pl-4 py-1">
                 <span className="font-bold text-[13px] text-theme-secondary truncate">
                   {source || 'Anywhere'} {destination ? `to ${destination}` : ''}
                 </span>
                 <div className="flex items-center text-[11px] text-theme-secondary/60 gap-1 mt-[2px] truncate font-medium">
                   <span>{dates.start ? `${dates.start}` : 'Any dates'}</span>
+                  {tripType === "round-trip" && dates.end && (
+                    <><span>•</span><span>{dates.end}</span></>
+                  )}
                   <span>•</span>
-                   <span>{dates.end ? `${dates.end}` : 'Any dates'}</span>
-                   <span>•</span>
                   <span>{adults + children} Guest{adults + children !== 1 ? 's' : ''}</span>
                   <span>•</span>
                   <span>{travelMode === 'fly' ? 'Flights' : 'Drive'}</span>
                 </div>
               </div>
 
-              {/* MOBILE: Right Edit Icon */}
               <div className="sm:hidden bg-theme-primary text-theme-white p-2 rounded-full shadow-sm mr-1 shrink-0">
                 <PenBoxIcon size={16} strokeWidth={2.5} />
               </div>
 
-              {/* DESKTOP: Segmented Content */}
               <div className="hidden sm:flex items-center justify-between flex-1 pl-2 pr-1">
                 <div className="flex items-center flex-1">
                   
-                  {/* Location Segment */}
                   <div className="font-bold text-[14px] text-theme-secondary px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[200px] lg:max-w-[320px]">
                     {source || 'Anywhere'} {destination ? `→ ${destination}` : ''}
                   </div>
                   
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
                   
-                  {/* Dates Segment */}
                   <div className="font-medium text-[13px] text-theme-secondary/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
-                    {dates.start ? `${dates.start} - ${dates.end || '?'}` : 'Any week'}
+                    {dates.start ? `${dates.start} ${tripType === "round-trip" ? `- ${dates.end || '?'}` : '(One Way)'}` : 'Any week'}
                   </div>
 
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
                   
-                  {/* Guests Segment */}
                   <div className="font-medium text-[13px] text-theme-secondary/70 px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors whitespace-nowrap">
                     {adults + children} Guest{adults + children !== 1 ? 's' : ''}
                   </div>
 
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
 
-                  {/* Mode Indicator */}
                   <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-[10px] text-theme-secondary font-black bg-theme-primary/10 px-2 py-1 rounded-md shrink-0">
                     {travelMode === 'fly' ? <Plane size={12}/> : <Car size={12}/>}
                     {travelMode === 'fly' ? 'Flights' : 'Drive'}
@@ -594,14 +573,12 @@ const renderFullSearchContent = () => (
 
                 </div>
                 
-                {/* DESKTOP: Right Edit Button */}
                 <div className="bg-theme-white text-theme-secondary p-2.5 rounded-full shadow-sm group-hover:scale-105 transition-transform ml-2 shrink-0">
                   <PenBoxIcon size={16} strokeWidth={3} />
                 </div>
               </div>
             </button>
 
-            {/* Mobile Map Toggle */}
             {onMapToggle && (
               <button
                 onClick={onMapToggle}
@@ -615,14 +592,11 @@ const renderFullSearchContent = () => (
         </div>
       )}
 
-      {/* 2. Blurred Overlay Modal (Opens when pill is clicked) */}
       {isCompact && isOverlayOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 px-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
           
-          {/* UPDATED: w-full for mobile/tablet, lg:w-[70%] for desktop */}
           <div className="relative max-w-full lg:max-w-[70%] animate-in slide-in-from-top-4 fade-in duration-200 z-50">
-            {/* The Expanded Searchbar - overflow-visible fixes the clipping issue! */}
             <div className="max-w-full  bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none">
               {renderFullSearchContent()}
             </div>
@@ -630,13 +604,11 @@ const renderFullSearchContent = () => (
         </div>
       )}
 
-      {/* 3. Standard Inline View (When isCompact is false) */}
       {!isCompact && renderFullSearchContent()}
     </>
   );
 }
 
-// Modernized Counter for the Popover
 function SbCounter({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void; }) {
   return (
     <div className="flex items-center gap-3 bg-theme-secondary/5 rounded-full p-1 border border-theme-secondary/20">

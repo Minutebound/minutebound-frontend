@@ -61,8 +61,8 @@ export default function LandingPage() {
                   <img src={dest.image_url} alt={dest.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-6 z-20 w-full">
-                      <span className="text-theme-primary font-bold text-[10px] uppercase tracking-widest block mb-1">{dest.category}</span>
-                      <h3 className="text-white font-black text-2xl leading-tight mb-1">{dest.name}</h3>
+                      <span className="text-theme-primary font-bold text-[10px] uppercase tracking-widest block mb-1">{dest.name}</span>
+                      <h3 className="text-white font-black text-2xl leading-tight mb-1">{dest.category}</h3>
                       <p className="text-white/80 text-xs font-medium line-clamp-2">{dest.description}</p>
                   </div>
                 </Link>

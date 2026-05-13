@@ -4,7 +4,8 @@ export default function AttractionsCard({ attractions }: { attractions: any[] })
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    const tripStateStr = localStorage.getItem('trip_state');
+    // UPDATED: Read from sessionStorage instead of localStorage
+    const tripStateStr = sessionStorage.getItem('selected_trip_state');
     if (tripStateStr) {
       try {
         const tripState = JSON.parse(tripStateStr);
@@ -14,13 +15,14 @@ export default function AttractionsCard({ attractions }: { attractions: any[] })
           setSelectedKeys([]);
         }
       } catch (e) {
-        console.error("Error parsing trip_state localStorage:", e);
+        console.error("Error parsing selected_trip_state sessionStorage:", e);
       }
     }
   }, [attractions]);
 
   const toggleAttractionSelection = (item: any, uniqueKey: string) => {
-    const tripStateStr = localStorage.getItem('trip_state');
+    // UPDATED: Read from sessionStorage
+    const tripStateStr = sessionStorage.getItem('selected_trip_state');
     let tripState = tripStateStr ? JSON.parse(tripStateStr) : {};
     if (!tripState.attractions) tripState.attractions = [];
 
@@ -35,9 +37,11 @@ export default function AttractionsCard({ attractions }: { attractions: any[] })
       setSelectedKeys((prev) => [...prev, uniqueKey]);
     }
 
-    localStorage.setItem('trip_state', JSON.stringify(tripState));
-    // Event this to show on the Map
-window.dispatchEvent(new Event("trip_state_changed"));
+    // UPDATED: Save to sessionStorage
+    sessionStorage.setItem('selected_trip_state', JSON.stringify(tripState));
+    
+    // UPDATED: Dispatch the new event name
+    window.dispatchEvent(new Event("selected_trip_state_changed"));
   };
 
   if (!attractions || attractions.length === 0) {
