@@ -127,19 +127,19 @@ export default function StatusPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-surface/50 p-5 rounded-2xl border border-theme-muted/20 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-theme-primary/10 rounded-xl text-theme-primary hidden sm:block">
-              <ActivityIcon size={28} />
+              <ActivityIcon size={24} />
             </div>
             <div>
               <h1 className="text-2xl font-black">System Status</h1>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-1.5 text-xs">
                 <span className="flex items-center gap-1.5 text-theme-muted font-medium">
-                  <Clock size={14} className="text-theme-secondary" />
+                  <Clock size={16} className="text-theme-secondary" />
                  Last Checked: {healthData?.external_apis_last_checked 
                     ? formatTime(healthData.external_apis_last_checked)
                     : "Fetching..."}
                 </span>
                 <span className="flex items-center gap-1.5 text-theme-muted font-medium">
-                  <Timer size={14} className="text-theme-primary" />
+                  <Timer size={16} className="text-theme-primary" />
                   Next Check: {healthData?.next_external_check_due 
                     ? formatTime(healthData.next_external_check_due)
                     : "Pending..."}
@@ -164,7 +164,7 @@ export default function StatusPage() {
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-xl shadow-sm flex items-center gap-3">
-            <XCircle size={20} className="text-red-500 flex-shrink-0" />
+            <XCircle size={24} className="text-red-500 flex-shrink-0" />
             <p className="font-medium text-sm">{error}</p>
           </div>
         )}
@@ -177,7 +177,7 @@ export default function StatusPage() {
             
             {/* INTERNAL DIVIDER HEADER */}
             <div className="px-6 py-5 border-b border-theme-white/10 flex items-center gap-3 bg-white/5">
-              <Server className="text-theme-white/70" size={22} />
+              <Server className="text-theme-white/70" size={24} />
               <h2 className="text-lg font-bold tracking-wide">Internal Core Services</h2>
             </div>
             
@@ -213,11 +213,11 @@ export default function StatusPage() {
             {/* EXTERNAL DIVIDER HEADER */}
             <div className="px-6 py-5 border-y border-theme-white/10 flex justify-between items-center bg-white/5 mt-2">
               <div className="flex items-center gap-3">
-                <Globe className="text-theme-white/70" size={22} />
+                <Globe className="text-theme-white/70" size={24} />
                 <h2 className="text-lg font-bold tracking-wide">External API Integrations</h2>
               </div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-theme-white/80 bg-theme-white/10 px-3 py-1.5 rounded-lg border border-theme-white/20">
-                <Info size={14} /> TTL: 48h
+                <Info size={16} /> TTL: 48h
               </div>
             </div>
 
@@ -261,7 +261,7 @@ function StatusCard({
   const Icon = getApiIcon(internalKey);
   
   return (
-    <div className="relative flex flex-col p-5 bg-transparent rounded-2xl border border-theme-white/15 hover:border-theme-white/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[120px]">
+    <div className="relative flex flex-col p-5 bg-transparent rounded-2xl border border-theme-white/15 hover:border-theme-white/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[124px]">
       
       {/* Background Icon Watermark */}
       <div className="absolute right-0 -bottom-4 opacity-[0.04] text-theme-white pointer-events-none transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
@@ -320,7 +320,7 @@ function StatusCard({
         </div>
         
         <div className="flex items-center gap-1.5 text-xs text-theme-white/50 font-mono tracking-tight mt-1">
-          <Clock size={12} /> 
+          <Clock size={16} /> 
           {formatTime(timestamp)}
         </div>
       </div>
@@ -336,8 +336,8 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isUp && statusCode === 200) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/30 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
-        <CheckCircle2 size={14} className="text-green-400" /> 
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/30 rounded-lg font-black text-[8px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
+        <CheckCircle2 size={16} className="text-green-400" /> 
         <span className="hidden sm:inline">OPERATIONAL</span><span className="sm:hidden">UP</span>
       </div>
     );
@@ -345,8 +345,8 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isUp && statusCode && statusCode !== 200) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
-        <AlertTriangle size={14} className="text-yellow-400" /> 
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-lg font-black text-[8px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
+        <AlertTriangle size={16} className="text-yellow-400" /> 
         <span className="hidden sm:inline">CAUTION</span><span className="sm:hidden">WARN</span>
       </div>
     );
@@ -354,16 +354,16 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isDown) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
-        <XCircle size={14} className="text-red-400" /> 
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg font-black text-[8px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
+        <XCircle size={16} className="text-red-400" /> 
         <span className="hidden sm:inline">OUTAGE</span><span className="sm:hidden">DOWN</span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-white/10 text-theme-white/70 border border-theme-white/20 rounded-lg font-black text-[10px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
-      <RefreshCw size={14} className="animate-spin text-theme-white/50" /> 
+    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-white/10 text-theme-white/70 border border-theme-white/20 rounded-lg font-black text-[8px] sm:text-xs tracking-wider shadow-sm backdrop-blur-sm">
+      <RefreshCw size={16} className="animate-spin text-theme-white/50" /> 
       <span className="hidden sm:inline">PENDING</span><span className="sm:hidden">WAIT</span>
     </div>
   );

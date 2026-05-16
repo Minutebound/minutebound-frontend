@@ -164,7 +164,7 @@ export default function SharedItineraryPage() {
             MinuteBound<span className="text-theme-primary">US</span>
           </Link>
           <div className="flex items-center gap-2 text-xs font-bold text-theme-secondary bg-theme-secondary/10 px-3 py-1.5 rounded-full border border-theme-secondary/20">
-            <Globe size={14} /> MinuteBound US is in early access.
+            <Globe size={16} /> MinuteBound US is in early access.
           </div>
         </div>
       </nav>
@@ -197,7 +197,7 @@ export default function SharedItineraryPage() {
           {/* Total Cost */}
           <div className="bg-theme-secondary/10 border border-theme-secondary/20 rounded-2xl p-6 flex items-center justify-between">
             <div className="flex items-center gap-3 text-theme-secondary">
-              <DollarSign size={28} />
+              <DollarSign size={24} />
               <span className="font-black uppercase tracking-widest text-sm">
                 Total Estimated Cost
               </span>
@@ -212,9 +212,9 @@ export default function SharedItineraryPage() {
             <section>
               <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                 {tData.flight ? (
-                  <Plane size={20} className="text-theme-primary" />
+                  <Plane size={24} className="text-theme-primary" />
                 ) : (
-                  <Car size={20} className="text-theme-primary" />
+                  <Car size={24} className="text-theme-primary" />
                 )}
                 Transportation
               </h3>
@@ -249,7 +249,7 @@ export default function SharedItineraryPage() {
                                 )}
                               </span>
                               <span
-                                className={`text-[10px] uppercase font-black tracking-wider px-2 py-1 rounded-md ${
+                                className={`text-[8px] uppercase font-black tracking-wider px-2 py-1 rounded-md ${
                                   stops === 0
                                     ? "bg-green-100 text-green-700"
                                     : "bg-amber-100 text-amber-700"
@@ -275,7 +275,7 @@ export default function SharedItineraryPage() {
                                     <React.Fragment key={sIdx}>
                                       {layover && (
                                         <div className="flex justify-center my-2">
-                                          <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-sm">
+                                          <span className="text-[8px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-sm">
                                             Layover: {layover}
                                           </span>
                                         </div>
@@ -342,7 +342,7 @@ export default function SharedItineraryPage() {
           {tData.hotel && (
             <section>
               <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Hotel size={20} className="text-theme-primary" /> Accommodation
+                <Hotel size={24} className="text-theme-primary" /> Accommodation
               </h3>
               <div className="bg-theme-white border border-theme-surface rounded-2xl p-5">
                 <div className="flex justify-between items-start gap-4">
@@ -368,7 +368,7 @@ export default function SharedItineraryPage() {
           {tData.attractions && tData.attractions.length > 0 && (
             <section>
               <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Map size={20} className="text-theme-secondary" /> Planned
+                <Map size={24} className="text-theme-secondary" /> Planned
                 Attractions
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -389,7 +389,7 @@ export default function SharedItineraryPage() {
           {tData.activities && tData.activities.length > 0 && (
             <section>
               <h3 className="text-lg font-black text-theme-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Ticket size={20} className="text-theme-secondary" /> Tours &
+                <Ticket size={24} className="text-theme-secondary" /> Tours &
                 Activities
               </h3>
               <div className="grid grid-cols-1 gap-4">

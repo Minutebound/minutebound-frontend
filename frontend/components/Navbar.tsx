@@ -151,9 +151,8 @@ export default function Navbar({
   }, []);
 
   return (
-<nav className={`${isSticky ? "sticky top-0 z-50 shadow-md":'relative z-1'} bg-theme-white`}>      <div 
-        className="w-full lg:w-[85%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-secondary relative z-[999] transition-all duration-300 h-[60px]"
-      >
+<nav className={`${isSticky ? "sticky top-0 shadow-md" : "relative"} z-[120] bg-theme-white`}>      
+  <div className="w-full lg:w-[85%] mx-auto flex items-center justify-between px-4 md:px-6 text-theme-secondary relative transition-all duration-300 h-[60px]">
         {/* LEFT SECTION - Logo */}
         <div className="flex items-center flex-shrink-0 h-full">
           <Link
@@ -192,17 +191,17 @@ export default function Navbar({
                     />
                   ) : (
                     <div className="bg-theme-primary/10 p-1.5 rounded-full">
-                      <UserIcon size={20} className="text-theme-primary" />
+                      <UserIcon size={24} className="text-theme-primary" />
                     </div>
                   )}
 
-                  <span className="text-theme-secondary font-bold hidden sm:block max-w-[120px] truncate">
+                  <span className="text-theme-secondary font-bold hidden sm:block max-w-[124px] truncate">
                     {displayName}
                   </span>
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 top-[100%] mt-0 w-64 bg-theme-white rounded-b-2xl rounded-t-none shadow-2xl border border-t-0 border-theme-surface py-2 z-[1000] animate-in slide-in-from-top-2 fade-in duration-200">
+                  <div className="absolute z-120 right-0 top-[100%] mt-0 w-64 bg-theme-white rounded-b-2xl rounded-t-none shadow-2xl border border-t-0 border-theme-surface py-2 z-120 animate-in slide-in-from-top-2 fade-in duration-200">
                     
                     {/* TRAVEL ID SECTION (Inside Dropdown) */}
                     <div className="px-4 py-3 mb-1 border-b border-theme-surface bg-theme-surface/20">
@@ -276,14 +275,14 @@ export default function Navbar({
             className="cursor-pointer rounded-lg bg-theme-surface text-theme-secondary lg:hidden hover:bg-theme-surface/80 transition-all duration-300 shadow-sm active:scale-95 border border-theme-surface p-1.5"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
       {/* MOBILE NAVIGATION MENU */}
       {isMobileMenuOpen && (
-        <div className="absolute top-full right-0 w-full bg-theme-white border-b border-theme-secondary/10 shadow-xl lg:hidden flex flex-col z-[1000] animate-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full right-0 w-full bg-theme-white border-b border-theme-secondary/10 shadow-xl lg:hidden flex flex-col z-120 animate-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col p-2">
             {!isHomePage && (
               <Link
@@ -291,7 +290,7 @@ export default function Navbar({
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
               >
-                <Home size={20} className="text-theme-primary" />
+                <Home size={24} className="text-theme-primary" />
                 Home
               </Link>
             )}
@@ -303,7 +302,7 @@ export default function Navbar({
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
                 >
-                  <UserIcon size={20} className="text-theme-primary" />
+                  <UserIcon size={24} className="text-theme-primary" />
                   Profile Settings
                 </Link>
                 <Link
@@ -311,7 +310,7 @@ export default function Navbar({
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
                 >
-                  <Bookmark size={20} className="text-theme-primary" />
+                  <Bookmark size={24} className="text-theme-primary" />
                   Saved Itineraries
                 </Link>
 
@@ -324,7 +323,7 @@ export default function Navbar({
                   }}
                   className="cursor-pointer flex items-center gap-3 px-4 py-4 text-red-600 hover:bg-red-50 font-bold transition-colors text-left rounded-xl mx-2"
                 >
-                  <LogOut size={20} className="text-red-500" />
+                  <LogOut size={24} className="text-red-500" />
                   Sign Out
                 </button>
               </>
@@ -334,7 +333,7 @@ export default function Navbar({
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
               >
-                <UserIcon size={20} className="text-theme-primary" />
+                <UserIcon size={24} className="text-theme-primary" />
                 Login / Sign Up
               </Link>
             )}

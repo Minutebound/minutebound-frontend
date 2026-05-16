@@ -290,10 +290,10 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center relative p-6 sm:p-12 overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-theme-primary/10 blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-theme-secondary/10 blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-theme-primary/10 blur-[124px] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-theme-secondary/10 blur-[124px] pointer-events-none"></div>
 
-        <div className="w-full max-w-[420px] relative z-10">
+        <div className="w-full max-w-[424px] relative z-10">
           <div className="lg:hidden text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Link
               href="/"
@@ -409,7 +409,7 @@ export default function LoginPage() {
                             : "text-theme-muted group-focus-within:text-theme-primary"
                         }`}
                       >
-                        <UserIcon size={18} />
+                        <UserIcon size={16} />
                       </div>
                       <input
                         type="text"
@@ -423,7 +423,7 @@ export default function LoginPage() {
                         }`}
                       />
                       {fieldErrors.firstName && (
-                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[8px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.firstName}
                         </p>
                       )}
@@ -454,7 +454,7 @@ export default function LoginPage() {
                         }`}
                       />
                       {fieldErrors.lastName && (
-                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[8px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.lastName}
                         </p>
                       )}
@@ -527,14 +527,14 @@ export default function LoginPage() {
                         }`}
                       />
                       {fieldErrors.phoneCountryCode && (
-                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">
+                        <p className="text-red-500 text-[8px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">
                           {fieldErrors.phoneCountryCode}
                         </p>
                       )}
                     </div>
                     <div className="flex-1 relative group">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors text-theme-muted group-focus-within:text-theme-primary">
-                        <Phone size={18} />
+                        <Phone size={16} />
                       </div>
                       <input
                         type="text"
@@ -551,7 +551,7 @@ export default function LoginPage() {
                         }`}
                       />
                       {fieldErrors.phoneNumber && (
-                        <p className="text-red-500 text-[10px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[8px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.phoneNumber}
                         </p>
                       )}
@@ -571,7 +571,7 @@ export default function LoginPage() {
                             : "text-theme-muted group-focus-within:text-theme-primary"
                         }`}
                       >
-                        <Mail size={18} />
+                        <Mail size={16} />
                       </div>
                       <input
                         type="text"
@@ -591,7 +591,7 @@ export default function LoginPage() {
                       />
                     </div>
                     {fieldErrors.email && (
-                      <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">
+                      <p className="text-red-500 text-[8px] font-bold mt-1.5 ml-1">
                         {fieldErrors.email}
                       </p>
                     )}
@@ -607,7 +607,7 @@ export default function LoginPage() {
                               : "text-theme-muted group-focus-within:text-theme-primary"
                           }`}
                         >
-                          <Lock size={18} />
+                          <Lock size={16} />
                         </div>
                         <input
                           type="password"
@@ -624,7 +624,7 @@ export default function LoginPage() {
                         />
                       </div>
                       {fieldErrors.password && (
-                        <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-1">
+                        <p className="text-red-500 text-[8px] font-bold mt-1.5 ml-1">
                           {fieldErrors.password}
                         </p>
                       )}
@@ -638,7 +638,7 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-4 animate-in slide-in-from-top-2 fade-in duration-300">
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors text-theme-muted group-focus-within:text-theme-primary">
-                      <Mail size={18} />
+                      <Mail size={16} />
                     </div>
                     <input
                       type="text"
@@ -656,7 +656,7 @@ export default function LoginPage() {
                 <div className="animate-in slide-in-from-top-2 fade-in duration-300">
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors text-theme-muted group-focus-within:text-theme-primary">
-                      <Key size={18} />
+                      <Key size={16} />
                     </div>
                     <input
                       type="text"
@@ -691,7 +691,7 @@ export default function LoginPage() {
                 className="w-full mt-2 py-3.5 px-4 bg-theme-primary hover:bg-theme-secondary text-theme-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-theme-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {isLoading ? (
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                 ) : (
                   <>
                     {!isForgotMode
@@ -704,7 +704,7 @@ export default function LoginPage() {
                       ? "Send Reset Code"
                       : "Verify & Reset Password"}
                     <ArrowRight
-                      size={18}
+                      size={16}
                       className="group-hover:translate-x-1 transition-transform"
                     />
                   </>
@@ -734,7 +734,7 @@ export default function LoginPage() {
               <>
                 <div className="mt-8 flex items-center gap-4">
                   <div className="flex-1 h-px bg-theme-surface"></div>
-                  <span className="text-[10px] font-bold text-theme-muted uppercase tracking-widest">
+                  <span className="text-[8px] font-bold text-theme-muted uppercase tracking-widest">
                     Or continue with
                   </span>
                   <div className="flex-1 h-px bg-theme-surface"></div>

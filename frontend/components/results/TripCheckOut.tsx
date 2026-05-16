@@ -1,20 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, ShieldCheck, AlertCircle, CheckCircle, User, CreditCard, X } from "lucide-react";
+import { Loader2, ShieldCheck, AlertCircle, User, CreditCard } from "lucide-react";
 import { travelApi } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
+// Ensure this environment variable exists in your .env.local file
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
-function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, setTravelers, onSuccess, onCancel }: any) {
+function CheckoutFormInner({ flightOffer, stay, tours, pricedData, grandTotal, travelers, setTravelers, onSuccess, onCancel }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const [step, setStep] = useState<"FORM" | "PROCESSING" | "SUCCESS" | "ERROR">("FORM");
   const [errorMsg, setErrorMsg] = useState("");
-  const [pnr, setPnr] = useState("");
 
   const updateTraveler = (index: number, field: string, value: string) => {
     const newTravelers = [...travelers];
@@ -28,6 +28,7 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
     setErrorMsg("");
 
     try {
+      // 1. Process Stripe Payment for the Grand Total
       const { client_secret } = await travelApi.createPaymentIntent(grandTotal, "USD");
       const cardElement = elements.getElement(CardElement);
       if (!cardElement) throw new Error("Card element not found");
@@ -44,23 +45,37 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
 
       if (paymentResult.error) throw new Error(paymentResult.error.message || "Payment declined.");
 
+      // 2. Format Travelers for APIs
       const formattedTravelers = travelers.map((t: any) => ({
         id: t.id,
         dateOfBirth: t.dob,
         name: { firstName: t.firstName.toUpperCase(), lastName: t.lastName.toUpperCase() },
         gender: t.gender,
         contact: {
-          emailAddress: t.email || travelers[0].email, // Fallback to primary email if omitted
+          emailAddress: t.email || travelers[0].email, 
           phones: [{ deviceType: "MOBILE", countryCallingCode: "1", number: (t.phone || travelers[0].phone).replace(/\D/g,'') }]
         }
       }));
 
-      const bookingRes = await travelApi.bookFlight(pricedData.priced_offer, formattedTravelers);
-      if (bookingRes.error) throw new Error(bookingRes.error);
+      // 3. Execute Applicable Bookings based on what is in the cart
+      let finalPnr = "TRIP-" + Math.floor(Math.random() * 90000 + 10000);
       
-      setPnr(bookingRes.pnr);
+      if (flightOffer && pricedData) {
+        const flightRes = await travelApi.bookFlight(pricedData.priced_offer, formattedTravelers);
+        if (flightRes.error) throw new Error(flightRes.error);
+        finalPnr = flightRes.pnr; // Use flight PNR as master reference if available
+      }
+      
+      if (stay) {
+        await travelApi.bookStay(stay, formattedTravelers);
+      }
+      
+      if (tours && tours.length > 0) {
+        await travelApi.bookTours(tours, formattedTravelers);
+      }
+
       setStep("SUCCESS");
-      if (onSuccess) onSuccess(bookingRes.pnr);
+      if (onSuccess) onSuccess(finalPnr);
 
     } catch (err: any) {
       setErrorMsg(err.message || err.error || "An error occurred during checkout.");
@@ -75,7 +90,7 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
         color: '#012C23',
         fontWeight: '900',
         fontFamily: 'system-ui, -apple-system, sans-serif',
-        fontSize: '14px',
+        fontSize: '16px',
         fontSmoothing: 'antialiased',
         '::placeholder': { color: '#64748B' },
       },
@@ -87,7 +102,7 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
     return (
       <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-theme-cool-white">
         <Loader2 size={32} className="text-theme-primary animate-spin" />
-        <p className="text-[11px] font-black uppercase tracking-widest text-theme-secondary/60 text-center px-4">
+        <p className="text-[8px] font-black uppercase tracking-widest text-theme-secondary/60 text-center px-4">
           Processing Payment securely... <br/> <span className="opacity-50">Please do not close this window.</span>
         </p>
       </div>
@@ -100,15 +115,12 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
         <AlertCircle size={48} className="text-theme-error mb-2" />
         <p className="font-bold text-base text-theme-secondary">{errorMsg}</p>
         <div className="flex gap-4 mt-6">
-          <button onClick={onCancel} className="text-[11px] font-black uppercase tracking-widest text-theme-secondary border border-theme-soft-slate bg-theme-white px-8 py-4 rounded-xl hover:bg-theme-soft-slate/50 transition-colors shadow-sm">Cancel</button>
-          <button onClick={() => setStep("FORM")} className="text-[11px] font-black uppercase tracking-widest text-theme-white border border-theme-primary bg-theme-primary px-8 py-4 rounded-xl hover:bg-theme-primary/90 transition-colors shadow-md">Try Again</button>
+          <button onClick={onCancel} className="text-[8px] font-black uppercase tracking-widest text-theme-secondary border border-theme-soft-slate bg-theme-white px-8 py-4 rounded-xl hover:bg-theme-soft-slate/50 transition-colors shadow-sm">Cancel</button>
+          <button onClick={() => setStep("FORM")} className="text-[8px] font-black uppercase tracking-widest text-theme-white border border-theme-primary bg-theme-primary px-8 py-4 rounded-xl hover:bg-theme-primary/90 transition-colors shadow-md">Try Again</button>
         </div>
       </div>
     );
   }
-
-  let adultCount = 0;
-  let childCount = 0;
 
   // Validation: Primary Adult needs everything. Others just need Name/DOB.
   const isFormValid = travelers.every((t: any, i: number) => {
@@ -121,26 +133,18 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
 
   return (
     <div className="flex flex-col h-full bg-theme-cool-white/50 min-h-0">
-      
-      {/* Scrollable Form Area */}
       <div className="p-6 sm:p-10 space-y-8 flex-1 overflow-y-auto custom-scrollbar">
         {travelers.map((t: any, i: number) => {
-          const isAdult = t.type !== "CHILD" && t.type !== "HELD_INFANT";
-          if (isAdult) adultCount++; else childCount++;
-          const label = isAdult ? `Adult ${adultCount}` : `Child ${childCount}`;
-
           return (
             <div key={i} className="space-y-5 pb-8 border-b border-theme-soft-slate last:border-0 last:pb-0">
-              <h5 className="font-black text-[12px] uppercase tracking-widest text-theme-secondary flex items-center gap-2">
-                <User size={16} className="text-theme-primary" /> {label}
-                {i === 0 && <span className="ml-2 text-[9px] bg-theme-primary/10 text-theme-primary px-2 py-0.5 rounded-md">Primary</span>}
+              <h5 className="font-black text-[8px] uppercase tracking-widest text-theme-secondary flex items-center gap-2">
+                <User size={16} className="text-theme-primary" /> Traveler {i + 1}
+                {i === 0 && <span className="ml-2 text-[8px] bg-theme-primary/10 text-theme-primary px-2 py-0.5 rounded-md">Primary</span>}
               </h5>
-              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input type="text" placeholder="First Name" value={t.firstName} onChange={(e) => updateTraveler(i, "firstName", e.target.value)} className={inputClass} />
                 <input type="text" placeholder="Last Name" value={t.lastName} onChange={(e) => updateTraveler(i, "lastName", e.target.value)} className={inputClass} />
               </div>
-              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input type="date" value={t.dob} onChange={(e) => updateTraveler(i, "dob", e.target.value)} className={inputClass} />
                 <select value={t.gender} onChange={(e) => updateTraveler(i, "gender", e.target.value)} className={`${inputClass} cursor-pointer`}>
@@ -148,12 +152,10 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
                   <option value="FEMALE">Female</option>
                 </select>
               </div>
-              
-              {/* Show Contact Info for ALL Adults */}
-              {isAdult && (
+              {i === 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <input type="email" placeholder={`email (optional) ${i > 0 ? '(Optional)' : ''}`} value={t.email} onChange={(e) => updateTraveler(i, "email", e.target.value)} className={inputClass} />
-                  <input type="tel" placeholder={`phone (optional) ${i > 0 ? '(Optional)' : ''}`} value={t.phone} onChange={(e) => updateTraveler(i, "phone", e.target.value)} className={inputClass} />
+                  <input type="email" placeholder="Email Address" value={t.email} onChange={(e) => updateTraveler(i, "email", e.target.value)} className={inputClass} />
+                  <input type="tel" placeholder="Phone Number" value={t.phone} onChange={(e) => updateTraveler(i, "phone", e.target.value)} className={inputClass} />
                 </div>
               )}
             </div>
@@ -161,7 +163,7 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
         })}
 
         <div className="pt-2">
-          <h5 className="font-black text-[12px] uppercase tracking-widest text-theme-secondary flex items-center gap-2 mb-4">
+          <h5 className="font-black text-[8px] uppercase tracking-widest text-theme-secondary flex items-center gap-2 mb-4">
             <CreditCard size={16} className="text-theme-primary" /> Payment Details
           </h5>
           <div className="p-5 rounded-xl border border-theme-soft-slate bg-theme-white shadow-sm focus-within:ring-4 focus-within:ring-theme-primary/10 transition-all focus-within:border-theme-primary">
@@ -170,57 +172,40 @@ function CheckoutFormInner({ flightOffer, pricedData, grandTotal, travelers, set
         </div>
       </div>
 
-      {/* Action Footer */}
-      <div className="flex gap-4 p-5 sm:p-6 border-t border-theme-soft-slate bg-theme-white shrink-0 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
-        <button 
-          onClick={onCancel} 
-          className="px-8 py-4 bg-theme-white text-theme-secondary font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-soft-slate/30 transition-all border border-theme-soft-slate flex items-center justify-center active:scale-95 shadow-sm"
-        >
+      <div className="flex gap-4 p-5 sm:p-6 border-t border-theme-soft-slate bg-theme-white shrink-0 shadow-[0_-8px_24px_-8px_rgba(0,0,0,0.05)]">
+        <button onClick={onCancel} className="px-8 py-4 bg-theme-white text-theme-secondary font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-soft-slate/30 transition-all border border-theme-soft-slate flex items-center justify-center active:scale-95 shadow-sm">
           Cancel
         </button>
-        <button 
-          onClick={handleCheckoutSubmit} 
-          disabled={!isFormValid || !stripe} 
-          className="flex-1 py-4 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
-        >
-          <ShieldCheck size={18} /> Pay ${grandTotal.toFixed(2)} & Book
+        <button onClick={handleCheckoutSubmit} disabled={!isFormValid || !stripe} className="flex-1 py-4 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]">
+          <ShieldCheck size={16} /> Pay ${grandTotal.toFixed(2)} & Book
         </button>
       </div>
     </div>
   );
 }
 
-export default function FlightCheckout({ flightOffer, grandTotal, onSuccess, onPriceConfirmed, onExpandedChange }: any) {
+export default function TripCheckout({ flightOffer, stay, tours, grandTotal, rawParams, onSuccess, onPriceConfirmed, onExpandedChange, onStepChange }: any) {
   const { isLoggedIn } = useAuth();
   const [step, setStep] = useState<"IDLE" | "PRICING" | "READY" | "ERROR">("IDLE");
   const [pricedData, setPricedData] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState("");
   
-  // Read exact Adult/Child composition from Amadeus API directly
-  const travelerPricings = flightOffer.raw_offer_data?.travelerPricings || [];
-  
+  // Calculate travelers dynamically based on what's in the cart
+  const numTravelers = flightOffer?.raw_offer_data?.travelerPricings?.length || rawParams?.adults || 1;
   const [travelers, setTravelers] = useState<any[]>(() => {
-    if (travelerPricings.length > 0) {
-      return travelerPricings.map((tp: any, i: number) => ({
-        id: tp.travelerId || String(i + 1), 
-        type: tp.travelerType || "ADULT", // Maps exactly to ADULT, CHILD, etc.
-        firstName: "", lastName: "", dob: "", gender: "MALE", email: "", phone: ""
-      }));
-    }
-    // Fallback if Amadeus data is malformed
-    return [{ id: "1", type: "ADULT", firstName: "", lastName: "", dob: "", gender: "MALE", email: "", phone: "" }];
+    return Array.from({ length: numTravelers }).map((_, i) => ({
+      id: String(i + 1), type: "ADULT", firstName: "", lastName: "", dob: "", gender: "MALE", email: "", phone: ""
+    }));
   });
 
-  // Inform parent modal when form expands to take over full screen
   useEffect(() => {
     if (onExpandedChange) onExpandedChange(step !== "IDLE");
-  }, [step, onExpandedChange]);
+    if (onStepChange) onStepChange(step);
+  }, [step, onExpandedChange, onStepChange]);
 
-  // Pre-fill Primary User if logged in
   useEffect(() => {
     if (isLoggedIn) {
-      travelApi.getProfile()
-        .then((profile) => {
+      travelApi.getProfile().then((profile) => {
           setTravelers((prev: any[]) => {
             const newTravelers = [...prev];
             newTravelers[0] = {
@@ -234,75 +219,69 @@ export default function FlightCheckout({ flightOffer, grandTotal, onSuccess, onP
             };
             return newTravelers;
           });
-        })
-        .catch((err) => console.error("Failed to fetch profile", err));
+        }).catch(() => {});
     }
   }, [isLoggedIn]);
 
-  const handlePriceCheck = async () => {
-    setStep("PRICING");
-    try {
-      const payloadToPrice = flightOffer.raw_offer_data; 
-      if (!payloadToPrice) throw new Error("Missing raw airline data.");
-
-      const res = await travelApi.confirmFlightPrice(payloadToPrice);
-      if (res.error) throw new Error(res.error);
-      
-      setPricedData(res);
-      if (onPriceConfirmed) {
-        onPriceConfirmed(Number(res.priced_offer.price.total), Number(res.priced_offer.price.totalTaxes || 0));
+  const handleInitializeCheckout = async () => {
+    if (flightOffer) {
+      setStep("PRICING");
+      try {
+        const res = await travelApi.confirmFlightPrice(flightOffer.raw_offer_data);
+        if (res.error) throw new Error(res.error);
+        setPricedData(res);
+        if (onPriceConfirmed) onPriceConfirmed(Number(res.priced_offer.price.total), Number(res.priced_offer.price.totalTaxes || 0));
+        setStep("READY");
+      } catch (err: any) {
+        setErrorMsg(err.message || err.error || "Failed to confirm flight fare. It may have expired.");
+        setStep("ERROR");
       }
+    } else {
+      // If just stays/tours, skip flight pricing validation
       setStep("READY");
-    } catch (err: any) {
-      setErrorMsg(err.message || err.error || "Failed to confirm fare. It may have expired.");
-      setStep("ERROR");
     }
   };
 
   const handleCancel = () => setStep("IDLE");
 
-  // Initial Closed View (Replaces Sticky Footer on Right Panel)
   if (step === "IDLE") {
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
         <div className="text-center sm:text-left flex flex-col">
-          <span className="text-[10px] uppercase tracking-widest text-theme-light-gray font-black mb-0.5">Total Due Now</span>
+          <span className="text-[8px] uppercase tracking-widest text-theme-light-gray font-black mb-0.5">Total Due Now</span>
           <span className="text-3xl font-black text-theme-secondary leading-none">${grandTotal.toFixed(2)}</span>
         </div>
-        <button onClick={handlePriceCheck} className="px-8 py-4 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
+        <button onClick={handleInitializeCheckout} className="px-8 py-4 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
           Confirm Fares
         </button>
       </div>
     );
   }
 
-  // Full Screen Overlays (Pricing Loading / Error / Form)
   return (
     <Elements stripe={stripePromise}>
       <div className="w-full h-full flex flex-col bg-theme-white overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-        
-        {/* Full Screen Header */}
         <div className="p-5 sm:p-6 bg-theme-cool-white border-b border-theme-soft-slate flex justify-between items-center shrink-0 z-10">
           <div className="flex items-center gap-2 text-theme-secondary">
-            <ShieldCheck size={20} className="text-theme-primary" />
-            <span className="font-black text-[12px] uppercase tracking-widest hidden sm:block">Fares Confirmed & Locked</span>
-            <span className="font-black text-[12px] uppercase tracking-widest sm:hidden">Fares Locked</span>
+            <ShieldCheck size={24} className="text-theme-primary" />
+            <span className="font-black text-[8px] uppercase tracking-widest hidden sm:block">Secure Trip Checkout</span>
           </div>
           <p className="font-black text-2xl text-theme-secondary">
             ${grandTotal.toFixed(2)}
           </p>
         </div>
 
-        {/* Dynamic Form Area */}
         <div className="flex-1 flex flex-col min-h-0 bg-theme-white">
           {step === "PRICING" ? (
             <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-theme-white">
               <Loader2 size={32} className="text-theme-primary animate-spin" />
-              <p className="text-[11px] font-black uppercase tracking-widest text-theme-secondary/60">Confirming live fare with airline...</p>
+              <p className="text-[8px] font-black uppercase tracking-widest text-theme-secondary/60">Validating Live Fares...</p>
             </div>
           ) : (
             <CheckoutFormInner 
-              flightOffer={flightOffer} 
+              flightOffer={flightOffer}
+              stay={stay}
+              tours={tours}
               pricedData={pricedData}
               grandTotal={grandTotal} 
               travelers={travelers} 

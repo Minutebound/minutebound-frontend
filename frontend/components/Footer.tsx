@@ -2,9 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Facebook, Twitter, Instagram, Server, Globe } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isResultsPage = pathname === '/results';
+
+  // Smart Visibility State
+  const [isVisible, setIsVisible] = useState(true);
+
   const [statusSummary, setStatusSummary] = useState<{
     state: 'loading' | 'operational' | 'degraded' | 'outage';
     internal: boolean;
@@ -12,6 +19,7 @@ export default function Footer() {
     extTotal: number;
   }>({ state: 'loading', internal: true, extUp: 0, extTotal: 0 });
 
+  // 1. Health Check Polling
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -43,87 +51,139 @@ export default function Footer() {
     return () => clearInterval(interval);
   }, []);
 
+  // 2. Smart Scroll & Dismiss Engine (Only active on Results page)
+  useEffect(() => {
+    if (!isResultsPage) {
+      setIsVisible(true);
+      return;
+    }
+
+    let lastY = 0;
+    
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 15) setIsVisible(false); // Hide on scroll down
+      else if (e.deltaY < -15) setIsVisible(true); // Show on scroll up
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      lastY = e.touches[0].clientY;
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      if (lastY - currentY > 15) setIsVisible(false); // Hide on swipe up
+      else if (lastY - currentY < -15) setIsVisible(true); // Show on swipe down
+      lastY = currentY;
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // If clicking anywhere outside the footer itself, hide it
+      if (!target.closest('footer')) {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('click', handleClick);
+    };
+  }, [isResultsPage]);
+
   return (
-    <footer className="bg-theme-dark-blue text-theme-white pt-8 pb-8 border-t-4 border-theme-primary shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 relative mt-auto">      
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-12">
+    <div 
+      className={`w-full transition-all duration-700 ease-in-out transform origin-bottom overflow-hidden ${
+        isVisible 
+          ? "max-h-[1000px] opacity-100 translate-y-0" 
+          : "max-h-0 opacity-0 translate-y-full"
+      }`}
+    >
+      <footer className="bg-theme-dark-blue text-theme-white pt-8 pb-8 border-t-4 border-theme-primary shadow-[0_-4px_24px_rgba(0,0,0,0.05)] z-50 relative mt-auto w-full">      
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
           
-          <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-12">
+            
+            <div className="flex flex-col gap-5">
+              <p className="text-sm text-theme-white/70 leading-relaxed max-w-sm font-medium">
+                Your intelligent travel companion. Plan flights, accommodations, road trips, and adventures in minutes.
+              </p>
 
-
-            <p className="text-sm text-theme-white/70 leading-relaxed max-w-sm font-medium">
-              Your intelligent travel companion. Plan flights, accommodations, road trips, and adventures in minutes.
-            </p>
-
-            <Link href="/status" className="flex flex-col gap-2 p-3 rounded-xl bg-white/5 border border-theme-white/10 hover:bg-white/10 hover:border-theme-white/30 transition-all group w-fit cursor-pointer">
-              <div className="flex items-center gap-2.5">
-                <div className="relative flex h-2.5 w-2.5">
-                  {statusSummary.state !== 'loading' && (
-                    <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${
-                      statusSummary.state === 'operational' ? 'bg-green-400' : 
-                      statusSummary.state === 'degraded' ? 'bg-yellow-400' : 'bg-red-400'
+              <Link href="/status" className="flex flex-col gap-2 p-3 rounded-xl bg-white/5 border border-theme-white/10 hover:bg-white/10 hover:border-theme-white/30 transition-all group w-fit cursor-pointer">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative flex h-2.5 w-2.5">
+                    {statusSummary.state !== 'loading' && (
+                      <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${
+                        statusSummary.state === 'operational' ? 'bg-green-400' : 
+                        statusSummary.state === 'degraded' ? 'bg-yellow-400' : 'bg-red-400'
+                      }`}></span>
+                    )}
+                    <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                      statusSummary.state === 'loading' ? 'bg-theme-white/30' :
+                      statusSummary.state === 'operational' ? 'bg-green-500' : 
+                      statusSummary.state === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
                     }`}></span>
-                  )}
-                  <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    statusSummary.state === 'loading' ? 'bg-theme-white/30' :
-                    statusSummary.state === 'operational' ? 'bg-green-500' : 
-                    statusSummary.state === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}></span>
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-theme-white/90">
-                  {statusSummary.state === 'loading' ? 'Checking Status...' : 
-                   statusSummary.state === 'operational' ? 'All Systems Operational' : 
-                   statusSummary.state === 'degraded' ? 'Partial Degradation' : 'System Outage'}
-                </span>
-              </div>
-              
-              {statusSummary.state !== 'loading' && (
-                <div className="flex items-center gap-4 text-[10px] font-mono text-theme-white/60 pl-5">
-                  <span className={`flex items-center gap-1 ${statusSummary.internal ? 'text-green-400/80' : 'text-red-400/80'}`}>
-                    <Server size={11} /> Core: {statusSummary.internal ? 'UP' : 'DOWN'}
-                  </span>
-                  <span className="text-theme-white/20">•</span>
-                  <span className={`flex items-center gap-1 ${statusSummary.extUp === statusSummary.extTotal ? 'text-green-400/80' : statusSummary.extUp > 0 ? 'text-yellow-400/80' : 'text-red-400/80'}`}>
-                    <Globe size={11} /> APIs: {statusSummary.extUp}/{statusSummary.extTotal}
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-theme-white/90">
+                    {statusSummary.state === 'loading' ? 'Checking Status...' : 
+                     statusSummary.state === 'operational' ? 'All Systems Operational' : 
+                     statusSummary.state === 'degraded' ? 'Partial Degradation' : 'System Outage'}
                   </span>
                 </div>
-              )}
-            </Link>
+                
+                {statusSummary.state !== 'loading' && (
+                  <div className="flex items-center gap-4 text-[8px] font-mono text-theme-white/60 pl-5">
+                    <span className={`flex items-center gap-1 ${statusSummary.internal ? 'text-green-400/80' : 'text-red-400/80'}`}>
+                      <Server size={10} /> Core: {statusSummary.internal ? 'UP' : 'DOWN'}
+                    </span>
+                    <span className="text-theme-white/20">•</span>
+                    <span className={`flex items-center gap-1 ${statusSummary.extUp === statusSummary.extTotal ? 'text-green-400/80' : statusSummary.extUp > 0 ? 'text-yellow-400/80' : 'text-red-400/80'}`}>
+                      <Globe size={10} /> APIs: {statusSummary.extUp}/{statusSummary.extTotal}
+                    </span>
+                  </div>
+                )}
+              </Link>
 
-            <div className="flex items-center gap-4 mt-2">
-              <SocialLink href="#" icon={<Facebook size={18} />} />
-              <SocialLink href="#" icon={<Twitter size={18} />} />
-              <SocialLink href="#" icon={<Instagram size={18} />} />
+              <div className="flex items-center gap-4 mt-2">
+                <SocialLink href="#" icon={<Facebook size={16} />} />
+                <SocialLink href="#" icon={<Twitter size={16} />} />
+                <SocialLink href="#" icon={<Instagram size={16} />} />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 lg:pl-8">
+              <h4 className="font-black text-lg text-theme-white tracking-wide mb-2 uppercase ">Explore</h4>
+              <FooterLink href="/" text="Home" />
+              <FooterLink href="/" text="Trip Planner" />
+              <FooterLink href="/savedtrips" text="Saved Itineraries" />
+              <FooterLink href="/profile" text="Your Account" />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <h4 className="font-black text-lg text-theme-white tracking-wide mb-2 uppercase ">Support</h4>
+              <FooterLink href="#" text="Help Center & FAQ" />
+              <FooterLink href="/status" text="System Status" />
+              <FooterLink href="#" text="Privacy Policy" />
+              <FooterLink href="#" text="Terms of Service" />
+              <FooterLink href="#" text="Contact Us" />
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 lg:pl-8">
-            <h4 className="font-black text-lg text-theme-white tracking-wide mb-2 uppercase text-[13px]">Explore</h4>
-            <FooterLink href="/" text="Home" />
-            <FooterLink href="/" text="Trip Planner" />
-            <FooterLink href="/savedtrips" text="Saved Itineraries" />
-            <FooterLink href="/profile" text="Your Account" />
+          <div className="pt-8 border-t border-theme-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-theme-white/50 font-bold tracking-widest uppercase">
+              © {new Date().getFullYear()} MinuteBound Travel LLC. All rights reserved.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h4 className="font-black text-lg text-theme-white tracking-wide mb-2 uppercase text-[13px]">Support</h4>
-            <FooterLink href="#" text="Help Center & FAQ" />
-            <FooterLink href="/status" text="System Status" />
-            <FooterLink href="#" text="Privacy Policy" />
-            <FooterLink href="#" text="Terms of Service" />
-            <FooterLink href="#" text="Contact Us" />
-          </div>
         </div>
-
-        <div className="pt-8 border-t border-theme-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-theme-white/50 font-bold tracking-widest uppercase">
-            © {new Date().getFullYear()} MinuteBound Travel LLC. All rights reserved.
-          </p>
-        </div>
-
-      </div>
-    </footer>
+      </footer>
+    </div>
   );
 }
 

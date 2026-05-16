@@ -2,18 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { travelApi } from "../../services/api";
-import Navbar from "../../components/Navbar";
 import Link from "next/link";
+import ItineraryModal from "../../components/results/ItineraryModal";
 import {
-  X,
-  Plane,
-  Hotel,
-  MapPin,
-  Calendar,
-  Map,
-  Ticket,
+  PlaneTakeoff,
+  Building2,
+  Map as MapIcon,
   Car,
-  DollarSign,
   Share2,
   Mail,
   Copy,
@@ -21,18 +16,13 @@ import {
   Globe,
   Loader2,
   CheckCircle2,
-  Droplet,
-  ArrowBigDown,
-  LucideArrowDownAz,
-  ArrowDown,
-  Delete,
-  DeleteIcon,
-  LucideDelete,
   Trash,
+  ChevronRight,
+  Compass
 } from "lucide-react";
 
 interface SavedTrip {
-  id: string; // Updated to string because UUID from new backend
+  id: string;
   destination: string;
   visibility: "PRIVATE" | "PUBLIC";
   share_token?: string | null;
@@ -56,8 +46,10 @@ export default function SavedTripsPage() {
   const [savedTrips, setSavedTrips] = useState<SavedTrip[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState<SavedTrip | null>(null);
+  
+  // Track which link was just copied for visual feedback
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
 
-  // --- NEW: EMAIL MODAL STATE ---
   const [emailModal, setEmailModal] = useState<{
     isOpen: boolean;
     tripId: string | null;
@@ -100,7 +92,6 @@ export default function SavedTripsPage() {
     }
   };
 
-  // --- NEW: VISIBILITY & SHARING HANDLERS ---
   const handleVisibilityChange = async (
     tripId: string,
     visibility: "PRIVATE" | "PUBLIC"
@@ -127,10 +118,11 @@ export default function SavedTripsPage() {
     }
   };
 
-  const handleCopyLink = (token: string) => {
+  const handleCopyLink = (token: string, tripId: string) => {
     const url = `${window.location.origin}/shared/${token}`;
     navigator.clipboard.writeText(url);
-    alert("Share link copied to clipboard!");
+    setCopiedLinkId(tripId);
+    setTimeout(() => setCopiedLinkId(null), 2000);
   };
 
   const handleSendEmail = async (e: React.FormEvent) => {
@@ -162,7 +154,6 @@ export default function SavedTripsPage() {
     }
   };
 
-  // --- FORMATTING HELPERS ---
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "N/A";
     const parts = dateStr.split("-");
@@ -173,71 +164,31 @@ export default function SavedTripsPage() {
       parseInt(parts[2])
     );
     return localDate.toLocaleDateString("en-US", {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric",
     });
-  };
-
-  const formatTime = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
-
-  const formatShortDate = (dateString: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  };
-
-  const safeFloat = (val: any) => {
-    if (!val) return 0;
-    if (typeof val === "string")
-      return parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0;
-    return parseFloat(val) || 0;
-  };
-
-  const getLayoverTime = (arrivalStr: string, departureStr: string) => {
-    if (!arrivalStr || !departureStr) return null;
-    const arr = new Date(arrivalStr).getTime();
-    const dep = new Date(departureStr).getTime();
-    const diffMs = dep - arr;
-    if (diffMs <= 0) return null;
-    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    return diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
   };
 
   const getTripTitle = (trip: SavedTrip) => {
     const source =
       trip.data.rawParams?.source?.name?.split(",")[0] ||
       trip.data.rawParams?.source?.city;
-    return source ? `${source} to ${trip.destination}` : trip.destination;
-  };
-
-  const calculateTotal = (trip: SavedTrip) => {
-    let total = 0;
-    if (trip.data.flight) total += safeFloat(trip.data.flight.price);
-    else if (trip.data.drive) total += safeFloat(trip.data.drive.fuelEstimate);
-    if (trip.data.hotel) total += safeFloat(trip.data.hotel.price);
-    return total;
+    return source ? `${source} to ${trip.destination.split(',')[0]}` : trip.destination.split(',')[0];
   };
 
   if (!isLoggedIn) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-theme-white">
-        <h1 className="text-2xl font-bold text-theme-secondary mb-4">
+        <h1 className="text-3xl font-black text-theme-secondary mb-3">Access Restricted</h1>
+        <p className="text-theme-secondary/50 font-black text-[12px] mb-8 uppercase tracking-widest">
           Please login to view your saved trips
-        </h1>
+        </p>
         <Link
           href="/auth"
-          className="bg-theme-primary text-theme-white px-6 py-2 rounded-lg hover:bg-theme-secondary transition-colors"
+          className="bg-theme-primary text-theme-white px-8 py-4 rounded-xl hover:bg-theme-primary/90 transition-all font-black shadow-xl active:scale-95 text-[12px] uppercase tracking-widest"
         >
-          Go to Login
+          Login To Continue
         </Link>
       </div>
     );
@@ -245,37 +196,62 @@ export default function SavedTripsPage() {
 
   return (
     <div className="min-h-screen bg-theme-white relative pb-20">
-      <main className="max-w-6xl mx-auto p-8">
-        <header className="mb-8 flex justify-between items-end">
+      
+      {/* 1. NEW 1:1 REPLICA MODAL INTEGRATION */}
+      {selectedTrip && (
+         <ItineraryModal
+           isOpen={!!selectedTrip}
+           onClose={() => setSelectedTrip(null)}
+           rawParams={selectedTrip.data.rawParams}
+           weatherData={selectedTrip.data.weather}
+           isSavedView={true}
+           preloadedData={{
+             flight: selectedTrip.data.flight,
+             stay: selectedTrip.data.hotel, // Saved trip stores it as 'hotel'
+             tours: selectedTrip.data.activities, // Saved trip stores it as 'activities'
+             attractions: selectedTrip.data.attractions,
+             drive: selectedTrip.data.drive,
+             bookingRef: (selectedTrip as any).booking_ref || null
+           }}
+         />
+      )}
+
+      <main className="max-w-6xl mx-auto p-4 md:p-8 animate-in fade-in duration-300">
+        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            <h1 className="text-3xl font-black text-theme-secondary tracking-tight">
-              My Saved Itineraries
+            <h1 className="text-4xl font-black text-theme-secondary tracking-tight">
+              Saved Itineraries
             </h1>
-            <p className="text-theme-secondary/70 font-medium mt-1">
-              You have {savedTrips.length} saved trip{savedTrips.length !== 1 && "s"}. You can view, share, or delete itineraries here.
+            <p className="text-[12px] text-theme-secondary/50 font-black uppercase tracking-[0.2em] mt-2">
+              You have {savedTrips.length} saved trip{savedTrips.length !== 1 && "s"}. View, share, or delete them here.
             </p>
           </div>
           <Link
             href="/"
-            className="bg-theme-surface text-theme-primary px-4 py-2 rounded-lg font-bold hover:bg-theme-muted/20 transition-colors"
+            className="flex items-center gap-2 bg-theme-primary/10 text-theme-primary px-6 py-3 rounded-xl font-black text-[12px] uppercase tracking-widest hover:bg-theme-primary hover:text-theme-white transition-all shadow-sm active:scale-95"
           >
-            + Plan New Trip
+            <Compass size={14} /> Plan New Trip
           </Link>
         </header>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-primary"></div>
+          <div className="flex justify-center py-32">
+            <div className="w-8 h-8 border-4 border-theme-primary/20 border-t-theme-primary rounded-full animate-spin"></div>
           </div>
         ) : savedTrips.length === 0 ? (
-          <div className="bg-theme-surface p-12 rounded-2xl shadow-sm text-center border border-theme-muted/30">
-            <div className="text-6xl mb-4">🗺️</div>
-            <h3 className="text-xl font-bold text-theme-secondary mb-2">
+          <div className="bg-theme-white border-[1px] border-theme-secondary/10 p-16 rounded-[2rem] shadow-sm text-center flex flex-col items-center justify-center gap-4">
+            <div className="w-20 h-20 bg-theme-secondary/5 rounded-full flex items-center justify-center text-theme-secondary/20">
+              <MapIcon size={32} />
+            </div>
+            <h3 className="text-xl font-black text-theme-secondary">
               No trips planned yet
             </h3>
+            <p className="text-sm font-bold text-theme-secondary/50 max-w-md">
+              Start building your next adventure. Search for flights, stays, and activities to create your perfect itinerary.
+            </p>
             <Link
               href="/"
-              className="bg-theme-primary text-theme-white px-6 py-3 rounded-xl font-bold hover:bg-theme-secondary transition-colors"
+              className="mt-4 bg-theme-primary text-theme-white px-8 py-4 rounded-xl font-black text-[12px] uppercase tracking-widest hover:bg-theme-primary/90 transition-all shadow-xl active:scale-95"
             >
               Create Your First Itinerary
             </Link>
@@ -285,39 +261,38 @@ export default function SavedTripsPage() {
             {savedTrips.map((trip) => (
               <div
                 key={trip.id}
-                className="bg-theme-surface rounded-2xl shadow-sm border border-theme-muted/30 overflow-hidden hover:shadow-md transition flex flex-col relative"
+                className="bg-theme-white border-[1px] border-theme-secondary/10 rounded-[1.5rem] shadow-sm hover:shadow-xl hover:border-theme-primary/50 transition-all duration-300 overflow-hidden flex flex-col relative group"
               >
                 {/* Visibility Badge/Dropdown overlay */}
-                <button className="absolute top-4 right-4 z-10 flex items-center bg-theme-white/90 backdrop-blur-sm rounded-lg border border-theme-muted/20 px-2 py-1 shadow-sm">
+                <div className="absolute top-4 right-4 z-10 flex items-center bg-theme-white/90 backdrop-blur-md rounded-lg border border-theme-secondary/10 px-2.5 py-1.5 shadow-sm">
                   {trip.visibility === "PRIVATE" ? (
-                    <Lock size={12} className="text-theme-muted mr-1" />
+                    <Lock size={10} className="text-theme-secondary/40 mr-1.5" />
                   ) : (
-                    <Globe size={12} className="text-blue-500 mr-1" />
+                    <Globe size={10} className="text-blue-500 mr-1.5" />
                   )}
                   <select
                     value={trip.visibility || "PRIVATE"}
                     onChange={(e) =>
                       handleVisibilityChange(trip.id, e.target.value as any)
                     }
-                    className="bg-transparent text-[10px] font-bold tracking-wider uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-secondary"
+                    className="bg-transparent text-[8px] font-black tracking-widest uppercase focus:outline-none appearance-none pr-3 cursor-pointer text-theme-secondary"
                   >
                     <option value="PRIVATE">Private</option>
                     <option value="PUBLIC">Public</option>
                   </select>
-            
-                </button>
+                </div>
 
                 <div className="p-6 flex-grow mt-4">
                   <div className="flex justify-between items-start mb-2 pr-24">
                     <h2
-                      className="text-xl font-black text-theme-secondary line-clamp-2 leading-tight"
+                      className="text-xl font-black text-theme-secondary line-clamp-2 leading-tight group-hover:text-theme-primary transition-colors"
                       title={getTripTitle(trip)}
                     >
                       {getTripTitle(trip)}
                     </h2>
                   </div>
 
-                  <span className="inline-block bg-theme-primary/10 text-theme-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider mb-4 border border-theme-primary/20">
+                  <span className="inline-block bg-theme-primary/10 text-theme-primary text-[8px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest mb-6 border border-theme-primary/20">
                     {formatDate(
                       trip.data.check_in_date ||
                         trip.data.rawParams?.startDate ||
@@ -326,13 +301,11 @@ export default function SavedTripsPage() {
                     )}
                   </span>
 
-                  <div className="space-y-3 text-sm text-theme-secondary/80 mb-4 font-medium">
-                    <div className="flex items-center gap-2">
-                      {trip.data.flight ? (
-                        <Plane size={16} className="text-theme-muted" />
-                      ) : (
-                        <Car size={16} className="text-theme-muted" />
-                      )}
+                  <div className="space-y-4 text-xs text-theme-secondary/70 font-bold">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-theme-secondary/5 flex items-center justify-center text-theme-secondary">
+                        {trip.data.flight ? <PlaneTakeoff size={14} /> : <Car size={14} />}
+                      </div>
                       <span className="truncate">
                         {trip.data.flight?.airline_name ||
                           (trip.data.drive
@@ -340,14 +313,18 @@ export default function SavedTripsPage() {
                             : "No transport selected")}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Hotel size={16} className="text-theme-muted" />
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-theme-secondary/5 flex items-center justify-center text-theme-secondary">
+                        <Building2 size={14} />
+                      </div>
                       <span className="truncate">
                         {trip.data.hotel?.name || "No hotel selected"}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Map size={16} className="text-theme-muted" />
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-theme-secondary/5 flex items-center justify-center text-theme-secondary">
+                        <MapIcon size={14} />
+                      </div>
                       <span>
                         {trip.data.attractions?.length || 0} Attractions saved
                       </span>
@@ -355,23 +332,30 @@ export default function SavedTripsPage() {
                   </div>
                 </div>
 
-                {/* --- UPDATED FOOTER WITH SHARING CONTROLS --- */}
-                <div className="p-4 bg-theme-white border-t border-theme-muted/30 flex flex-col gap-2">
+                <div className="p-4 bg-theme-secondary/5 border-t border-theme-secondary/10 flex flex-col gap-2">
                   {trip.visibility !== "PRIVATE" && trip.share_token && (
-                    <button
-                      onClick={() => handleCopyLink(trip.share_token!)}
-                      className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-xl border border-blue-200 transition"
-                    >
-                      <Copy size={14} /> Copy Public Link
-                    </button>
+                    <>
+                      {copiedLinkId === trip.id ? (
+                        <button className="w-full flex items-center justify-center gap-2 text-[12px] uppercase tracking-widest font-black bg-green-50 text-green-600 py-3 rounded-xl border border-green-200 transition-all">
+                          <CheckCircle2 size={14} /> Link Copied!
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleCopyLink(trip.share_token!, trip.id)}
+                          className="w-full flex items-center justify-center gap-2 text-[12px] uppercase tracking-widest font-black bg-blue-50 text-blue-600 shadow-sm hover:bg-blue-100 transition-all active:scale-95 py-3 rounded-xl border border-blue-200"
+                        >
+                          <Copy size={14} /> Copy Public Link
+                        </button>
+                      )}
+                    </>
                   )}
 
                   <div className="flex gap-2">
                     <button
                       onClick={() => setSelectedTrip(trip)}
-                      className="flex-[2] text-center bg-theme-surface border border-theme-muted/50 text-theme-secondary py-2 rounded-xl text-sm font-bold hover:bg-theme-muted/20 active:scale-95 transition"
+                      className="flex-[2] flex items-center justify-center gap-2 text-center bg-theme-white border border-theme-secondary/10 text-theme-secondary py-3 rounded-xl text-[12px] font-black uppercase tracking-widest hover:bg-theme-primary hover:text-theme-white hover:border-theme-primary active:scale-95 transition-all shadow-sm"
                     >
-                      View Details
+                      View Details <ChevronRight size={14} />
                     </button>
                     <button
                       title="Email to a Friend"
@@ -385,16 +369,16 @@ export default function SavedTripsPage() {
                           success: false,
                         })
                       }
-                      className="flex-1 flex justify-center items-center bg-theme-surface border border-theme-primary/30 text-theme-primary py-2 rounded-xl hover:bg-theme-primary/10 active:scale-95 transition"
+                      className="flex-1 flex justify-center items-center bg-theme-white border border-theme-secondary/10 text-theme-secondary py-3 rounded-xl hover:bg-theme-primary hover:text-theme-white hover:border-theme-primary active:scale-95 transition-all shadow-sm"
                     >
-                      <Mail size={18} />
+                      <Mail size={16} />
                     </button>
                     <button
                       title="Delete Trip"
                       onClick={() => handleDelete(trip.id)}
-                      className="flex-1 flex justify-center items-center bg-theme-surface border border-red-200 text-red-500 py-2 rounded-xl hover:bg-red-50 active:scale-95 transition"
+                      className="flex-1 flex justify-center items-center bg-theme-white border border-red-100 text-red-500 py-3 rounded-xl hover:bg-red-50 active:scale-95 transition-all shadow-sm"
                     >
-                      <Trash size={18} />
+                      <Trash size={16} />
                     </button>
                   </div>
                 </div>
@@ -404,33 +388,33 @@ export default function SavedTripsPage() {
         )}
       </main>
 
-      {/* --- NEW EMAIL MODAL --- */}
+      {/* --- EMAIL MODAL --- */}
       {emailModal.isOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-theme-secondary/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in"
             onClick={() =>
               !emailModal.loading &&
               setEmailModal((prev) => ({ ...prev, isOpen: false }))
             }
           />
-          <div className="relative bg-theme-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 p-6">
+          <div className="relative bg-theme-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 p-6 border border-theme-secondary/10">
             <h3 className="text-xl font-black text-theme-secondary flex items-center gap-2 mb-1">
               <Share2 size={20} className="text-theme-primary" /> Share
               Itinerary
             </h3>
-            <p className="text-xs font-medium text-theme-secondary/70 mb-5">
+            <p className="text-xs font-bold text-theme-secondary/60 mb-5">
               Send a beautiful PDF copy of this trip to a friend via email.
             </p>
 
             {emailModal.success ? (
-              <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 font-bold mb-4 border border-green-200">
-                <CheckCircle2 size={20} /> Email sent successfully!
+              <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center justify-center gap-2 text-[12px] uppercase tracking-widest font-black mb-4 border border-green-200">
+                <CheckCircle2 size={16} /> Email sent successfully!
               </div>
             ) : (
               <form onSubmit={handleSendEmail} className="flex flex-col gap-4">
                 <div>
-                  <label className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-1 block">
+                  <label className="text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-2 block">
                     Friend's Email
                   </label>
                   <input
@@ -444,11 +428,11 @@ export default function SavedTripsPage() {
                       }))
                     }
                     placeholder="friend@example.com"
-                    className="w-full px-4 py-3 bg-theme-surface border border-theme-muted/30 rounded-xl text-sm focus:ring-2 focus:ring-theme-primary focus:outline-none"
+                    className="w-full px-4 py-4 bg-theme-secondary/5 border border-theme-secondary/10 rounded-xl text-sm font-bold focus:ring-1 focus:ring-theme-primary focus:border-theme-primary focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-theme-secondary uppercase tracking-wider mb-1 block">
+                  <label className="text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-2 block">
                     Personal Message (Optional)
                   </label>
                   <textarea
@@ -461,23 +445,23 @@ export default function SavedTripsPage() {
                     }
                     placeholder="Hey! Check out this trip I planned..."
                     rows={3}
-                    className="w-full px-4 py-3 bg-theme-surface border border-theme-muted/30 rounded-xl text-sm focus:ring-2 focus:ring-theme-primary focus:outline-none resize-none"
+                    className="w-full px-4 py-4 bg-theme-secondary/5 border border-theme-secondary/10 rounded-xl text-sm font-bold focus:ring-1 focus:ring-theme-primary focus:border-theme-primary focus:outline-none resize-none"
                   />
                 </div>
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 mt-4">
                   <button
                     type="button"
                     onClick={() =>
                       setEmailModal((prev) => ({ ...prev, isOpen: false }))
                     }
-                    className="flex-1 py-3 text-sm font-bold text-theme-secondary bg-theme-surface rounded-xl hover:bg-theme-muted/20 transition"
+                    className="flex-1 py-4 text-[12px] font-black uppercase tracking-widest text-theme-secondary bg-theme-secondary/5 rounded-xl hover:bg-theme-secondary/10 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={emailModal.loading}
-                    className="flex-1 py-3 text-sm font-bold text-theme-white bg-theme-primary rounded-xl flex justify-center items-center gap-2 hover:bg-theme-secondary transition disabled:opacity-70"
+                    className="flex-1 py-4 text-[12px] font-black uppercase tracking-widest text-theme-white bg-theme-primary rounded-xl flex justify-center items-center gap-2 hover:bg-theme-primary/90 transition-colors shadow-lg disabled:opacity-70"
                   >
                     {emailModal.loading ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -490,273 +474,6 @@ export default function SavedTripsPage() {
                 </div>
               </form>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* --- EXISTING ITINERARY DETAILS MODAL (Kept exactly the same) --- */}
-      {selectedTrip && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-theme-secondary/60 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={() => setSelectedTrip(null)}
-          />
-          <div className="relative bg-theme-white w-full max-w-2xl max-h-[85vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-theme-surface flex justify-between items-center bg-theme-surface/50">
-              <div>
-                <h2 className="text-xl font-black text-theme-secondary line-clamp-1">
-                  {getTripTitle(selectedTrip)}
-                </h2>
-                <p className="text-xs font-bold text-theme-secondary/60 uppercase tracking-widest mt-1">
-                  <Calendar size={12} className="inline mr-1 mb-0.5" />
-                  {formatDate(
-                    selectedTrip.data.check_in_date ||
-                      selectedTrip.data.rawParams?.startDate ||
-                      selectedTrip.data.startDate ||
-                      ""
-                  )}{" "}
-                  —{" "}
-                  {formatDate(
-                    selectedTrip.data.check_out_date ||
-                      selectedTrip.data.rawParams?.endDate ||
-                      selectedTrip.data.endDate ||
-                      ""
-                  )}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedTrip(null)}
-                className="p-2 hover:bg-theme-surface rounded-full transition bg-theme-white text-theme-secondary/70"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-theme-white">
-              {/* Total Estimated Cost */}
-              <div className="bg-theme-secondary/10 border border-theme-secondary/20 rounded-xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-theme-secondary">
-                  <DollarSign size={20} />
-                  <span className="font-black uppercase tracking-widest text-xs">
-                    Total Estimated Cost
-                  </span>
-                </div>
-                <span className="font-black text-xl text-theme-secondary">
-                  ${calculateTotal(selectedTrip).toFixed(2)}
-                </span>
-              </div>
-
-              {/* Transportation Info */}
-              {(selectedTrip.data.flight || selectedTrip.data.drive) && (
-                <div>
-                  <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    {selectedTrip.data.flight ? (
-                      <Plane size={16} className="text-theme-primary" />
-                    ) : (
-                      <Car size={16} className="text-theme-primary" />
-                    )}
-                    Transportation
-                  </h3>
-                  {selectedTrip.data.flight ? (
-                    <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4 space-y-4">
-                      <div className="flex justify-between items-center">
-                        <p className="font-bold text-theme-secondary">
-                          {selectedTrip.data.flight.airline_name}
-                        </p>
-                        <span className="font-black text-theme-primary">
-                          $
-                          {safeFloat(selectedTrip.data.flight.price).toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        {(selectedTrip.data.flight.itineraries || []).map(
-                          (itin: any, idx: number) => {
-                            const stops = itin.segments?.length
-                              ? itin.segments.length - 1
-                              : 0;
-                            return (
-                              <div
-                                key={idx}
-                                className="bg-theme-white p-3 rounded-lg border border-theme-surface/60"
-                              >
-                                <div className="flex justify-between items-center mb-2 pb-1 border-b border-theme-surface/40">
-                                  <span className="text-[10px] uppercase font-bold text-theme-muted tracking-wider">
-                                    {idx === 0 ? "Outbound" : "Return"} •{" "}
-                                    {formatShortDate(
-                                      itin.segments?.[0]?.departure_time
-                                    )}
-                                  </span>
-                                  <span
-                                    className={`text-[10px] uppercase font-bold tracking-wider ${
-                                      stops === 0
-                                        ? "text-green-500"
-                                        : "text-amber-500"
-                                    }`}
-                                  >
-                                    {stops === 0
-                                      ? "Direct"
-                                      : `${stops} Stop(s)`}
-                                  </span>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                  {(itin.segments || []).map(
-                                    (seg: any, sIdx: number) => {
-                                      const layover =
-                                        sIdx > 0
-                                          ? getLayoverTime(
-                                              itin.segments[sIdx - 1]
-                                                .arrival_time,
-                                              seg.departure_time
-                                            )
-                                          : null;
-                                      return (
-                                        <React.Fragment key={sIdx}>
-                                          {layover && (
-                                            <div className="flex justify-center my-1">
-                                              <span className="text-[9px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                                                Layover: {layover}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <div className="flex items-center gap-3 text-sm text-theme-secondary/80">
-                                            <div className="flex-1">
-                                              <p className="font-black text-theme-secondary">
-                                                {seg.departure_airport}
-                                              </p>
-                                              <p className="text-[10px] font-bold text-theme-muted">
-                                                {formatTime(seg.departure_time)}
-                                              </p>
-                                            </div>
-                                            <span className="text-xs">✈️</span>
-                                            <div className="flex-1 text-right">
-                                              <p className="font-black text-theme-secondary">
-                                                {seg.arrival_airport}
-                                              </p>
-                                              <p className="text-[10px] font-bold text-theme-muted">
-                                                {formatTime(seg.arrival_time)}
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </React.Fragment>
-                                      );
-                                    }
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          }
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-bold text-theme-secondary">
-                          Road Trip Journey
-                        </p>
-                        <span className="font-black text-theme-primary">
-                          $
-                          {safeFloat(
-                            selectedTrip.data.drive?.fuelEstimate
-                          ).toFixed(2)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-theme-secondary/70 font-medium">
-                        Duration: {selectedTrip.data.drive?.duration} |
-                        Distance: {selectedTrip.data.drive?.distance}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Hotel Info */}
-              {selectedTrip.data.hotel && (
-                <div>
-                  <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Hotel size={16} className="text-theme-primary" />{" "}
-                    Accommodation
-                  </h3>
-                  <div className="bg-theme-primary/10 border border-theme-primary/20 rounded-xl p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-bold text-theme-secondary">
-                          {selectedTrip.data.hotel.name}
-                        </p>
-                        <p className="text-xs text-theme-secondary/60 mt-1 flex items-center gap-1">
-                          <MapPin size={12} />{" "}
-                          {selectedTrip.data.hotel.address?.lines?.join(", ") ||
-                            "Address unavailable"}
-                        </p>
-                      </div>
-                      <span className="font-black text-theme-primary">
-                        ${safeFloat(selectedTrip.data.hotel.price).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Attractions Info */}
-              {selectedTrip.data.attractions &&
-                selectedTrip.data.attractions.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <Map size={16} className="text-theme-secondary" /> Planned
-                      Attractions
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {selectedTrip.data.attractions.map((attr, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-secondary/80 flex items-start gap-2"
-                        >
-                          <span className="text-theme-secondary mt-0.5">•</span>{" "}
-                          {attr.name}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {/* Tours & Activities Info */}
-              {selectedTrip.data.activities &&
-                selectedTrip.data.activities.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-black text-theme-secondary/80 uppercase tracking-wider mb-3 flex items-center gap-2">
-                      <Ticket size={16} className="text-theme-secondary" />{" "}
-                      Tours & Activities
-                    </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {selectedTrip.data.activities.map(
-                        (tour: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className="bg-theme-surface border border-theme-muted/30 p-3 rounded-lg text-sm font-medium text-theme-secondary/80 flex items-start gap-2"
-                          >
-                            <span className="text-theme-secondary mt-0.5">
-                              •
-                            </span>{" "}
-                            {tour.name || tour.title}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-theme-surface bg-theme-surface/30">
-              <button
-                onClick={() => setSelectedTrip(null)}
-                className="w-full bg-theme-secondary text-theme-white font-bold py-3 rounded-xl hover:bg-theme-secondary/80 transition"
-              >
-                Close Details
-              </button>
-            </div>
           </div>
         </div>
       )}

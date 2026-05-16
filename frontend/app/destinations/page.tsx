@@ -187,7 +187,7 @@ function DestinationsContent() {
                         )}
                       </div>
                     <div className="p-2.5 bg-theme-primary/60 rounded-xl group-hover:bg-theme-primary group-hover:text-white transition-colors">
-                        <ArrowRight size={18} className='text-theme-white'/>
+                        <ArrowRight size={16} className='text-theme-white'/>
                       </div>
                     </div>
                   </div>

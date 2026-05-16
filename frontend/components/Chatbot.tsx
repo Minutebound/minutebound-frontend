@@ -127,7 +127,7 @@ export default function Chatbot({
                 }`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm shadow-sm ${
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 md:px-4 md:py-2  md:text-sm shadow-sm ${
                     msg.role === "user"
                       ? "bg-theme-primary text-theme-white rounded-tr-none"
                       : "bg-theme-surface text-theme-secondary border border-theme-surface rounded-tl-none"
@@ -139,7 +139,7 @@ export default function Chatbot({
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-theme-surface text-theme-muted border border-theme-surface rounded-2xl rounded-tl-none px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm animate-pulse">
+                <div className="bg-theme-surface text-theme-muted border border-theme-surface rounded-2xl rounded-tl-none px-3 py-2 md:px-4 md:py-2  md:text-sm animate-pulse">
                   Typing...
                 </div>
               </div>
@@ -155,7 +155,7 @@ export default function Chatbot({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               placeholder="Ask about your destination..."
-              className="flex-1 bg-theme-surface text-theme-secondary placeholder:text-theme-muted border border-transparent rounded-full px-3 py-2 md:px-4 md:py-2 text-[13px] md:text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/50 transition-all shadow-inner"
+              className="flex-1 bg-theme-surface text-theme-secondary placeholder:text-theme-muted border border-transparent rounded-full px-3 py-2 md:px-4 md:py-2  md:text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/50 transition-all shadow-inner"
             />
             <button
               onClick={sendMessage}

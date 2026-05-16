@@ -11,7 +11,7 @@
 
 @layer base {
   html {
-    font-size: 14px; /* Your desired site-wide baseline */
+    font-size: 16px; /* Your desired site-wide baseline */
     font-weight: 600; /* This is a fallback for browsers that don't support the new font-weight syntax */
   }
   
@@ -23,8 +23,7 @@
 @theme inline {
   /* Generalized Semantic Color Palette */
   --color-theme-primary: #F97316;   
-  --color-theme-secondary: #012C23;     
-  --color-theme-light-blue: #FAFBFB; 
+  --color-theme-secondary: #012C23;   
   --color-theme-white: #FFFFFF;
   --color-theme-cool-white:#F5F7FA;
   --color-theme-black: #000000;
@@ -37,7 +36,6 @@
   --color-theme-orange: #F97316;
   --color-theme-violet: #7C3AED;
   --color-theme-blue: #2563EB;
-  --color-theme-yellow: #0C0A08;
   --color-theme-dark-gray: #111827;
   --color-theme-light-gray: #64748B;
   --color-theme-light-slate: #334155;
@@ -47,6 +45,7 @@
   --color-theme-dark-green: #012C23;
   --color-theme-gold:#F59E0B;
   --color-theme-emerald: #10B981;
+  --color-theme-golden-yellow: #DCF86E;
   
   /* FONT MAPPINGS */
   /* This maps the Inter variable to Tailwind's default font-sans utility */
@@ -96,7 +95,7 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(74, 124, 64, 0.3); /* Secondary color with opacity */
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {

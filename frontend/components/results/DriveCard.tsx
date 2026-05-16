@@ -92,15 +92,15 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
 
           <div className="flex-1 w-full space-y-4">
              <div className="flex items-center gap-3">
-               <span className="font-black text-theme-secondary text-[16px] ">{sName}</span>
-               <ArrowRight size={14} className="text-theme-secondary/30" />
-               <span className="font-black text-theme-secondary text-[16px] ">{dName}</span>
+               <span className="font-black text-theme-secondary  ">{sName}</span>
+               <ArrowRight size={16} className="text-theme-secondary/30" />
+               <span className="font-black text-theme-secondary  ">{dName}</span>
              </div>
 
              <div className="flex flex-wrap lg:flex-nowrap gap-4 sm:gap-8">
                <div className="flex flex-col">
                   <span className=" uppercase font-black text-theme-secondary/40 tracking-widest">Distance</span>
-                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{fuel.miles} mi</span>
+                  <span className=" font-black text-theme-secondary leading-tight">{fuel.miles} mi</span>
                   <span className="font-bold text-theme-secondary/40">{drivingData.distance_km} km</span>
                </div>
                
@@ -108,7 +108,7 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
 
                <div className="flex flex-col">
                   <span className=" uppercase font-black text-theme-secondary/40 tracking-widest">Drive Time</span>
-                  <span className="text-[16px] font-black text-theme-secondary leading-tight">
+                  <span className=" font-black text-theme-secondary leading-tight">
                     {Math.floor(drivingData.duration_mins / 60)}h {Math.round(drivingData.duration_mins % 60)}m
                   </span>
                </div>
@@ -117,7 +117,7 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
 
                <div className="flex flex-col">
                   <span className=" uppercase font-black text-theme-primary tracking-widest">Fuel Estimate</span>
-                  <span className="text-[16px] font-black text-theme-primary leading-tight">${fuel.cost}</span>
+                  <span className=" font-black text-theme-primary leading-tight">${fuel.cost}</span>
                   <span className=" font-bold text-theme-primary/60">{fuel.gallons} Gal</span>
                </div>
              </div>
@@ -126,13 +126,13 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
           <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
              <div className="text-left lg:text-right">
                 <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none">${fuel.cost}</p>
-                <p className="text-[8px] sm:text-[10px] uppercase text-theme-secondary/30 tracking-widest mt-1">Est. Gas Total</p>
+                <p className="text-[8px] sm:text-[8px] uppercase text-theme-secondary/30 tracking-widest mt-1">Est. Gas Total</p>
              </div>
              <button 
                 onClick={(e) => { e.stopPropagation(); toggleDriveSelection(); }}
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-[100px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 whitespace-nowrap ${isSelected ? "bg-theme-secondary text-theme-light-blue" : "bg-theme-primary text-theme-light-blue hover:bg-theme-primary/90"}`}
              >
-                {isSelected ? <CheckCircle2 size={20} /> : null}
+                {isSelected ? <CheckCircle2 size={24} /> : null}
                 {isSelected ? "Selected" : "Select Route"}
              </button>
           </div>
@@ -143,10 +143,10 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
            onClick={(e) => { e.stopPropagation(); toggleIntermediates(); }}
         >
           <div className="flex flex-col items-center gap-1 group">
-             <span className="text-[10px] font-bold uppercase tracking-widest text-theme-primary transition-colors">
+             <span className="text-[8px] font-bold uppercase tracking-widest text-theme-primary transition-colors">
                Route Details
              </span>
-             <ChevronDown size={14} className={`text-theme-secondary/30 group-hover:text-theme-primary transition-transform ${showIntermediates ? 'rotate-180' : ''}`} />
+             <ChevronDown size={16} className={`text-theme-secondary/30 group-hover:text-theme-primary transition-transform ${showIntermediates ? 'rotate-180' : ''}`} />
           </div>
         </div>
 
@@ -161,9 +161,9 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
 
             <div className="relative ml-2">
               <div className="relative pl-6 border-l-2 border-theme-secondary/20 pb-6">
-                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-light-blue border-4 border-theme-primary flex items-center justify-center shadow-sm" />
+                <div className="absolute -left-[8px] top-0 w-4 h-4 rounded-full bg-theme-light-blue border-4 border-theme-primary flex items-center justify-center shadow-sm" />
                 <div className="flex flex-col -mt-1">
-                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{sName}</span>
+                  <span className=" font-black text-theme-secondary leading-tight">{sName}</span>
                   <span className="font-bold text-theme-secondary/40 uppercase tracking-widest mt-0.5">Source</span>
                 </div>
               </div>
@@ -176,9 +176,9 @@ export default function DrivingCard({ drivingData }: { drivingData?: any }) {
               ))}
 
               <div className="relative pl-6">
-                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-theme-secondary border-[3px] border-theme-light-blue flex items-center justify-center shadow-sm" />
+                <div className="absolute -left-[8px] top-0 w-4 h-4 rounded-full bg-theme-secondary border-[3px] border-theme-light-blue flex items-center justify-center shadow-sm" />
                 <div className="flex flex-col -mt-1">
-                  <span className="text-[16px] font-black text-theme-secondary leading-tight">{dName}</span>
+                  <span className=" font-black text-theme-secondary leading-tight">{dName}</span>
                   <span className="font-bold text-theme-secondary/40 uppercase tracking-widest mt-0.5">Destination</span>
                 </div>
               </div>

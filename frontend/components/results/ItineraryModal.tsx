@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import {
-  X, Plane, Hotel, MapPin, Calendar, Users, DollarSign, Download, Share2, 
-  Loader2, Send, Car, Ticket, Sun, Camera, Save, Plus, CheckCircle2, Receipt
+  X, PlaneTakeoff,Plane, Building2, MapPin, Calendar, Users, DollarSign, Download, Share2, 
+  Loader2, Send, Car, Ticket, Sun, Camera, Save, Plus, CheckCircle2, Receipt, ShieldCheck, Clock, Leaf, Info,
+  CreditCard
 } from "lucide-react";
 import { travelApi } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import FlightCheckout from "./FlightCheckOut";
+import TripCheckout from "./TripCheckOut";
 import { useRouter } from "next/navigation";
 
 interface ItineraryModalProps {
@@ -15,6 +16,15 @@ interface ItineraryModalProps {
   onClose: () => void;
   rawParams: any;
   weatherData?: any;
+  isSavedView?: boolean;
+  preloadedData?: {
+    flight?: any;
+    stay?: any;
+    tours?: any[];
+    attractions?: any[];
+    drive?: any;
+    bookingRef?: string | null;
+  };
 }
 
 export default function ItineraryModal({
@@ -22,10 +32,12 @@ export default function ItineraryModal({
   onClose,
   rawParams,
   weatherData,
+  isSavedView = false,
+  preloadedData
 }: ItineraryModalProps) {
   const { user, isLoggedIn } = useAuth();
-  const checkoutRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  
   // --- States ---
   const [selections, setSelections] = useState<any>({});
   const [defaultAttractions, setDefaultAttractions] = useState<any[]>([]);
@@ -45,40 +57,55 @@ export default function ItineraryModal({
   const [updatedFlightPrice, setUpdatedFlightPrice] = useState<number | null>(null);
   const [updatedFlightTaxes, setUpdatedFlightTaxes] = useState<number | null>(null);
   const [isCheckoutExpanded, setIsCheckoutExpanded] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<string>("IDLE");
 
   useEffect(() => {
     if (isOpen) {
-      const savedSelections = sessionStorage.getItem("selected_trip_state");
-      if (savedSelections) {
-        try { setSelections(JSON.parse(savedSelections)); } 
-        catch (e) { setSelections({}); }
+      if (preloadedData) {
+        setSelections({
+          flights: preloadedData.flight ? [preloadedData.flight] : [],
+          stays: preloadedData.stay ? [preloadedData.stay] : [],
+          tours: preloadedData.tours || [],
+          attractions: preloadedData.attractions || [],
+          drive: preloadedData.drive || null,
+        });
+        setDefaultAttractions(preloadedData.attractions || []);
+        setIsBooked(!!preloadedData.bookingRef);
+        setBookingRef(preloadedData.bookingRef || null);
       } else {
-        setSelections({});
-      }
+        const savedSelections = sessionStorage.getItem("selected_trip_state");
+        if (savedSelections) {
+          try { setSelections(JSON.parse(savedSelections)); } 
+          catch (e) { setSelections({}); }
+        } else {
+          setSelections({});
+        }
 
-      const cachedTrip = sessionStorage.getItem("current_trip_results");
-      if (cachedTrip) {
-        try {
-          const parsedTrip = JSON.parse(cachedTrip);
-          setDefaultAttractions(parsedTrip.attractions || parsedTrip.attractionsData || []);
-        } catch (e) {
+        const cachedTrip = sessionStorage.getItem("current_trip_results");
+        if (cachedTrip) {
+          try {
+            const parsedTrip = JSON.parse(cachedTrip);
+            setDefaultAttractions(parsedTrip.attractions || parsedTrip.attractionsData || []);
+          } catch (e) {
+            setDefaultAttractions([]);
+          }
+        } else {
           setDefaultAttractions([]);
         }
-      } else {
-        setDefaultAttractions([]);
+        setIsBooked(false);
+        setBookingRef(null);
       }
 
       setShowEmailInput(false);
       setEmail("");
       setIsSaved(false);
       setIsAlreadySaved(false);
-      setIsBooked(false);
-      setBookingRef(null);
       setUpdatedFlightPrice(null);
       setUpdatedFlightTaxes(null);
       setIsCheckoutExpanded(false);
+      setCheckoutStep("IDLE");
     }
-  }, [isOpen]);
+  }, [isOpen, preloadedData]);
 
   if (!isOpen) return null;
 
@@ -88,10 +115,8 @@ export default function ItineraryModal({
     onClose();
   };
 
-
   // --- Data Extraction ---
   const flight = Array.isArray(selections?.flights) ? selections.flights[0] : selections?.flights;
-  
   let rawDrive = selections?.drive || selections?.driving;
   let drive = null;
   if (rawDrive) {
@@ -99,7 +124,6 @@ export default function ItineraryModal({
     else if (rawDrive.data) drive = rawDrive.data;
     else drive = rawDrive;
   }
-
   const stay = Array.isArray(selections?.stays) ? selections.stays[0] : selections?.stays;
   const tours = selections?.tours || selections?.activities || [];
   const activeAttractions = selections?.attractions?.length > 0 ? selections.attractions : defaultAttractions;
@@ -108,46 +132,56 @@ export default function ItineraryModal({
   const isOneWay = !rawParams?.endDate || rawParams?.tripType === "one-way";
   let firstDayWeather = isWeatherSelected ? weatherData.days[0] : null;
 
+  // --- Formatting Helpers ---
+  const safeFloat = (val: any) => {
+    if (!val) return 0;
+    if (typeof val === "string") return parseFloat(val.replace(/[^0-9.-]+/g, "")) || 0;
+    return parseFloat(val) || 0;
+  };
+
   // --- Detailed Cost Calculations ---
   let chargeableSubtotal = 0;
   let taxesAndFees = 0;
-  let estimatedFuel = 0; // Tracked separately for info only
+  let estimatedFuel = 0; 
 
   if (flight) {
-    const total = updatedFlightPrice !== null ? updatedFlightPrice : Number(flight.price?.total || flight.price || 0);
-    const explicitTaxes = updatedFlightTaxes !== null ? updatedFlightTaxes : (flight.price?.totalTaxes ? Number(flight.price.totalTaxes) : total * 0.15);
+    const total = updatedFlightPrice !== null ? updatedFlightPrice : safeFloat(flight.price?.total || flight.price);
+    const explicitTaxes = updatedFlightTaxes !== null ? updatedFlightTaxes : (flight.price?.totalTaxes ? safeFloat(flight.price.totalTaxes) : total * 0.15);
     chargeableSubtotal += (total - explicitTaxes);
     taxesAndFees += explicitTaxes;
   } else if (drive) {
     if (drive.distance_km) {
       estimatedFuel = ((drive.distance_km * 0.621371) / 25) * 3.35;
     } else {
-      estimatedFuel = Number((drive.fuelEstimate || drive.price || "0").toString().replace(/[^0-9.-]+/g, ""));
+      estimatedFuel = safeFloat(drive.fuelEstimate || drive.price);
     }
   }
 
   if (stay) {
-    const total = Number(stay.offerDetails?.price || stay.price || 0);
-    const explicitTaxes = Number(stay.offerDetails?.taxes || 0);
+    const total = safeFloat(stay.offerDetails?.price || stay.price);
+    const explicitTaxes = safeFloat(stay.offerDetails?.taxes);
     const estTax = explicitTaxes > 0 ? explicitTaxes : total * 0.12; 
     chargeableSubtotal += (total - estTax);
     taxesAndFees += estTax;
   }
 
   tours.forEach((t: any) => {
-    if (t.price && t.price.amount) chargeableSubtotal += parseFloat(t.price.amount);
+    if (t.price && (t.price.amount || t.price)) {
+      chargeableSubtotal += safeFloat(t.price.amount || t.price);
+    }
   });
 
   const grandTotal = chargeableSubtotal + taxesAndFees;
 
-  // --- Formatting Helpers ---
   let displayDriveDuration = "N/A";
   let displayDriveDistance = "N/A";
   if (drive?.duration_mins) displayDriveDuration = `${Math.floor(drive.duration_mins / 60)}h ${Math.round(drive.duration_mins % 60)}m`;
   else if (drive?.duration?.text) displayDriveDuration = drive.duration.text;
+  else if (drive?.duration) displayDriveDuration = drive.duration;
   
   if (drive?.distance_km) displayDriveDistance = `${(drive.distance_km * 0.621371).toFixed(0)} Mi`;
   else if (drive?.distance?.text) displayDriveDistance = drive.distance.text;
+  else if (drive?.distance) displayDriveDistance = drive.distance;
 
   const passedCities = drive?.passedCities || [];
 
@@ -158,7 +192,7 @@ export default function ItineraryModal({
     return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   };
   const formatTime = (d: string) => d ? new Date(d).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
-  const formatShortDate = (d: string) => d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
+  const formatShortDate = (d: string) => d ? new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric" }) : "";
   
   const getLayoverTime = (arrStr: string, depStr: string) => {
     if (!arrStr || !depStr) return null;
@@ -169,30 +203,18 @@ export default function ItineraryModal({
     return diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
   };
 
-  // NEW: Dynamic Route Formatter
   const formatRoute = (cities: string[]) => {
     if (!cities || cities.length === 0) return null;
-    // Strip state strings by splitting at the comma
     const formattedCities = cities.map(c => c.split(',')[0].trim());
-    
-    if (formattedCities.length <= 4) {
-      return formattedCities.join(" - ");
-    }
-    
-    // Grab first two and last two cities, separated by dots
+    if (formattedCities.length <= 4) return formattedCities.join(" - ");
     const start = formattedCities.slice(0, 2).join(" - ");
     const end = formattedCities.slice(-2).join(" - ");
     return `${start} ...... ${end}`;
   };
 
-  const getFullTripTitle = () => {
-    const src = rawParams?.source?.name?.split(",")[0] || rawParams?.source?.city;
-    const dst = rawParams?.destination?.name?.split(",")[0] || rawParams?.destination?.city || "Trip";
-    return src ? `${src} to ${dst}` : dst;
-  };
-  const destCityName = rawParams?.destination?.name?.split(",")[0] || "Destination";
+  const destCityName = rawParams?.destination?.name?.split(",")[0] || rawParams?.destination?.city || "Destination";
   const originCityName = rawParams?.source?.name?.split(",")[0] || "Origin";
-
+  const getFullTripTitle = () => originCityName ? `${originCityName} to ${destCityName}` : destCityName;
   const cityImageUrl = `https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=800&q=80`;
 
   // --- Handlers ---
@@ -200,24 +222,22 @@ export default function ItineraryModal({
     setIsBooked(true);
     setIsCheckoutExpanded(false); 
     if (pnrCode) setBookingRef(pnrCode);
-    if (!isSaved && !isAlreadySaved) handleSaveTrip();
+    if (!isSavedView && !isSaved && !isAlreadySaved) handleSaveTrip();
   };
 
   const handleSaveTrip = async () => {
-   if (!isLoggedIn) {router.push("/auth"); 
-      return;
-    }
+   if (!isLoggedIn) {router.push("/auth"); return;}
     setIsSaving(true); setIsAlreadySaved(false);
     try {
       const res = await travelApi.saveTrip({
         destination: rawParams?.destination?.city || rawParams?.destination?.name || "Trip",
         check_in_date: rawParams?.startDate, check_out_date: rawParams?.endDate, booking_ref: bookingRef,
-        flight: flight ? { airline_name: flight.airline_name, price: flight.price?.total || flight.price } : null,
-        drive: drive ? { distance: displayDriveDistance, duration: displayDriveDuration, estimatedFuel } : null,
-        hotel: stay ? { name: stay.name, price: stay.offerDetails?.price || stay.price } : null,
-        attractions: activeAttractions ? activeAttractions.map((a: any) => ({ name: a.name })) : [],
-        activities: tours ? tours.map((t: any) => ({ name: t.name || t.title })) : [],
-        rawParams: { source: { name: originCityName }, startDate: rawParams?.startDate, endDate: rawParams?.endDate },
+        flight: flight ? { airline_name: flight.airline_name, price: flight.price?.total || flight.price, itineraries: flight.itineraries, travel_class: flight.travel_class, carbon_emissions_kg: flight.carbon_emissions_kg } : null,
+        drive: drive ? { distance: displayDriveDistance, duration: displayDriveDuration, fuelEstimate: estimatedFuel } : null,
+        hotel: stay ? { name: stay.name, price: stay.offerDetails?.price || stay.price, address: stay.address, rating: stay.rating || stay.hotel?.rating, offerDetails: stay.offerDetails } : null,
+        attractions: activeAttractions ? activeAttractions.map((a: any) => ({ name: a.name, image: a.image || a.photo, category: a.category })) : [],
+        activities: tours ? tours.map((t: any) => ({ name: t.name || t.title, price: t.price, duration: t.duration, rating: t.rating, short_description: t.short_description })) : [],
+        rawParams: { source: { name: originCityName }, destination: { name: destCityName }, startDate: rawParams?.startDate, endDate: rawParams?.endDate },
       });
       if (res && res.message === "Trip already saved!") setIsAlreadySaved(true);
       else setIsSaved(true);
@@ -262,85 +282,95 @@ export default function ItineraryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 lg:p-8 overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-3 lg:p-3 overflow-hidden">
       <div className="absolute inset-0 bg-theme-secondary/90 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
       <div className="relative bg-theme-white w-full h-full md:h-[90vh] max-w-[1200px] md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
         
-        {/* Universal Top Header */}
-        <div className="px-6 py-5 flex justify-between items-center bg-theme-white border-b border-theme-soft-slate shrink-0 z-20 relative">
+        {/* Modal Header */}
+        <div className="px-5 py-4 sm:px-6 sm:py-5 flex justify-between items-center bg-theme-white border-b border-theme-soft-slate shrink-0 z-20 relative">
           <div className="flex items-center gap-3">
              <div className="w-8 h-8 rounded-full bg-theme-primary flex items-center justify-center shadow-md">
-               <Plane size={14} className="text-theme-white" />
+               <CreditCard size={14} className="text-theme-white" />
              </div>
-             <h2 className="text-xl font-black text-theme-secondary tracking-tight hidden sm:block">Checkout & Itinerary</h2>
+             <h2 className="text-xl font-black text-theme-secondary tracking-tight hidden sm:block">
+               {isSavedView ? "Saved Itinerary" : "Checkout & Itinerary"}
+             </h2>
           </div>
           <button onClick={onClose} className="p-2 bg-theme-cool-white hover:bg-theme-soft-slate/50 rounded-full transition-colors border border-theme-soft-slate shadow-sm shrink-0 active:scale-95 flex items-center gap-2">
-            <span className="text-xs font-bold px-2 hidden sm:block text-theme-secondary">Close</span>
-            <X size={18} className="text-theme-secondary" />
+            <span className="text-sm font-bold px-2 hidden sm:block text-theme-secondary">Close</span>
+            <X size={16} className="text-theme-secondary" />
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden relative custom-scrollbar">
+        <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden relative custom-scrollbar min-h-0">
           
-          {/* =========================================================
-              LEFT COLUMN: STATIC SUMMARY 
-              ========================================================= */}
-          <div className="w-full lg:w-[320px] xl:w-[360px] flex flex-col border-b lg:border-b-0 lg:border-r border-theme-soft-slate bg-theme-cool-white shrink-0 relative lg:h-full lg:min-h-0">
-            
-            <div className="flex-1 lg:overflow-y-auto custom-scrollbar pb-6 lg:pb-0 lg:min-h-0">
+          {/* LEFT COLUMN: STATIC SUMMARY */}
+          <div className="w-full lg:w-[320px] xl:w-[340px] flex flex-col border-b lg:border-b-0 lg:border-r border-theme-soft-slate bg-theme-cool-white shrink-0 relative lg:h-full lg:min-h-0">
+            <div className="flex-1 lg:overflow-y-auto custom-scrollbar pb-3 lg:pb-0 lg:min-h-0">
               
-              <div className="w-full h-48 relative border-b border-theme-soft-slate">
+              <div className="w-full h-40 sm:h-48 relative border-b border-theme-soft-slate">
                 <img src={cityImageUrl} alt={destCityName} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-theme-secondary/95 via-theme-secondary/40 to-transparent"></div>
-                <div className="absolute bottom-4 left-6 right-6">
-                  <p className="text-theme-white/80 text-[10px] font-black uppercase tracking-widest mb-1">{originCityName} to</p>
-                  <h3 className="text-3xl font-black text-theme-white tracking-tight leading-none truncate">{destCityName}</h3>
+                <div className="absolute bottom-4 left-5 right-5">
+                  <p className="text-theme-white/80 text-xs font-black uppercase tracking-widest mb-1">{originCityName} to</p>
+                  <h3 className="text-2xl sm:text-3xl font-black text-theme-white tracking-tight leading-none truncate">{destCityName}</h3>
                 </div>
               </div>
 
-              <div className="p-6 flex flex-col gap-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <SummaryCard icon={<Calendar size={14} />} label="Dates" value={isOneWay ? "One Way" : `${formatDate(rawParams?.startDate)} - ${formatDate(rawParams?.endDate)}`} />
-                  <SummaryCard icon={<Users size={14} />} label="Guests" value={`${rawParams?.adults || 0} Adults, ${rawParams?.children || 0} Children`} />
+              <div className="p-5 flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
+                  <SummaryCard icon={<Calendar size={16} />} label="Dates" value={isOneWay ? `${formatShortDate(rawParams?.startDate)} (One Way)` : `${formatShortDate(rawParams?.startDate)} - ${formatShortDate(rawParams?.endDate)}`} />
+                  <SummaryCard icon={<Users size={16} />} label="Guests" value={`${rawParams?.adults || 1} Adults, ${rawParams?.children || 0} Children`} />
                 </div>
 
                 {isWeatherSelected && firstDayWeather && (
                   <div className="p-4 rounded-2xl bg-theme-white border border-theme-soft-slate shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-theme-light-gray">Arrival Weather</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12px] font-black uppercase tracking-widest text-theme-light-gray">Destination Weather Estimate</span>
                       <Sun size={16} className="text-theme-primary" />
                     </div>
                     <div className="flex items-end gap-2">
                       <span className="text-3xl font-black text-theme-secondary leading-none">{Math.round(firstDayWeather.max_temp ?? 0)}°</span>
-                      <span className="text-xs font-bold text-theme-light-gray mb-1">/ {Math.round(firstDayWeather.min_temp ?? 0)}° F</span>
+                      <span className="text-sm font-bold text-theme-light-gray mb-1">/ {Math.round(firstDayWeather.min_temp ?? 0)}° F</span>
                     </div>
-                    <p className="text-[11px] font-black text-theme-secondary/80 mt-1 uppercase tracking-widest">{firstDayWeather.weather ?? "Clear skies"}</p>
+                    <p className="text-sm font-bold text-theme-secondary/80 mt-1 capitalize">{firstDayWeather.weather ?? "Clear skies"}</p>
                   </div>
                 )}
 
-                <div className="rounded-2xl bg-theme-white border border-theme-soft-slate shadow-sm overflow-hidden mt-2 transition-all">
-                   <div className="p-4 bg-theme-secondary flex items-center gap-2">
-                     <Receipt size={14} className="text-theme-white" />
-                     <span className="font-black uppercase tracking-widest text-[10px] text-theme-white">Price Breakdown</span>
+                <div className="rounded-2xl bg-theme-white border border-theme-soft-slate shadow-sm overflow-hidden mt-1 transition-all">
+                   <div className="p-4 bg-theme-secondary flex items-center justify-between transition-all duration-300">
+                     <div className="flex items-center gap-2">
+                       <Receipt size={14} className="text-theme-white" />
+                       <span className="font-black uppercase tracking-widest text-[12px] text-theme-white">Price Breakdown</span>
+                     </div>
+                     {checkoutStep === "READY" && (
+                       <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-2 duration-300">
+                         <ShieldCheck size={12} className="text-theme-primary" />
+                         <span className="font-black uppercase tracking-widest text-[8px] text-theme-primary">
+                           Fares Confirmed
+                         </span>
+                       </div>
+                     )}
                    </div>
-                   <div className="p-4 flex flex-col gap-3">
-                     <div className="flex justify-between items-center text-[13px] font-bold text-theme-secondary">
+
+                   <div className="p-4 flex flex-col gap-2">
+                     <div className="flex justify-between items-center text-sm font-bold text-theme-secondary">
                        <span>Base Fares & Rates</span>
                        <span>${chargeableSubtotal.toFixed(2)}</span>
                      </div>
-                     <div className="flex justify-between items-center text-[13px] font-bold text-theme-secondary border-b border-theme-soft-slate pb-3">
+                     <div className="flex justify-between items-center text-sm font-bold text-theme-secondary border-b border-theme-soft-slate pb-3">
                        <span>Est. Taxes & Fees</span>
                        <span>${taxesAndFees.toFixed(2)}</span>
                      </div>
                      {drive && (
-                        <div className="flex justify-between items-center text-[11px] font-bold text-theme-light-gray border-b border-theme-soft-slate pb-3">
-                          <span className="flex items-center gap-1.5">Est. Fuel <span className="text-[9px] uppercase tracking-widest text-theme-primary">(Not Charged)</span></span>
+                        <div className="flex justify-between items-center text-xs font-bold text-theme-light-gray border-b border-theme-soft-slate pb-3">
+                          <span className="flex items-center gap-1.5">Est. Fuel <span className="text-[12px] uppercase tracking-widest text-theme-primary">(Not Charged)</span></span>
                           <span>~${estimatedFuel.toFixed(2)}</span>
                         </div>
                      )}
                      <div className="flex justify-between items-end pt-1">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-theme-light-gray">Total Due Now</span>
+                       <span className="text-[12px] font-black uppercase tracking-widest text-theme-light-gray">Total Estimate</span>
                        <span className="font-black text-2xl tracking-tight text-theme-primary transition-all">${grandTotal.toFixed(2)}</span>
                      </div>
                    </div>
@@ -348,64 +378,73 @@ export default function ItineraryModal({
               </div>
             </div>
 
-{/* Left Sticky Footer: Save Draft */}
-<div className="w-full p-5 bg-theme-cool-white/95 border-t border-theme-soft-slate lg:absolute lg:bottom-0">
-  <button
-    onClick={handleSaveTrip}
-    // Button is now ENABLED if not logged in (to allow the redirect)
-    disabled={isSaving || isSaved || isAlreadySaved} 
-    className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.98] ${
-      (isSaving || isSaved || isAlreadySaved)
-        ? "bg-theme-white text-theme-light-gray cursor-not-allowed shadow-none border border-theme-soft-slate"
-        : "bg-theme-secondary text-theme-white shadow-lg hover:bg-theme-secondary/90"
-    }`}
-  >
-    {isSaving ? (
-      <Loader2 size={16} className="animate-spin" />
-    ) : isAlreadySaved ? (
-      <Save size={16} className="text-theme-primary" />
-    ) : isSaved ? (
-      <Save size={16} className="text-theme-success" />
-    ) : (
-      <Save size={16} />
-    )}
-    
-    {!isLoggedIn 
-      ? "Log in to Save" 
-      : isSaving 
-        ? "Saving..." 
-        : isAlreadySaved 
-          ? "Draft Saved" 
-          : isSaved 
-            ? "Saved!" 
-            : "Save Draft"
-    }
-  </button>
-</div>
+            {/* ONLY RENDER SAVE BUTTON IF IT IS NOT A SAVED TRIP */}
+            {!isSavedView && (
+              <div className="w-full p-4 bg-theme-cool-white border-t border-theme-soft-slate shrink-0">
+                <button
+                  onClick={handleSaveTrip}
+                  disabled={isSaving || isSaved || isAlreadySaved} 
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black text-sm transition-all active:scale-[0.98] ${
+                    (isSaving || isSaved || isAlreadySaved)
+                      ? "bg-theme-white text-theme-light-gray cursor-not-allowed shadow-none border border-theme-soft-slate"
+                      : "bg-theme-secondary text-theme-white shadow-lg hover:bg-theme-secondary/90"
+                  }`}
+                >
+                  {isSaving ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : isAlreadySaved ? (
+                    <Save size={16} className="text-theme-primary" />
+                  ) : isSaved ? (
+                    <Save size={16} className="text-theme-success" />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  
+                  {!isLoggedIn 
+                    ? "Log in to Save" 
+                    : isSaving 
+                      ? "Saving..." 
+                      : isAlreadySaved 
+                        ? "Already Saved!" 
+                        : isSaved 
+                          ? "Saved!" 
+                          : "Save Draft"
+                  }
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* =========================================================
-              RIGHT COLUMN: SCROLLABLE INVENTORY & STICKY CHECKOUT
-              ========================================================= */}
-          <div className="flex-1 flex flex-col bg-theme-white relative lg:h-full lg:min-h-0">
-            
-            <div className="flex-1 lg:overflow-y-auto lg:overscroll-contain custom-scrollbar pb-10 lg:min-h-0">
-              <div className="p-6 sm:p-10 flex flex-col gap-10 max-w-4xl mx-auto w-full">
+          {/* RIGHT COLUMN: SCROLLABLE INVENTORY DETAILS */}
+          <div className="flex-1 flex flex-col bg-theme-white relative lg:h-full min-w-0 lg:min-h-0">
+            <div className="flex-1 lg:overflow-y-auto custom-scrollbar pb-6 lg:min-h-0">
+              <div className="p-5 sm:p-8 flex flex-col gap-8 max-w-4xl mx-auto w-full min-w-0">
                 
-                <section>
+                {/* 1. TRANSPORTATION */}
+                <section className="min-w-0">
                   <SectionTitle icon={flight ? <Plane size={16} /> : <Car size={16} />} title="Transportation" />
                   {flight ? (
-                     <div className="bg-theme-white rounded-2xl p-6 border border-theme-soft-slate shadow-sm relative overflow-hidden">
+                     <div className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
                        <div className="absolute top-0 left-0 w-1 h-full bg-theme-primary"></div>
-                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-2">
-                         <div>
-                            <span className="font-black text-xl text-theme-secondary">{flight.airline_name}</span>
-                            <p className="text-xs text-theme-light-gray mt-1 font-bold">
-                               {flight.travel_class || "Economy"} Class • {flight.itineraries?.[0]?.segments?.length > 1 ? "Connecting" : "Direct"} Flight
-                            </p>
+                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-5 gap-4 min-w-0">
+                         <div className="min-w-0 flex-1">
+                            <span className="font-black text-lg sm:text-xl text-theme-secondary block truncate">{flight.airline_name}</span>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                               <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
+                                 {flight.travel_class || "Economy"} Class
+                               </span>
+                               <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
+                                 {flight.itineraries?.[0]?.segments?.length > 1 ? "Connecting" : "Direct"}
+                               </span>
+                               {flight.carbon_emissions_kg && (
+                                 <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1">
+                                   <Leaf size={12} /> {flight.carbon_emissions_kg} kg CO₂
+                                 </span>
+                               )}
+                            </div>
                          </div>
-                         <span className="text-theme-primary font-black text-lg bg-theme-primary/10 px-3 py-1 rounded-lg inline-block w-fit">
-                           ${Number(flight.price?.total || flight.price || 0).toFixed(2)}
+                         <span className="text-theme-primary font-black text-lg bg-theme-primary/10 px-3 py-1.5 rounded-lg inline-block w-fit shrink-0">
+                           ${safeFloat(flight.price?.total || flight.price || 0).toFixed(2)}
                          </span>
                        </div>
                        
@@ -415,51 +454,60 @@ export default function ItineraryModal({
                            const boundDate = itin.segments?.[0]?.departure_time ? formatShortDate(itin.segments[0].departure_time) : "";
                            return (
                              <div key={idx} className="bg-theme-cool-white p-4 rounded-xl border border-theme-soft-slate">
-                               <div className="flex justify-between items-center mb-4 pb-3 border-b border-theme-soft-slate">
-                                 <span className="text-[10px] uppercase font-black text-theme-secondary/80 tracking-widest">
-                                   {idx === 0 ? "🛫 Outbound" : "🛬 Return"} {boundDate && `• ${boundDate}`}
+                               <div className="flex flex-wrap justify-between items-center mb-3 pb-3 border-b border-theme-soft-slate gap-2">
+                                 <span className="text-[12px] uppercase font-black text-theme-secondary/80 tracking-widest flex items-center gap-2">
+                                   {idx === 0 ? <PlaneTakeoff size={12}/> : <PlaneTakeoff size={12} className="rotate-180"/>} 
+                                   {idx === 0 ? "Outbound" : "Return"} <span className="text-theme-secondary/40">•</span> {boundDate}
                                  </span>
-                                 <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${stops === 0 ? "bg-theme-primary/10 text-theme-primary" : "bg-theme-secondary/10 text-theme-secondary"}`}>
-                                   {stops === 0 ? "Direct" : `${stops} Stop(s)`}
-                                 </span>
+                                 <div className="flex items-center gap-2">
+                                   {itin.duration && (
+                                     <span className="text-xs font-bold text-theme-secondary/60 flex items-center gap-1">
+                                       <Clock size={12} /> {(itin.duration || '').replace('PT', '').toLowerCase()}
+                                     </span>
+                                   )}
+                                   <span className={`text-[12px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${stops === 0 ? "bg-theme-primary/10 text-theme-primary" : "bg-theme-secondary/10 text-theme-secondary"}`}>
+                                     {stops === 0 ? "Direct" : `${stops} Stop(s)`}
+                                   </span>
+                                 </div>
                                </div>
-                               <div className="flex flex-col gap-2">
+                               
+                               <div className="flex flex-col">
                                  {(itin.segments || []).map((seg: any, sIdx: number) => {
                                    let layoverStr = null;
                                    if (sIdx > 0) layoverStr = getLayoverTime(itin.segments[sIdx - 1].arrival_time, seg.departure_time);
                                    return (
                                      <React.Fragment key={sIdx}>
                                        {layoverStr && (
-                                         <div className="flex items-center justify-center my-1">
-                                           <span className="text-[9px] font-black uppercase tracking-widest text-theme-light-gray bg-theme-white px-3 py-1 rounded-full border border-theme-soft-slate">⏱ Layover: {layoverStr}</span>
+                                         <div className="flex items-center justify-center my-2">
+                                            <span className="text-xs font-bold text-theme-secondary/60 bg-theme-white px-3 py-1 rounded-full border border-theme-soft-slate shadow-sm">
+                                              ⏱ Layover: {layoverStr}
+                                            </span>
                                          </div>
                                        )}
-                                       <div className="flex flex-col gap-3 bg-theme-white p-4 rounded-lg border border-theme-soft-slate shadow-sm">
-                                         <div className="flex items-center gap-4 text-theme-secondary">
-                                           <div className="flex-1">
+                                       <div className="flex flex-col justify-center bg-theme-white p-4 rounded-xl border border-theme-soft-slate shadow-sm min-w-0">
+                                         <div className="flex items-center gap-4 text-theme-secondary min-w-0">
+                                           <div className="flex-1 min-w-0">
                                              <p className="font-black text-xl text-theme-secondary">{formatTime(seg.departure_time)}</p>
-                                             <p className="text-[10px] font-black text-theme-light-gray uppercase tracking-widest mt-0.5">{seg.departure_airport}</p>
+                                             <p className="text-xs font-bold text-theme-light-gray mt-1 truncate">{seg.departure_airport_name || seg.departure_airport}</p>
                                            </div>
-                                           <div className="h-[2px] flex-1 bg-theme-soft-slate relative"><div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-theme-white px-2 text-[10px]">✈️</div></div>
-                                           <div className="flex-1 text-right">
+                                           
+                                           {/* Optimized Centered Flight/Aircraft Data (No extra bottom section) */}
+                                           <div className="flex-1 flex flex-col items-center relative min-w-[60px] shrink-0 pt-1">
+                                             <div className="w-full flex items-center relative">
+                                               <div className="w-full h-[2px] bg-theme-soft-slate absolute z-0"></div>
+                                               <div className="mx-auto bg-theme-white px-2 z-10 text-theme-secondary/40">
+                                                  <PlaneTakeoff size={14} />
+                                               </div>
+                                             </div>
+                                             <span className="text-[12px] font-black uppercase tracking-widest text-theme-light-gray whitespace-nowrap mt-1 text-center hidden sm:block">
+                                                {typeof seg.aircraft === 'string' ? seg.aircraft : seg.aircraft?.code || `${seg.carrierCode || seg.airline_code}${seg.flightNumber || seg.number}`}
+                                             </span>
+                                           </div>
+                                           
+                                           <div className="flex-1 text-right min-w-0">
                                              <p className="font-black text-xl text-theme-secondary">{formatTime(seg.arrival_time)}</p>
-                                             <p className="text-[10px] font-black text-theme-light-gray uppercase tracking-widest mt-0.5">{seg.arrival_airport}</p>
+                                             <p className="text-xs font-bold text-theme-light-gray mt-1 truncate">{seg.arrival_airport_name || seg.arrival_airport}</p>
                                            </div>
-                                         </div>
-                                         <div className="flex flex-wrap gap-2 mt-1 pt-3 border-t border-theme-soft-slate/50">
-                                            <span className="text-[9px] bg-theme-cool-white px-2 py-1 rounded-md text-theme-light-gray font-black uppercase tracking-widest">
-                                              Flight {seg.carrierCode || seg.airline_code}{seg.flightNumber || seg.number}
-                                            </span>
-                                            {seg.aircraft && (
-                                              <span className="text-[9px] bg-theme-cool-white px-2 py-1 rounded-md text-theme-light-gray font-black uppercase tracking-widest">
-                                                {typeof seg.aircraft === 'string' ? seg.aircraft : seg.aircraft.code || "Aircraft"}
-                                              </span>
-                                            )}
-                                            {(flight.travel_class || seg.cabin) && (
-                                              <span className="text-[9px] bg-theme-cool-white px-2 py-1 rounded-md text-theme-light-gray font-black uppercase tracking-widest">
-                                                {flight.travel_class || seg.cabin}
-                                              </span>
-                                            )}
                                          </div>
                                        </div>
                                      </React.Fragment>
@@ -472,91 +520,93 @@ export default function ItineraryModal({
                        </div>
                      </div>
                   ) : drive ? (
-                     <div className="bg-theme-white rounded-xl p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden">
+                     <div className="bg-theme-white rounded-2xl p-6 border border-theme-soft-slate shadow-sm relative overflow-hidden">
                        <div className="absolute top-0 left-0 w-1 h-full bg-theme-primary"></div>
-                       <div className="flex justify-between items-center mb-4">
-                         <span className="font-black text-lg text-theme-secondary flex items-center gap-2"><Car size={18} /> Road Trip</span>
-                         <span className="text-theme-primary font-black text-sm bg-theme-primary/10 px-3 py-1 rounded-lg">{displayDriveDuration}</span>
+                       <div className="flex justify-between items-center mb-5">
+                         <span className="font-black text-xl text-theme-secondary flex items-center gap-2"><Car size={20} /> Road Trip</span>
+                         <span className="text-theme-primary font-black text-base bg-theme-primary/10 px-4 py-2 rounded-xl">{displayDriveDuration}</span>
                        </div>
-                       <div className="flex flex-col gap-3 bg-theme-cool-white p-4 rounded-xl border border-theme-soft-slate">
-                         <div className="flex justify-between items-end">
-                           <div>
-                             <p className="font-black text-sm text-theme-secondary flex items-center gap-2">
-                               <span>{drive?.sourceName?.split(',')[0] || originCityName}</span>
-                               <span className="text-theme-light-gray text-xs">➔</span>
-                               <span>{drive?.destinationName?.split(',')[0] || destCityName}</span>
+                       <div className="flex flex-col gap-4 bg-theme-cool-white p-5 rounded-xl border border-theme-soft-slate">
+                         <div className="flex justify-between items-end gap-2">
+                           <div className="flex flex-col gap-1 min-w-0">
+                             <p className="font-black text-base text-theme-secondary flex items-center gap-2 flex-wrap">
+                               <span className="truncate">{originCityName}</span>
+                               <span className="text-theme-light-gray text-sm">➔</span>
+                               <span className="truncate">{destCityName}</span>
                              </p>
-                             <p className="text-[10px] text-theme-light-gray font-black mt-1 uppercase tracking-widest">Distance: {displayDriveDistance}</p>
+                             <p className="text-xs text-theme-secondary/60 font-bold">Total Distance: {displayDriveDistance}</p>
                            </div>
-                           <div className="text-right flex flex-col items-end">
-                             <p className="text-theme-primary font-black text-lg">~${estimatedFuel.toFixed(2)}</p>
-                             <p className="text-[8px] text-theme-light-gray font-black uppercase tracking-widest mt-0.5">Est. Fuel</p>
+                           <div className="text-right flex flex-col items-end gap-1">
+                             <p className="text-theme-primary font-black text-xl">~${estimatedFuel.toFixed(2)}</p>
+                             <p className="text-[12px] uppercase tracking-widest text-theme-secondary/60 font-black">Est. Fuel</p>
                            </div>
                          </div>
-                         {passedCities.length > 0 && (
-                            <div className="mt-1 pt-3 border-t border-theme-soft-slate/50">
-                              <p className="text-xs font-bold text-theme-secondary/80 leading-relaxed truncate">
-                                {formatRoute(passedCities)}
-                              </p>
-                            </div>
-                         )}
                        </div>
                      </div>
                   ) : (
-                    <EmptyStateCard title="Transportation" message={`No ${rawParams?.travelMode === 'fly' ? 'flights' : 'drive route'} selected.`} buttonText={`Add ${rawParams?.travelMode === 'fly' ? 'Flights' : 'Drive'}`} onAdd={() => handleNavigateToTab(rawParams?.travelMode === 'fly' ? 'flights' : 'drive')} />
+                    <div className="relative rounded-2xl p-5 border border-dashed border-theme-light-gray/50 bg-theme-cool-white flex items-center justify-between">
+                      <span className="font-bold text-theme-secondary text-sm">No transportation selected.</span>
+                    </div>
                   )}
                 </section>
 
-                <section>
-                  <SectionTitle icon={<Hotel size={16} />} title="Accommodation" />
+                {/* 2. ACCOMMODATION */}
+                <section className="min-w-0">
+                  <SectionTitle icon={<Building2 size={16} />} title="Accommodation" />
                   {stay ? (
-                    <div className="bg-theme-white rounded-2xl p-6 border border-theme-soft-slate shadow-sm relative overflow-hidden">
+                    <div className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
                       <div className="absolute top-0 left-0 w-1 h-full bg-theme-secondary"></div>
                       
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1.5">
-                             <h4 className="font-black text-lg text-theme-secondary leading-tight">{stay.name}</h4>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-5 min-w-0">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                             <h4 className="font-black text-lg sm:text-xl text-theme-secondary leading-tight break-words">{stay.name}</h4>
                              {(stay.rating || stay.hotel?.rating) && (
-                                <span className="bg-theme-accent/10 text-theme-accent text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                                <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[12px] font-black uppercase tracking-widest px-2 py-0.5 rounded flex items-center gap-1 shadow-sm shrink-0">
                                   ★ {stay.rating || stay.hotel?.rating} Star
                                 </span>
                              )}
                           </div>
-                          <p className="text-[10px] text-theme-secondary/80 font-black uppercase tracking-widest flex items-center gap-1.5">
-                             <MapPin size={12} className="text-theme-light-gray" /> 
-                             <span className="line-clamp-1">{stay.address?.lines?.join(", ")}</span>
+                          <p className="text-xs sm:text-sm text-theme-secondary/70 font-medium flex items-start gap-1.5 min-w-0">
+                             <MapPin size={14} className="shrink-0 mt-0.5 text-theme-secondary/40" /> 
+                             <span className="truncate">{stay.address?.lines?.join(", ") || stay.address || "Address unavailable"}</span>
                           </p>
                         </div>
-                        <div className="text-left sm:text-right shrink-0 bg-theme-cool-white px-4 py-3 rounded-xl border border-theme-soft-slate">
-                          <p className="text-theme-secondary font-black text-xl">${Number(stay.offerDetails?.price || stay.price || 0).toFixed(2)}</p>
-                          <p className="text-[9px] text-theme-light-gray font-black uppercase tracking-widest mt-1">Total Stay</p>
+                        <div className="text-left sm:text-right shrink-0 bg-theme-cool-white px-4 py-3 rounded-xl border border-theme-soft-slate shadow-sm">
+                          <p className="text-theme-secondary font-black text-xl">${safeFloat(stay.offerDetails?.price || stay.price || 0).toFixed(2)}</p>
+                          <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 mt-0.5">Total Stay</p>
                         </div>
                       </div>
 
                       <div className="bg-theme-cool-white rounded-xl p-4 border border-theme-soft-slate flex flex-col gap-3">
-                         <div className="flex justify-between items-center text-xs font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
-                           <span className="flex items-center gap-1.5 text-theme-light-gray"><Calendar size={12}/> Check In</span>
-                           <span>{formatShortDate(rawParams?.startDate)}</span>
+                         <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
+                           <span className="flex items-center gap-2 text-theme-secondary/60"><Calendar size={14}/> Check In</span>
+                           <span className="text-theme-secondary">{formatDate(rawParams?.startDate)}</span>
                          </div>
-                         <div className="flex justify-between items-center text-xs font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
-                           <span className="flex items-center gap-1.5 text-theme-light-gray"><Calendar size={12}/> Check Out</span>
-                           <span>{formatShortDate(rawParams?.endDate)}</span>
+                         <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
+                           <span className="flex items-center gap-2 text-theme-secondary/60"><Calendar size={14}/> Check Out</span>
+                           <span className="text-theme-secondary">{formatDate(rawParams?.endDate)}</span>
                          </div>
                          
-                         <div className="flex flex-wrap gap-2 pt-1">
-                           <span className="text-[9px] bg-theme-white px-2 py-1 rounded-md border border-theme-soft-slate/50 text-theme-secondary font-black uppercase tracking-widest">
-                             {stay.offerDetails?.rooms?.[0]?.category || stay.room?.type || "Standard Room"}
-                           </span>
-                           <span className="text-[9px] bg-theme-white px-2 py-1 rounded-md border border-theme-soft-slate/50 text-theme-secondary font-black uppercase tracking-widest">
-                             {stay.offerDetails?.rooms?.[0]?.bed_type || stay.room?.bedType || "Standard Bed"}
-                           </span>
-                           {stay.offerDetails?.boardType && (
-                              <span className="text-[9px] bg-theme-white px-2 py-1 rounded-md border border-theme-soft-slate/50 text-theme-primary font-black uppercase tracking-widest">
-                                {stay.offerDetails.boardType.replace(/_/g, " ")}
-                              </span>
-                           )}
-                         </div>
+                         {stay.offerDetails && (
+                           <div className="flex flex-wrap gap-2 pt-1 text-xs font-bold text-theme-secondary">
+                             {stay.offerDetails?.rooms?.[0]?.category && (
+                               <span className="bg-theme-white px-2.5 py-1 rounded border border-theme-soft-slate shadow-sm">
+                                 {stay.offerDetails.rooms[0].category.replace(/_/g, " ")}
+                               </span>
+                             )}
+                             {stay.offerDetails?.rooms?.[0]?.bed_type && (
+                               <span className="bg-theme-white px-2.5 py-1 rounded border border-theme-soft-slate shadow-sm">
+                                 {stay.offerDetails.rooms[0].bed_type.replace(/_/g, " ")} Bed
+                               </span>
+                             )}
+                             {stay.offerDetails?.boardType && (
+                               <span className="bg-theme-primary/10 px-2.5 py-1 rounded border border-theme-primary/20 text-theme-primary shadow-sm">
+                                 {stay.offerDetails.boardType.replace(/_/g, " ")} Included
+                               </span>
+                             )}
+                           </div>
+                         )}
                       </div>
 
                     </div>
@@ -565,41 +615,42 @@ export default function ItineraryModal({
                   )}
                 </section>
 
-                <section>
+                {/* 3. TOURS */}
+                <section className="min-w-0">
                   <SectionTitle icon={<Ticket size={16} />} title="Tours & Activities" />
                   {tours.length > 0 ? (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 min-w-0">
                       {tours.map((tour: any, idx: number) => (
-                        <div key={idx} className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm flex flex-col gap-4">
-                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div key={idx} className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm flex flex-col gap-3 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 min-w-0">
                             <div className="flex-1 min-w-0">
-                              <h5 className="font-bold text-base text-theme-secondary leading-snug">{tour.name || tour.title}</h5>
-                              <p className="text-xs text-theme-light-gray mt-1.5 line-clamp-2 leading-relaxed">
+                              <h5 className="font-black text-base sm:text-lg text-theme-secondary leading-snug break-words">{tour.name || tour.title}</h5>
+                              <p className="text-xs sm:text-sm text-theme-secondary/70 font-medium mt-1.5 line-clamp-2 leading-relaxed">
                                 {tour.short_description || tour.description || "Experience the best of the local culture and sights with this highly-rated guided tour."}
                               </p>
                             </div>
-                            {tour.price && tour.price.amount && (
-                              <div className="text-left sm:text-right shrink-0">
-                                <p className="text-theme-primary font-black text-xl">${parseFloat(tour.price.amount).toFixed(2)}</p>
-                                <p className="text-[9px] text-theme-light-gray font-black uppercase tracking-widest mt-1">Per Person</p>
+                            {tour.price && (tour.price.amount || tour.price) && (
+                              <div className="text-left sm:text-right shrink-0 bg-theme-cool-white p-3 rounded-xl border border-theme-soft-slate">
+                                <p className="text-theme-primary font-black text-lg">${safeFloat(tour.price.amount || tour.price).toFixed(2)}</p>
+                                <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 mt-0.5">Per Person</p>
                               </div>
                             )}
                           </div>
                           
-                          <div className="flex flex-wrap gap-2 pt-3 border-t border-theme-soft-slate/50">
+                          <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-theme-soft-slate/50 text-xs font-bold">
                              {tour.duration && (
-                                <span className="text-[9px] bg-theme-cool-white border border-theme-soft-slate px-2 py-1 rounded-md text-theme-secondary font-black uppercase tracking-widest flex items-center gap-1">
-                                  ⏱ {tour.duration}
+                                <span className="bg-theme-cool-white border border-theme-soft-slate px-2.5 py-1 rounded text-theme-secondary flex items-center gap-1 shadow-sm">
+                                  <Clock size={12} className="text-theme-secondary/50"/> {tour.duration}
                                 </span>
                              )}
-                             <span className="text-[9px] bg-theme-cool-white border border-theme-soft-slate px-2 py-1 rounded-md text-theme-success font-black uppercase tracking-widest">
-                               ✓ Free Cancellation
-                             </span>
                              {tour.rating && (
-                                <span className="text-[9px] bg-theme-accent/10 border border-theme-accent/20 px-2 py-1 rounded-md text-theme-accent font-black uppercase tracking-widest">
-                                  ★ {tour.rating} Rating
-                                </span>
+                               <span className="bg-amber-50 border border-amber-100 px-2.5 py-1 rounded text-amber-600 flex items-center gap-1 shadow-sm">
+                                 ★ {tour.rating}
+                               </span>
                              )}
+                             <span className="bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded text-emerald-700 flex items-center gap-1 shadow-sm">
+                               <CheckCircle2 size={12} className="text-emerald-500" /> Free Cancellation
+                             </span>
                           </div>
                         </div>
                       ))}
@@ -609,22 +660,23 @@ export default function ItineraryModal({
                   )}
                 </section>
 
-                <section>
-                  <SectionTitle icon={<Camera size={16} />} title="Planned Attractions" />
+                {/* 4. ATTRACTIONS */}
+                <section className="min-w-0">
+                  <SectionTitle icon={<Camera size={16} />} title="Suggested Attractions" />
                   {activeAttractions.length > 0 ? (
-                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory custom-scrollbar">
+                    <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory custom-scrollbar">
                       {activeAttractions.map((attr: any, idx: number) => (
-                        <div key={idx} className="min-w-[200px] w-[200px] sm:min-w-[240px] sm:w-[240px] snap-start bg-theme-white rounded-2xl p-4 border border-theme-soft-slate shadow-sm flex flex-col gap-3 group hover:border-theme-primary/30 transition-colors">
-                          <div className="w-full h-28 sm:h-32 bg-theme-cool-white rounded-xl flex items-center justify-center group-hover:bg-theme-primary/10 transition-colors overflow-hidden">
+                        <div key={idx} className="min-w-[200px] w-[200px] sm:min-w-[240px] sm:w-[240px] snap-start bg-theme-white rounded-2xl border border-theme-soft-slate shadow-sm flex flex-col group hover:border-theme-primary/30 transition-colors overflow-hidden">
+                          <div className="w-full h-32 sm:h-36 bg-theme-cool-white flex items-center justify-center overflow-hidden relative">
                             {attr.image || attr.photo ? (
-                                <img src={attr.image || attr.photo} alt={attr.name} className="w-full h-full object-cover" />
+                                <img src={attr.image || attr.photo} alt={attr.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             ) : (
-                                <MapPin size={32} className="text-theme-light-gray group-hover:text-theme-primary transition-colors" />
+                                <MapPin size={32} className="text-theme-light-gray" />
                             )}
                           </div>
-                          <div>
-                            <h5 className="font-bold text-sm text-theme-secondary truncate">{attr.name}</h5>
-                            <p className="text-[10px] text-theme-light-gray font-black uppercase tracking-widest mt-1 truncate">
+                          <div className="p-4 flex flex-col gap-1.5 bg-theme-white">
+                            <h5 className="font-black text-sm sm:text-base text-theme-secondary truncate">{attr.name}</h5>
+                            <p className="text-[12px] text-theme-secondary/50 font-black uppercase tracking-widest truncate">
                               {attr.category || attr.kinds?.split(",")[0]?.replace(/_/g, " ") || "Point of Interest"}
                             </p>
                           </div>
@@ -638,58 +690,62 @@ export default function ItineraryModal({
               </div>
             </div>
 
-            {/* STICKY RIGHT FOOTER: Dynamic Checkout Container */}
-            <div className={`w-full z-30 shrink-0 mt-auto transition-all duration-300 bg-theme-white ${
+            {/* CHECKOUT OR SAVED VIEW FOOTER */}
+            <div className={`w-full z-30 shrink-0 bg-theme-white ${
               isCheckoutExpanded
                 ? "absolute inset-0 h-full flex flex-col"
-                : "sticky bottom-0 border-t border-theme-soft-slate shadow-[0_-15px_30px_-15px_rgba(0,0,0,0.1)] p-5 lg:p-6 max-h-[75vh] overflow-y-auto custom-scrollbar"
+                : "border-t border-theme-soft-slate shadow-[0_-16px_30px_-16px_rgba(0,0,0,0.1)] p-4 lg:p-5"
             }`}>
                {!isBooked ? (
-                  flight ? (
-                     <FlightCheckout 
+                   grandTotal > 0 ? (
+                     <TripCheckout 
                         flightOffer={flight} 
+                        stay={stay}
+                        tours={tours}
+                        rawParams={rawParams}
                         grandTotal={grandTotal}
                         onPriceConfirmed={(total: number, taxes: number) => {
                            setUpdatedFlightPrice(total);
                            setUpdatedFlightTaxes(taxes);
                         }}
                         onExpandedChange={setIsCheckoutExpanded}
+                        onStepChange={setCheckoutStep}
                         onSuccess={(pnr: string) => handleBookingSuccess(pnr)} 
                      />
-                  ) : (
+                   ) : (
                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
                        <div className="text-center sm:text-left flex flex-col">
-                         <span className="text-[10px] uppercase tracking-widest text-theme-light-gray font-black mb-0.5">Total Due Now</span>
-                         <span className="text-3xl font-black text-theme-secondary leading-none">${grandTotal.toFixed(2)}</span>
+                         <span className="text-[12px] uppercase tracking-widest text-theme-light-gray font-black mb-0.5">Total Due Now</span>
+                         <span className="text-2xl sm:text-3xl font-black text-theme-secondary leading-none">${grandTotal.toFixed(2)}</span>
                        </div>
-                       <button onClick={() => handleBookingSuccess("TRIP-1234")} className="px-8 py-4 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
-                         {grandTotal > 0 ? "Confirm & Pay" : "Confirm Trip"}
+                       <button onClick={() => handleBookingSuccess("TRIP-1234")} className="px-6 py-3.5 bg-theme-primary text-theme-white font-black text-sm uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
+                         Finish Trip Plan
                        </button>
                      </div>
-                  )
+                   )
                ) : (
-                  <div className="w-full py-4 flex flex-col items-center text-center gap-4 animate-in zoom-in-95 duration-300">
+                  <div className="w-full py-2 sm:py-4 flex flex-col items-center text-center gap-3 animate-in zoom-in-95 duration-300">
                     <div className="flex items-center gap-3">
-                      <CheckCircle2 size={40} className="text-theme-success" />
+                      <CheckCircle2 size={32} className="text-theme-success" />
                       <div className="text-left">
-                        <h4 className="font-black text-2xl text-theme-secondary tracking-tight">Booking Confirmed!</h4>
-                        {bookingRef && <p className="text-xs font-bold text-theme-success mt-1">Ref: {bookingRef}</p>}
+                        <h4 className="font-black text-xl sm:text-2xl text-theme-secondary tracking-tight">Booking Confirmed!</h4>
+                        {bookingRef && <p className="text-xs font-bold text-theme-success mt-0.5">Ref: {bookingRef}</p>}
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row w-full gap-3 mt-2">
-                      <button onClick={handleExportPdf} disabled={isExporting || isSharing} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-sm bg-theme-primary text-theme-white shadow-lg hover:bg-theme-primary/90 transition-all active:scale-95 disabled:opacity-50">
+                      <button onClick={handleExportPdf} disabled={isExporting || isSharing} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-xs sm:text-sm bg-theme-primary text-theme-white shadow-lg hover:bg-theme-primary/90 transition-all active:scale-95 disabled:opacity-50">
                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Download PDF
                       </button>
-                      <button onClick={() => setShowEmailInput(!showEmailInput)} disabled={isExporting || isSharing} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-sm bg-theme-white border border-theme-soft-slate text-theme-secondary shadow-sm hover:border-theme-primary hover:text-theme-primary transition-all active:scale-95 disabled:opacity-50">
+                      <button onClick={() => setShowEmailInput(!showEmailInput)} disabled={isExporting || isSharing} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-xs sm:text-sm bg-theme-white border border-theme-soft-slate text-theme-secondary shadow-sm hover:border-theme-primary hover:text-theme-primary transition-all active:scale-95 disabled:opacity-50">
                         <Share2 size={16} /> Share Itinerary
                       </button>
                     </div>
 
                     {showEmailInput && (
                       <div className="flex w-full gap-2 pt-2 animate-in slide-in-from-top-2 duration-200">
-                        <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 px-4 py-3 rounded-xl border border-theme-soft-slate bg-theme-white text-theme-secondary focus:outline-none focus:border-theme-primary text-sm font-bold shadow-inner" />
-                        <button onClick={handleSharePdf} disabled={isSharing || !email} className="px-6 py-3 bg-theme-secondary text-theme-white font-black text-xs uppercase tracking-widest rounded-xl disabled:opacity-50 flex items-center gap-2 transition-all hover:bg-theme-secondary/90 active:scale-95">
+                        <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1 px-4 py-3 rounded-xl border border-theme-soft-slate bg-theme-white text-theme-secondary focus:outline-none focus:border-theme-primary text-sm font-bold shadow-inner min-w-0" />
+                        <button onClick={handleSharePdf} disabled={isSharing || !email} className="px-6 py-3 bg-theme-secondary text-theme-white font-black text-xs uppercase tracking-widest rounded-xl disabled:opacity-50 flex items-center gap-2 transition-all hover:bg-theme-secondary/90 active:scale-95 shrink-0">
                           {isSharing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Send
                         </button>
                       </div>
@@ -705,39 +761,35 @@ export default function ItineraryModal({
   );
 }
 
-// ---------------------------
-// SLEEK UI SUB-COMPONENTS
-// ---------------------------
-
 function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
+    <div className="flex items-center gap-3 mb-4">
       <div className="p-1.5 bg-theme-secondary text-theme-white rounded-lg shadow-sm">{icon}</div>
-      <h3 className="font-black text-theme-secondary uppercase tracking-widest text-[12px]">{title}</h3>
+      <h3 className="font-black text-theme-secondary uppercase tracking-[0.2em] text-[12px]">{title}</h3>
     </div>
   );
 }
 
 function SummaryCard({ icon, label, value }: any) {
   return (
-    <div className="p-3.5 rounded-xl bg-theme-white border border-theme-soft-slate shadow-sm flex flex-col justify-center">
-      <div className="flex items-center gap-1.5 text-theme-light-gray mb-1">
+    <div className="p-4 rounded-xl bg-theme-white border border-theme-soft-slate shadow-sm flex flex-col justify-center min-w-0">
+      <div className="flex items-center gap-1.5 text-theme-secondary/50 mb-1.5">
         {icon}
-        <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+        <span className="text-[12px] font-black uppercase tracking-widest">{label}</span>
       </div>
-      <p className="font-black text-[12px] leading-tight text-theme-secondary truncate">{value}</p>
+      <p className="font-black text-sm sm:text-base leading-tight text-theme-secondary truncate">{value}</p>
     </div>
   );
 }
 
 function EmptyStateCard({ title, message, buttonText, onAdd }: { title: string, message: string, buttonText: string, onAdd: () => void }) {
   return (
-    <div className="relative rounded-2xl p-6 border border-dashed border-theme-light-gray/50 bg-theme-cool-white overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group">
-      <div className="relative z-10 flex flex-col gap-1">
-        <span className="font-black text-theme-light-gray uppercase tracking-widest text-[10px]">{title}</span>
-        <span className="font-bold text-theme-secondary text-sm">{message}</span>
+    <div className="relative rounded-2xl p-6 border border-dashed border-theme-secondary/20 bg-theme-cool-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group">
+      <div className="flex flex-col gap-1 min-w-0">
+        <span className="font-black text-theme-secondary/40 uppercase tracking-widest text-[12px]">{title}</span>
+        <span className="font-bold text-theme-secondary text-sm truncate">{message}</span>
       </div>
-      <button onClick={onAdd} className="relative z-10 flex items-center gap-1.5 px-4 py-2.5 bg-theme-white border border-theme-soft-slate text-theme-secondary font-black text-[10px] uppercase tracking-widest rounded-xl hover:border-theme-primary hover:text-theme-primary transition-all shadow-sm active:scale-95 shrink-0">
+      <button onClick={onAdd} className="flex items-center gap-1.5 px-5 py-3 bg-theme-white border border-theme-soft-slate text-theme-secondary font-black text-[12px] uppercase tracking-widest rounded-xl hover:border-theme-primary hover:text-theme-primary transition-all shadow-sm active:scale-95 shrink-0">
         <Plus size={14} /> {buttonText}
       </button>
     </div>

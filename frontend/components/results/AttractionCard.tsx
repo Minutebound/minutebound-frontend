@@ -71,12 +71,12 @@ export default function AttractionsCard({ attractions }: { attractions: any[] })
               <div className="flex flex-col gap-2">
                 <h4 className="font-extrabold text-lg text-theme-secondary leading-tight" title={name}>{name}</h4>
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="inline-block bg-theme-surface text-theme-secondary text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
+                  <span className="inline-block bg-theme-surface text-theme-secondary text-[8px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">
                     {category.replace(/_/g, ' ')}
                   </span>
                   
                   {poi.distance && (
-                    <span className="text-[11px] font-bold text-theme-muted uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="text-[8px] font-bold text-theme-muted uppercase tracking-wider flex items-center gap-1.5">
                       <span className="text-theme-muted/60">•</span> 📍 {(poi.distance / 1609.34).toFixed(1)} miles away
                     </span>
                   )}

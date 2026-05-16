@@ -114,7 +114,7 @@ export default function ProfileModal({
             onClick={onClose}
             className="p-1.5 rounded-lg text-theme-muted hover:text-theme-secondary hover:bg-theme-surface transition-colors"
           >
-            <X size={20} />
+            <X size={24} />
           </button>
         </div>
 
@@ -151,7 +151,7 @@ export default function ProfileModal({
                 )}
 
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Upload size={20} className="text-white" />
+                  <Upload size={24} className="text-white" />
                 </div>
               </div>
               <input
@@ -172,7 +172,7 @@ export default function ProfileModal({
             {/* Form Fields Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+                <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                   First Name
                 </label>
                 <input
@@ -184,7 +184,7 @@ export default function ProfileModal({
               </div>
 
               <div>
-                <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+                <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                   Last Name
                 </label>
                 <input
@@ -196,7 +196,7 @@ export default function ProfileModal({
               </div>
 
               <div>
-                <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+                <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                   Middle Name <span className="text-[8px] opacity-50">(Optional)</span>
                 </label>
                 <input
@@ -208,7 +208,7 @@ export default function ProfileModal({
               </div>
 
               <div>
-                <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+                <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                   Suffix <span className="text-[8px] opacity-50">(Optional)</span>
                 </label>
                 <select
@@ -225,7 +225,7 @@ export default function ProfileModal({
             </div>
 
             <div>
-              <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+              <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                 Email Address
               </label>
               <input
@@ -237,7 +237,7 @@ export default function ProfileModal({
             </div>
 
             <div>
-              <label className="text-[10px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
+              <label className="text-[8px] font-bold tracking-[0.1em] uppercase text-theme-muted ml-1 mb-1 block">
                 Mobile Number
               </label>
               <input
@@ -257,7 +257,7 @@ export default function ProfileModal({
             disabled={saving || loading}
             className="w-full p-3 rounded-xl bg-theme-primary hover:bg-theme-secondary text-theme-white font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 shadow-md"
           >
-            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             {saving ? "SAVING..." : "SAVE PROFILE"}
           </button>
         </div>

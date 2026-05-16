@@ -16,7 +16,10 @@ const DynamicMap = dynamic(() => import("@/components/map/TripMap"), {
 export default function Results() {
   const router = useRouter();
   
-  // NEW: Authorization state to prevent flashing broken UI during redirect
+  // NEW: Hydration-safe mount state
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Authorization state to prevent flashing broken UI during redirect
   const [isAuthorized, setIsAuthorized] = useState(false);
   
   const [loading, setLoading] = useState(true);
@@ -38,7 +41,6 @@ export default function Results() {
     sessionStorage.removeItem("active_tab");
     sessionStorage.removeItem("drive_intermediates_open");
     sessionStorage.removeItem("stay_dropdown_state");
-    // UPDATED: Clear the tab-isolated selections instead of localStorage
     sessionStorage.removeItem("selected_trip_state");
 
     try {
@@ -53,6 +55,8 @@ export default function Results() {
   }, []);
 
   useEffect(() => {
+    setIsMounted(true); // Component is now safely mounted on the client browser
+
     const initializeData = async () => {
       // 1. Strict Gateway Check: Does the base search state even exist?
       const savedState = localStorage.getItem("search_state");
@@ -106,12 +110,17 @@ export default function Results() {
     initializeData();
   }, [router, handleSearch]);
 
+  // HYDRATION FIX: Return null on server and first client render to ensure perfect match
+  if (!isMounted) {
+    return null; 
+  }
+
   // Prevent UI rendering until we confirm they have a valid search state
   if (!isAuthorized) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center bg-theme-bg">
         <div className="w-10 h-10 border-4 border-theme-surface border-t-theme-primary rounded-full animate-spin mb-4"></div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-theme-secondary/50">
+        <p className="text-[8px] font-black uppercase tracking-widest text-theme-secondary/50">
           Redirecting to home...
         </p>
       </div>
@@ -127,7 +136,7 @@ export default function Results() {
         weatherData={tripData?.weather}
       />
 
-      <div className="w-full z-[60] flex-shrink-0 relative">
+      <div className="w-full relative z-[90] flex-shrink-0">
         <SearchBar
           onSearch={handleSearch}
           onSearchStart={() => {

@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
 import ProfileModal from "../../components/ProfileModal";
 import Link from "next/link";
-import { User, LogOut, Bookmark, Settings, Edit3, Loader2, MapPin, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, LogOut, Bookmark, Settings, Edit3, Loader2, MapPin, CheckCircle2, AlertCircle, ChevronRight, Compass } from "lucide-react";
 import { travelApi } from "@/services/api";
 import { useRouter } from "next/navigation";
 
@@ -111,14 +111,14 @@ export default function ProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-theme-white">
         <h1 className="text-3xl font-black text-theme-secondary mb-3">Access Restricted</h1>
-        <p className="text-theme-muted font-bold text-sm mb-8 uppercase tracking-widest">
+        <p className="text-theme-secondary/50 font-black text-[12px] mb-8 uppercase tracking-widest">
           Please login to access your profile
         </p>
         <Link
           href="/auth"
-          className="bg-theme-primary text-theme-white px-8 py-4 rounded-2xl hover:bg-theme-secondary transition-all font-black shadow-xl active:scale-95 tracking-wider"
+          className="bg-theme-primary text-theme-white px-8 py-4 rounded-xl hover:bg-theme-primary/90 transition-all font-black shadow-xl active:scale-95 text-[12px] uppercase tracking-widest"
         >
-          LOGIN TO CONTINUE
+          Login To Continue
         </Link>
       </div>
     );
@@ -134,13 +134,13 @@ export default function ProfilePage() {
 
       {/* Verification Popup Modal */}
       {isVerifyModalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-theme-white border border-theme-surface w-full max-w-sm rounded-3xl shadow-2xl p-6 text-theme-secondary animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-theme-white border-[1px] border-theme-secondary/10 w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-theme-secondary animate-in fade-in zoom-in duration-200">
             <h3 className="text-xl font-black mb-1">Verify Email</h3>
-            <p className="text-xs font-bold text-theme-muted mb-5">A 6-digit code has been sent to your email.</p>
+            <p className="text-xs font-bold text-theme-secondary/60 mb-5">A 6-digit code has been sent to your email.</p>
             
             {verifyError && (
-              <div className="p-2 mb-4 bg-red-50 border border-red-100 text-red-600 text-xs font-bold rounded-xl text-center">
+              <div className="p-3 mb-4 bg-red-50 border border-red-100 text-red-600 text-[12px] font-black uppercase tracking-widest rounded-xl text-center">
                 {verifyError}
               </div>
             )}
@@ -151,20 +151,20 @@ export default function ProfilePage() {
               value={verifyOtp} 
               onChange={(e) => setVerifyOtp(e.target.value)} 
               placeholder="123456" 
-              className="w-full p-4 rounded-xl bg-theme-surface/50 border border-theme-surface focus:border-theme-primary focus:ring-1 focus:ring-theme-primary outline-none text-center tracking-[0.5em] text-xl font-black mb-5"
+              className="w-full p-4 rounded-xl bg-theme-secondary/5 border border-theme-secondary/10 focus:border-theme-primary focus:ring-1 focus:ring-theme-primary outline-none text-center tracking-[0.5em] text-xl font-black mb-5"
             />
             
             <div className="flex gap-3">
               <button 
                 onClick={() => setIsVerifyModalOpen(false)} 
-                className="flex-1 p-3 rounded-xl bg-theme-surface hover:bg-theme-secondary/20 text-theme-secondary font-black text-sm transition-colors"
+                className="flex-1 p-3 rounded-xl bg-theme-secondary/5 hover:bg-theme-secondary/10 text-theme-secondary font-black text-[12px] uppercase tracking-widest transition-colors"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleVerifySubmit} 
                 disabled={verifyLoading || verifyOtp.length !== 6}
-                className="flex-[1.5] p-3 rounded-xl bg-theme-primary hover:bg-theme-secondary text-theme-white font-black text-sm transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+                className="flex-[1.5] p-3 rounded-xl bg-theme-primary hover:bg-theme-primary/90 text-theme-white font-black text-[12px] uppercase tracking-widest transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
               >
                 {verifyLoading && <Loader2 size={16} className="animate-spin" />}
                 {verifyLoading ? "Verifying..." : "Verify"}
@@ -176,15 +176,15 @@ export default function ProfilePage() {
 
       {/* Delete Account Popup Modal */}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-theme-white border border-red-100 w-full max-w-sm rounded-3xl shadow-2xl p-6 text-theme-secondary animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-theme-white border-[1px] border-red-100 w-full max-w-sm rounded-[2rem] shadow-2xl p-6 text-theme-secondary animate-in fade-in zoom-in duration-200">
             <h3 className="text-xl font-black mb-1 text-red-600">Delete Account</h3>
-            <p className="text-xs font-bold text-theme-muted mb-5">
+            <p className="text-xs font-bold text-theme-secondary/60 mb-5">
               Enter the 6-digit code sent to your email to confirm permanent deletion.
             </p>
             
             {deleteError && (
-              <div className="p-2 mb-4 bg-red-50 border border-red-100 text-red-600 text-xs font-bold rounded-xl text-center">
+              <div className="p-3 mb-4 bg-red-50 border border-red-100 text-red-600 text-[12px] font-black uppercase tracking-widest rounded-xl text-center">
                 {deleteError}
               </div>
             )}
@@ -195,20 +195,20 @@ export default function ProfilePage() {
               value={deleteOtp} 
               onChange={(e) => setDeleteOtp(e.target.value)} 
               placeholder="123456" 
-              className="w-full p-4 rounded-xl bg-theme-surface/50 border border-red-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-center tracking-[0.5em] text-xl font-black mb-5 text-red-600"
+              className="w-full p-4 rounded-xl bg-theme-secondary/5 border border-red-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none text-center tracking-[0.5em] text-xl font-black mb-5 text-red-600"
             />
             
             <div className="flex gap-3">
               <button 
                 onClick={() => setIsDeleteModalOpen(false)} 
-                className="flex-1 p-3 rounded-xl bg-theme-surface hover:bg-theme-secondary/20 text-theme-secondary font-black text-sm transition-colors"
+                className="flex-1 p-3 rounded-xl bg-theme-secondary/5 hover:bg-theme-secondary/10 text-theme-secondary font-black text-[12px] uppercase tracking-widest transition-colors"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleDeleteConfirm} 
                 disabled={deleteLoading || deleteOtp.length !== 6}
-                className="flex-[1.5] p-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-sm transition-colors disabled:opacity-50 flex justify-center items-center gap-2 shadow-md shadow-red-500/20"
+                className="flex-[1.5] p-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-[12px] uppercase tracking-widest transition-colors disabled:opacity-50 flex justify-center items-center gap-2 shadow-md shadow-red-500/20"
               >
                 {deleteLoading && <Loader2 size={16} className="animate-spin" />}
                 {deleteLoading ? "Deleting..." : "Confirm Delete"}
@@ -221,23 +221,23 @@ export default function ProfilePage() {
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8 animate-in fade-in duration-300">
         <header className="mb-10">
           <h1 className="text-4xl font-black text-theme-secondary tracking-tight">My Profile</h1>
-          <p className="text-[11px] text-theme-muted font-black uppercase tracking-widest mt-2">
+          <p className="text-[12px] text-theme-secondary/50 font-black uppercase tracking-[0.2em] mt-2">
             Manage your personal information and preferences
           </p>
         </header>
 
         {loading ? (
           <div className="flex justify-center items-center py-32">
-            <Loader2 className="animate-spin text-theme-primary" size={48} />
+            <div className="w-8 h-8 border-4 border-theme-primary/20 border-t-theme-primary rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="bg-theme-surface/20 rounded-[32px] border border-theme-surface shadow-2xl overflow-hidden relative">
+          <div className="bg-theme-white rounded-[2rem] border-[1px] border-theme-secondary/10 shadow-sm overflow-hidden relative">
             
             <div className="h-32 bg-theme-secondary w-full absolute top-0 left-0 z-0"></div>
 
             {/* Section 1: User Profile Header */}
-            <div className="p-6 md:p-10 flex flex-col md:flex-row items-center md:items-end gap-8 relative z-10 mt-12 border-b border-theme-surface pb-10">
-              <div className="w-32 h-32 bg-theme-white text-theme-secondary border-4 border-theme-white rounded-full flex items-center justify-center overflow-hidden shadow-xl shrink-0">
+            <div className="p-6 md:p-10 flex flex-col md:flex-row items-center md:items-end gap-8 relative z-10 mt-12 border-b border-theme-secondary/10 pb-10">
+              <div className="w-32 h-32 bg-theme-white text-theme-secondary border-4 border-theme-white rounded-full flex items-center justify-center overflow-hidden shadow-sm shrink-0">
                 {profileData?.profile_picture_url ? (
                   <img
                     src={
@@ -249,60 +249,56 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User size={64} />
+                  <User size={48} className="text-theme-secondary/20" />
                 )}
               </div>
 
               <div className="flex-1 text-center md:text-left">
-                {/* Name & Role Badge Inline */}
                 <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
                   <h2 className="text-3xl font-black text-theme-secondary truncate">
                     {profileData?.full_name || profileData?.email?.split("@")[0]}
                   </h2>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-theme-white bg-theme-primary px-2 py-1 rounded-lg shrink-0 shadow-sm mt-1">
+                  <span className="text-[8px] font-black uppercase tracking-widest text-theme-white bg-theme-primary px-2.5 py-1 rounded-md shrink-0 shadow-sm mt-1">
                     {profileData?.role?.replace("_", " ") || "USER"}
                   </span>
                 </div>
                 
-                {/* Travel ID beneath name */}
-                <div className="mt-2">
-                  <p className="text-[11px] font-bold text-theme-muted tracking-widest uppercase">
-                    Travel ID: <span className="text-theme-secondary font-black">{profileData?.unique_travel_id || "Pending"}</span>
-                  </p>
+                <div className="mt-2 flex justify-center md:justify-start items-center gap-2 text-[12px] font-black uppercase tracking-widest text-theme-secondary/50">
+                   <span>Travel ID:</span>
+                   <span className="bg-theme-secondary/10 px-2 py-0.5 rounded text-theme-secondary">{profileData?.unique_travel_id || "Pending"}</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-theme-surface text-theme-secondary rounded-2xl hover:bg-theme-muted/20 transition-colors font-black text-sm active:scale-95"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-theme-secondary/5 text-theme-secondary rounded-xl hover:bg-theme-secondary/10 hover:text-theme-primary transition-all font-black text-[12px] uppercase tracking-widest active:scale-95 border border-theme-secondary/10"
                 >
-                  <Edit3 size={18} /> Edit Profile
+                  <Edit3 size={16} /> Edit Profile
                 </button>
                 <button
                   onClick={logout}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-colors font-black text-sm active:scale-95"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all font-black text-[12px] uppercase tracking-widest active:scale-95 border border-red-100"
                 >
-                  <LogOut size={18} /> Sign Out
+                  <LogOut size={16} /> Sign Out
                 </button>
               </div>
             </div>
 
             {/* Section 2: Account Details */}
-            <div className="p-6 md:p-10 border-b border-theme-surface bg-theme-white">
-              <h3 className="text-[13px] font-black uppercase tracking-widest text-theme-secondary mb-6 flex items-center gap-3">
-                <div className="p-2 bg-theme-secondary text-theme-white rounded-xl shadow-md"><Settings size={16} /></div>
+            <div className="p-6 md:p-10 border-b border-theme-secondary/10 bg-theme-white">
+              <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-theme-secondary/50 mb-6 flex items-center gap-2">
+                <Settings size={16} className="text-theme-primary" />
                 Account Details
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-theme-surface/20 p-5 rounded-2xl border border-theme-surface shadow-sm">
-                  <label className="block text-[10px] font-black text-theme-muted uppercase tracking-widest mb-2">Email Address</label>
-                  <div className="flex items-center gap-2">
-                    <div className="font-bold text-theme-secondary text-lg truncate">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-theme-secondary/5 p-5 rounded-[1rem] border-[1px] border-theme-secondary/10 shadow-sm">
+                  <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-2">Email Address</label>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-black text-theme-secondary text-base truncate">
                     {profileData?.email || <span className="text-theme-secondary/40 italic">Not provided</span>}
                     </div>
-                    {/* Verification Symbol Only */}
                     {profileData?.is_email_verified ? (
                       <CheckCircle2 size={20} className="text-green-500 flex-shrink-0" />
                     ) : (
@@ -312,7 +308,7 @@ export default function ProfilePage() {
                         title="Unverified - Click to verify"
                       >
                         <AlertCircle size={20} className="text-red-500" />
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-[120%] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-theme-secondary text-theme-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap z-10">
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-[120%] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-theme-secondary text-theme-white text-[8px] font-black tracking-widest uppercase px-2 py-1 rounded whitespace-nowrap z-10">
                           Click to verify
                         </div>
                       </button>
@@ -320,9 +316,9 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="bg-theme-surface/20 p-5 rounded-2xl border border-theme-surface shadow-sm">
-                  <label className="block text-[10px] font-black text-theme-muted uppercase tracking-widest mb-2">Mobile Number</label>
-                  <div className="font-bold text-theme-secondary text-lg truncate">
+                <div className="bg-theme-secondary/5 p-5 rounded-[1rem] border-[1px] border-theme-secondary/10 shadow-sm">
+                  <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-2">Mobile Number</label>
+                  <div className="font-black text-theme-secondary text-base truncate">
                     {profileData?.mobile_number || <span className="text-theme-secondary/40 italic">Not provided</span>}
                   </div>
                 </div>
@@ -330,57 +326,75 @@ export default function ProfilePage() {
             </div>
 
             {/* Section 3: Quick Links */}
-            <div className="p-6 md:p-10 bg-theme-surface/20">
-              <h3 className="text-[13px] font-black uppercase tracking-widest text-theme-secondary mb-6 flex items-center gap-3">
-                <div className="p-2 bg-theme-secondary text-theme-white rounded-xl shadow-md"><MapPin size={16} /></div>
+            <div className="p-6 md:p-10 bg-theme-white">
+              <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-theme-secondary/50 mb-6 flex items-center gap-2">
+                <Compass size={16} className="text-theme-primary" />
                 Travel Hub
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Link
                   href="/savedtrips"
-                  className="flex items-center gap-5 p-6 rounded-2xl bg-theme-surface/20 border border-theme-surface hover:border-theme-primary hover:shadow-xl transition-all group active:scale-[0.98]"
+                  className="group w-full rounded-[1rem] border-[1px] border-theme-secondary/10 bg-theme-white p-5 flex items-center justify-between cursor-pointer hover:border-theme-primary hover:bg-theme-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary transition-all duration-300 shadow-sm"
                 >
-                  <div className="p-4 bg-theme-white text-theme-primary border border-theme-surface rounded-xl group-hover:bg-theme-primary group-hover:text-theme-white transition-colors shadow-sm">
-                    <Bookmark size={24} />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-theme-secondary/5 rounded-full flex items-center justify-center text-theme-secondary group-hover:bg-theme-primary/10 group-hover:text-theme-primary transition-colors shrink-0">
+                      <Bookmark size={20} />
+                    </div>
+                    <div className="text-left flex flex-col justify-center">
+                      <h4 className="font-black text-sm sm:text-base text-theme-secondary group-hover:text-theme-primary transition-colors">
+                        Saved Trips
+                      </h4>
+                      <p className="text-[12px] font-bold text-theme-secondary/50 mt-0.5 uppercase tracking-widest">
+                        View Itineraries
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-black text-xl text-theme-secondary group-hover:text-theme-secondary transition-colors">Saved Trips</h4>
-                    <p className="text-[11px] font-black uppercase tracking-widest text-theme-muted mt-1">View itineraries</p>
+                  <div className="w-8 h-8 rounded-full bg-theme-white border border-theme-secondary/10 flex items-center justify-center text-theme-secondary/40 group-hover:text-theme-primary group-hover:border-theme-primary/30 group-hover:translate-x-1 transition-all shrink-0 shadow-sm">
+                    <ChevronRight size={16} />
                   </div>
                 </Link>
 
                 <Link
                   href="/"
-                  className="flex items-center gap-5 p-6 rounded-2xl bg-theme-surface/20 border border-theme-surface hover:border-theme-primary hover:shadow-xl transition-all group active:scale-[0.98]"
+                  className="group w-full rounded-[1rem] border-[1px] border-theme-secondary/10 bg-theme-white p-5 flex items-center justify-between cursor-pointer hover:border-theme-primary hover:bg-theme-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary transition-all duration-300 shadow-sm"
                 >
-                  <div className="p-4 bg-theme-white text-theme-secondary border border-theme-surface rounded-xl group-hover:bg-theme-primary group-hover:text-theme-white transition-colors shadow-sm">
-                    <MapPin size={24} />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-theme-secondary/5 rounded-full flex items-center justify-center text-theme-secondary group-hover:bg-theme-primary/10 group-hover:text-theme-primary transition-colors shrink-0">
+                      <MapPin size={20} />
+                    </div>
+                    <div className="text-left flex flex-col justify-center">
+                      <h4 className="font-black text-sm sm:text-base text-theme-secondary group-hover:text-theme-primary transition-colors">
+                        Plan New Trip
+                      </h4>
+                      <p className="text-[12px] font-bold text-theme-secondary/50 mt-0.5 uppercase tracking-widest">
+                        Start an Adventure
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-black text-xl text-theme-secondary group-hover:text-theme-secondary transition-colors">Plan New Trip</h4>
-                    <p className="text-[11px] font-black uppercase tracking-widest text-theme-muted mt-1">Start an adventure</p>
+                  <div className="w-8 h-8 rounded-full bg-theme-white border border-theme-secondary/10 flex items-center justify-center text-theme-secondary/40 group-hover:text-theme-primary group-hover:border-theme-primary/30 group-hover:translate-x-1 transition-all shrink-0 shadow-sm">
+                    <ChevronRight size={16} />
                   </div>
                 </Link>
               </div>
             </div>
             
             {/* Section 4: Danger Zone */}
-            <div className="p-6 md:p-10 border-t border-red-100 bg-red-50/30 rounded-b-[32px]">
-              <h3 className="text-[13px] font-black uppercase tracking-widest text-red-600 mb-4 flex items-center gap-3">
-                <div className="p-2 bg-red-100 text-red-600 rounded-xl shadow-sm"><AlertCircle size={16} /></div>
+            <div className="p-6 md:p-10 border-t border-red-100 bg-red-50/50">
+              <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-red-600/60 mb-4 flex items-center gap-2">
+                <AlertCircle size={16} className="text-red-500" />
                 Danger Zone
               </h3>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/50 p-5 rounded-2xl border border-red-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-theme-white p-5 rounded-[1rem] border-[1px] border-red-100 shadow-sm">
                 <div>
-                  <h4 className="font-bold text-red-900 text-sm">Delete Account</h4>
-                  <p className="text-xs font-medium text-red-700/70 mt-1">
+                  <h4 className="font-black text-red-600 text-sm">Delete Account</h4>
+                  <p className="text-[12px] font-bold text-red-600/60 mt-1">
                     Permanently delete your account and all of your saved itineraries.
                   </p>
                 </div>
                 <button
                   onClick={handleDeleteRequest}
-                  className="px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl font-black text-sm transition-colors shadow-sm active:scale-95 whitespace-nowrap"
+                  className="px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black text-[12px] uppercase tracking-widest transition-colors border border-red-100 shadow-sm active:scale-95 whitespace-nowrap"
                 >
                   Delete Account
                 </button>

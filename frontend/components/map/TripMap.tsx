@@ -222,7 +222,7 @@ export default function TripMap({ mapData }: TripMapProps) {
             el.innerHTML = `
               ${bedSvg}
               <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
-                <span class="font-black text-[11px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Selected Hotel"}</span>
+                <span class="font-black text-[8px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Selected Hotel"}</span>
                 <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
@@ -231,7 +231,7 @@ export default function TripMap({ mapData }: TripMapProps) {
             el.innerHTML = `
               ${bedSvgSmall}
               <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
-                <span class="font-black text-[11px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Hotel"}</span>
+                <span class="font-black text-[8px] uppercase tracking-widest">${stay.name || stay.hotel?.name || "Hotel"}</span>
                 <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
@@ -268,7 +268,7 @@ export default function TripMap({ mapData }: TripMapProps) {
             el.innerHTML = `
               ${cameraSvg}
               <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
-                <span class="font-black text-[11px] uppercase tracking-widest">${name}</span>
+                <span class="font-black text-[8px] uppercase tracking-widest">${name}</span>
                 <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
@@ -277,7 +277,7 @@ export default function TripMap({ mapData }: TripMapProps) {
             el.innerHTML = `
               ${cameraSvgSmall}
               <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap bg-theme-secondary text-theme-white px-3 py-1.5 rounded-xl shadow-xl z-50 flex flex-col items-center">
-                <span class="font-black text-[11px] uppercase tracking-widest">${name}</span>
+                <span class="font-black text-[8px] uppercase tracking-widest">${name}</span>
                 <div class="w-2 h-2 bg-theme-secondary absolute -bottom-1 left-1/2 -translate-x-1/2 rotate-45"></div>
               </div>
             `;
@@ -455,7 +455,7 @@ export default function TripMap({ mapData }: TripMapProps) {
     <div className="relative w-full h-full rounded-none overflow-hidden">
       {/* Search Radius UI */}
       <div className="absolute bottom-6 left-6 z-40 bg-theme-white px-2 py-1.5 rounded-2xl shadow-xl flex flex-col gap-1 border border-theme-surface">
-        <label className="text-[10px] font-black uppercase tracking-widest text-theme-muted pl-1">
+        <label className="text-[8px] font-black uppercase tracking-widest text-theme-muted pl-1">
           Search Radius: {radiusValue} mi
         </label>
         <input
