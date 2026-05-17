@@ -342,7 +342,7 @@ export default function ItineraryModal({
                    <div className="p-4 bg-theme-secondary flex items-center justify-between transition-all duration-300">
                      <div className="flex items-center gap-2">
                        <Receipt size={14} className="text-theme-white" />
-                       <span className="font-black uppercase tracking-widest text-[12px] text-theme-white">Price Breakdown</span>
+                       <span className="font-black uppercase tracking-widest text-[12px] text-theme-white">Fare Breakdown</span>
                      </div>
                      {checkoutStep === "READY" && (
                        <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-2 duration-300">

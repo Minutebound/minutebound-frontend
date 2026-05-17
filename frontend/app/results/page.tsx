@@ -136,19 +136,19 @@ export default function Results() {
         weatherData={tripData?.weather}
       />
 
-      <div className="w-full relative z-[90] flex-shrink-0">
-        <SearchBar
-          onSearch={handleSearch}
-          onSearchStart={() => {
-            setTripData(null);
-            setLoading(true);
-          }}
-          loading={loading}
-          isCompact={true}
-          mapOpen={mapOpen}
-          onMapToggle={() => setMapOpen(!mapOpen)}
-        />
-      </div>
+    <div className="w-full relative z-[90] flex-shrink-0">
+  <SearchBar
+    onSearch={handleSearch}
+    onSearchStart={() => {
+      setTripData(null);
+      setLoading(true);
+    }}
+    loading={loading}
+    isCompact={true}
+    mapOpen={mapOpen}
+    onMapToggle={() => setMapOpen(!mapOpen)}
+  />
+</div>
 
       <main className="flex-1 flex overflow-hidden min-w-0 bg-theme-white/20">
         <div className={`flex-1 h-full overflow-y-auto custom-scrollbar ${mapOpen && !loading ? "hidden md:block" : ""}`}>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Compass, PlaneTakeoff, Car, Building2, Map } from "lucide-react";
+import { Compass, Plane, Car, Building2, Map } from "lucide-react";
 import FlightCard from "./FlightCard";
 import StaysCard from "./StayCard";
 import DrivingCard from "./DriveCard";
@@ -153,7 +153,7 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
   };
 
   const transportTab = showFlights && hasFlights
-    ? { id: "flights", label: "Flights", icon: <PlaneTakeoff size={18} /> }
+    ? { id: "flights", label: "Flights", icon: <Plane size={18} /> }
     : { id: "drive", label: "Drive", icon: <Car size={18} /> };
 
   const tabs = [

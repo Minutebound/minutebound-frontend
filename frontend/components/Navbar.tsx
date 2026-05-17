@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   Bookmark,
   Home,
+  Ticket,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
@@ -201,57 +202,74 @@ export default function Navbar({
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute z-120 right-0 top-[100%] mt-0 w-64 bg-theme-white rounded-b-2xl rounded-t-none shadow-2xl border border-t-0 border-theme-surface py-2 z-120 animate-in slide-in-from-top-2 fade-in duration-200">
+                  /* INVISIBLE BRIDGE WRAPPER: pt-1.5 creates a safe hover zone */
+                  <div className="absolute right-0 top-[100%] w-[280px] pt-1.5 z-[120]">
                     
-                    {/* TRAVEL ID SECTION (Inside Dropdown) */}
-                    <div className="px-4 py-3 mb-1 border-b border-theme-surface bg-theme-surface/20">
-                      <div className="overflow-hidden">
-                        <p className="font-bold text-theme-primary truncate leading-tight mt-0.5" title={profileData?.unique_travel_id}>
-                         Travel ID: {profileData?.unique_travel_id || "Loading..."}
+                    {/* VISIBLE DROPDOWN CARD */}
+                    <div className="bg-theme-white rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-theme-secondary/10 py-2 animate-in slide-in-from-top-2 fade-in duration-200">
+                      
+                      {/* User Profile Header */}
+                      <div className="px-4 py-3.5 mb-2 mx-2 border border-theme-secondary/10 bg-theme-secondary/5 flex flex-col gap-0.5 rounded-xl">
+                        <p className="font-bold text-[12px] text-theme-primary uppercase tracking-widest truncate mt-0.5" title={profileData?.unique_travel_id}>
+                          Travel ID: {profileData?.unique_travel_id || "Loading..."}
                         </p>
                       </div>
+
+                      <div className="flex flex-col px-2 gap-1">
+                        {!isHomePage && (
+                          <Link
+                            href="/"
+                            onClick={() => setIsDropdownOpen(false)}
+                            className="group flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-theme-secondary/80 hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
+                          >
+                            <Home size={18} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
+                            Home
+                          </Link>
+                        )}
+
+                        <Link
+                          href="/profile"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="group flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-theme-secondary/80 hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
+                        >
+                          <UserIcon size={18} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
+                          Profile Settings
+                        </Link>
+
+                        <Link
+                          href="/bookings"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="group flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-theme-secondary/80 hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
+                        >
+                          <Ticket size={18} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
+                          My Bookings
+                        </Link>
+
+                        <Link
+                          href="/savedtrips"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="group flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-theme-secondary/80 hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
+                        >
+                          <Bookmark size={18} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
+                          Saved Itineraries
+                        </Link>
+                      </div>
+
+                      <div className="h-[1px] bg-theme-secondary/10 my-2 mx-4"></div>
+
+                      <div className="px-2">
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            logout();
+                          }}
+                          className="group w-full flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all text-left"
+                        >
+                          <LogOut size={18} className="text-red-400 group-hover:text-red-500 transition-colors" />
+                          Sign Out
+                        </button>
+                      </div>
                     </div>
-
-                    {!isHomePage && (
-                      <Link
-                        href="/"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-theme-secondary hover:bg-theme-surface font-bold transition-colors"
-                      >
-                        <Home size={16} className="text-theme-primary" />
-                        Home
-                      </Link>
-                    )}
-
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-theme-secondary hover:bg-theme-surface font-bold transition-colors"
-                    >
-                      <UserIcon size={16} className="text-theme-primary" />
-                      Profile Settings
-                    </Link>
-                    <Link
-                      href="/savedtrips"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-theme-secondary hover:bg-theme-surface font-bold transition-colors"
-                    >
-                      <Bookmark size={16} className="text-theme-primary" />
-                      Saved Itineraries
-                    </Link>
-
-                    <div className="h-px bg-theme-surface my-1.5 mx-3"></div>
-
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        logout();
-                      }}
-                      className="cursor-pointer w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 font-bold transition-colors text-left"
-                    >
-                      <LogOut size={16} className="text-red-500" />
-                      Sign Out
-                    </button>
                   </div>
                 )}
               </div>
@@ -282,15 +300,39 @@ export default function Navbar({
 
       {/* MOBILE NAVIGATION MENU */}
       {isMobileMenuOpen && (
-        <div className="absolute top-full right-0 w-full bg-theme-white border-b border-theme-secondary/10 shadow-xl lg:hidden flex flex-col z-120 animate-in slide-in-from-top-2 duration-200">
-          <div className="flex flex-col p-2">
+        <div className="absolute top-full right-0 w-full bg-theme-white border-b border-theme-secondary/10 shadow-2xl lg:hidden flex flex-col z-[120] animate-in slide-in-from-top-2 duration-200">
+          
+          {/* Mobile User Header (Shows if Logged In) */}
+          {isLoggedIn && (
+            <div className="px-6 py-5 border-b border-theme-secondary/10 bg-theme-secondary/5 flex items-center gap-4">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl.startsWith("http") ? avatarUrl : `${API_BASE_URL}${avatarUrl}`}
+                  alt="Profile"
+                  className="w-14 h-14 rounded-full object-cover border-2 border-theme-white shadow-md"
+                />
+              ) : (
+                <div className="bg-theme-primary/10 p-3 rounded-full shadow-inner">
+                  <UserIcon size={28} className="text-theme-primary" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="font-black text-[18px] text-theme-secondary leading-tight">{displayName}</span>
+                <span className="font-bold text-[11px] text-theme-primary uppercase tracking-widest mt-1 truncate">
+                  ID: {profileData?.unique_travel_id || "..."}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col p-4 gap-1.5">
             {!isHomePage && (
               <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
+                className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
               >
-                <Home size={24} className="text-theme-primary" />
+                <Home size={22} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
                 Home
               </Link>
             )}
@@ -300,30 +342,40 @@ export default function Navbar({
                 <Link
                   href="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
+                  className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
                 >
-                  <UserIcon size={24} className="text-theme-primary" />
+                  <UserIcon size={22} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
                   Profile Settings
                 </Link>
+
+                <Link
+                  href="/bookings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
+                >
+                  <Ticket size={22} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
+                  My Bookings
+                </Link>
+
                 <Link
                   href="/savedtrips"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
+                  className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
                 >
-                  <Bookmark size={24} className="text-theme-primary" />
+                  <Bookmark size={22} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
                   Saved Itineraries
                 </Link>
 
-                <div className="h-px bg-theme-surface my-2 mx-4"></div>
+                <div className="h-[1px] bg-theme-secondary/10 my-3 mx-4"></div>
 
                 <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
                   }}
-                  className="cursor-pointer flex items-center gap-3 px-4 py-4 text-red-600 hover:bg-red-50 font-bold transition-colors text-left rounded-xl mx-2"
+                  className="group w-full flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all text-left"
                 >
-                  <LogOut size={24} className="text-red-500" />
+                  <LogOut size={22} className="text-red-400 group-hover:text-red-500 transition-colors" />
                   Sign Out
                 </button>
               </>
@@ -331,9 +383,9 @@ export default function Navbar({
               <Link
                 href="/auth"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-4 text-theme-secondary hover:bg-theme-surface font-bold transition-colors rounded-xl mx-2"
+                className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
               >
-                <UserIcon size={24} className="text-theme-primary" />
+                <UserIcon size={22} className="text-theme-secondary/50 group-hover:text-theme-primary transition-colors" />
                 Login / Sign Up
               </Link>
             )}
