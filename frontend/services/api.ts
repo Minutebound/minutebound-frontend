@@ -29,7 +29,7 @@ axios.interceptors.response.use(
   }
 );
 
-// --- API SERVICE OBJECT ---
+// --- API SERVICE OBJECT INTERFACES ---
 export interface UserCreatePayload {
   email: string;
   password: string;
@@ -117,14 +117,14 @@ export interface FlightItinerary {
 }
 
 export interface FlightOffer {
-  id: string;
+  id: string; // Duffel Offer ID
   price: number;
   currency: string;
   airline_code: string;
   airline_name: string;
   cabin_class: string;
   carbon_emissions_kg?: number; 
-  raw_offer_data?: any; // <--- ADD THIS LINE
+  raw_offer_data?: any; 
   itineraries: FlightItinerary[];
 }
 
@@ -183,7 +183,7 @@ export interface TripSearchParams {
   destination: any;
   startDate: string;
   endDate: string;
-  tripType?: "round-trip" | "one-way"; // <-- Added this
+  tripType?: "round-trip" | "one-way"; 
   numNights: number;
   adults: number;
   children: number;
@@ -490,9 +490,10 @@ export const travelApi = {
          destIata = data.iata;
       }
 
-      const travelClasses = params.budget === 'Premium' 
-        ? 'BUSINESS,FIRST' 
-        : 'ECONOMY,PREMIUM_ECONOMY';
+      // FIX: Duffel only accepts a single strict string: 'economy', 'premium_economy', 'business', or 'first'
+      const travelClass = params.budget === 'Premium' 
+        ? 'business' 
+        : 'economy';
 
       // Dynamically build the parameters to optionally exclude return_date
       const searchParams: any = {
@@ -501,7 +502,7 @@ export const travelApi = {
         date: params.startDate,
         adults: params.adults,
         children: params.children,
-        travel_class: travelClasses
+        travel_class: travelClass // Now passing the clean string
       };
 
       // Only attach return_date if it's a round trip and an endDate exists
@@ -524,10 +525,18 @@ export const travelApi = {
     }
   },
 
-  confirmFlightPrice: async (flightOffer: any) => {
+  // ==========================================
+  // UPDATED METHODS FOR DUFFEL INTEGRATION
+  // ==========================================
+  
+  /**
+   * confirmFlightPrice expects a Duffel Offer ID instead of a raw JSON blob.
+   * It returns the validated priced offer along with the available seat maps.
+   */
+  confirmFlightPrice: async (offerId: string) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/flights/price`, {
-        flight_offer: flightOffer
+        offer_id: offerId
       }, { headers: getAuthHeaders() });
       return response.data;
     } catch (error: any) {
@@ -536,31 +545,58 @@ export const travelApi = {
     }
   },
 
-  bookFlight: async (pricedOffer: any, travelers: any[]) => {
+  /**
+   * bookFlight passes the Duffel Offer ID, formatted travelers, and their selected seat addons.
+   */
+// inside frontend/services/api.ts -> export const travelApi = { ... }
+bookFlight: async (offerId: string, travelers: any[], selectedSeats: any[] = []) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/flights/book`, {
-        priced_offer: pricedOffer,
-        travelers: travelers
-      }, { headers: getAuthHeaders() });
+        offer_id: offerId,
+        travelers: travelers,
+        selected_seats: selectedSeats
+      }, { 
+        headers: getAuthHeaders() // <--- THIS WAS MISSING
+      });
       return response.data;
     } catch (error: any) {
-      console.error("Booking failed:", error);
-      throw error.response?.data || { error: "Booking failed" };
+      console.error("Booking Error:", error);
+      // Handle Duffel's complex error array if it exists
+      const detail = error.response?.data?.detail;
+      const errorMsg = typeof detail === 'string' ? detail : JSON.stringify(detail);
+      return { error: errorMsg || "Failed to complete the booking." };
     }
   },
-
+  
   createPaymentIntent: async (amount: number, currency: string = "USD") => {
     try {
       const response = await axios.post(`${API_BASE_URL}/flights/create-payment-intent`, {
         amount,
         currency
-      }, { headers: getAuthHeaders() });
+      }, { 
+        headers: getAuthHeaders() // <--- THIS WAS MISSING
+      });
       return response.data;
     } catch (error: any) {
-      console.error("Failed to create payment intent:", error);
-      throw error.response?.data || { error: "Payment setup failed" };
+      console.error("Payment Intent Error:", error);
+      return { error: error.response?.data?.detail || "Failed to initialize secure payment." };
     }
   },
+
+  
+  
+  getDuffelOrderDetails: async (orderId: string) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/flights/orders/${orderId}`, {
+        headers: getAuthHeaders()
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Failed to load order metadata:", error);
+      return { error: "Could not read booking details." };
+    }
+  },
+  // ==========================================
 
   getDriving: async (params: TripSearchParams, signal?: AbortSignal) => {
     try {
@@ -738,4 +774,29 @@ getWeather: async (dest: { lat: number; lon: number }, dates: { start?: string; 
       return [];
     }
   },
+
+  getMyBookings: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/bookings/me/bookings`, {
+        headers: getAuthHeaders()
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+      return [];
+    }
+  },
+
+  getLiveDuffelOrder: async (orderId: string) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/bookings/duffel-order/${orderId}`, {
+        headers: getAuthHeaders()
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Failed to fetch live order from Duffel:", error);
+      throw error.response?.data || { detail: "Failed to load order" };
+    }
+  },
+
 };

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  Plane, Clock, CheckCircle2, ChevronDown, ShieldCheck, Gift, Wifi, Zap, Utensils, Briefcase, ArrowRight, Leaf, Luggage, BatteryCharging
+  Plane, Clock, CheckCircle2, ChevronDown, ShieldCheck, Gift, Wifi, Zap, Utensils, Briefcase, ArrowRight, Leaf, Luggage, BatteryCharging, RefreshCcw
 } from 'lucide-react';
 
 type SortOption = 'price_asc' | 'duration_asc';
@@ -109,7 +109,7 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
   return (
     <div className="flex flex-col gap-4 animate-in fade-in duration-500">
       
-{/* STICKY FLIGHT HEADER */}
+      {/* STICKY FLIGHT HEADER */}
       <div className=" bg-theme-white py-3 border-b border-theme-secondary/10 flex justify-between items-center">
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
           {flights.length} Flight options available
@@ -138,18 +138,32 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
         const isExpanded = expandedFlightKey === uniqueKey;
 
         let totalCheckedBags = 0;
+        let totalCarryOnBags = 0;
         let hasWifi = false;
         let hasPower = false;
         let foodOption = null;
 
         flight.itineraries?.forEach((itin: any) => {
           itin.segments?.forEach((seg: any) => {
-            if (seg.checked_bags > totalCheckedBags) totalCheckedBags = seg.checked_bags;
+            if (seg.baggages && Array.isArray(seg.baggages)) {
+              const checked = seg.baggages.find((b:any) => b.type === 'checked')?.quantity || 0;
+              const carryOn = seg.baggages.find((b:any) => b.type === 'carry_on')?.quantity || 0;
+              if (checked > totalCheckedBags) totalCheckedBags = checked;
+              if (carryOn > totalCarryOnBags) totalCarryOnBags = carryOn;
+            } else {
+              if (seg.checked_bags > totalCheckedBags) totalCheckedBags = seg.checked_bags;
+              if (seg.carry_on_bags > totalCarryOnBags) totalCarryOnBags = seg.carry_on_bags;
+            }
+
             if (seg.amenities?.wifi) hasWifi = true;
             if (seg.amenities?.power_usb) hasPower = true;
             if (seg.amenities?.food) foodOption = seg.amenities.food;
           });
         });
+
+        const isRefundable = flight.refund_policy?.is_refundable ?? false;
+        const penaltyAmount = flight.refund_policy?.penalty_amount;
+        const penaltyCurrency = flight.refund_policy?.currency || flight.currency;
 
         return (
           <div 
@@ -164,40 +178,66 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                 </div>
                 <div className="flex flex-col items-start lg:items-center text-left lg:text-center gap-1.5">
                   <span className="font-bold text-theme-secondary">{flight.airline_name || flight.airline_code}</span>
-                  {flight.carbon_emissions_kg && (
-                    <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-sm border border-emerald-500/20">
-                      <Leaf size={10} /> {flight.carbon_emissions_kg} kg CO₂
-                    </span>
-                  )}
                 </div>
               </div>
 
-              <div className="flex-1 w-full space-y-4 lg:space-y-6">
-                {flight.itineraries?.slice(0, 2).map((itin: any, i: number) => (
-                  <div key={i} className="flex items-center gap-2 sm:gap-4">
-                    <div className="flex-1 flex items-center gap-2 sm:gap-4">
-                      <div className="text-right min-w-[40px] sm:min-w-[45px]">
-                        <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[0].departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                        <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[0].departure_airport}</p>
-                      </div>
-                      
-                      <div className="flex-1 flex flex-col items-center gap-1 px-1 sm:px-2">
-                         <div className="w-10 text-[12px] align-center font-bold text-theme-secondary/50">{i === 0 ? 'DEPART' : 'RETURN'}</div>
-                        <div className="w-full h-[2px] bg-theme-secondary/20 relative rounded-full overflow-hidden">
-                           <div className="absolute inset-y-0 left-0 bg-theme-primary/20 w-full opacity-40" />
+              <div className="flex-1 w-full flex flex-col">
+                <div className="space-y-4 lg:space-y-6">
+                  {flight.itineraries?.slice(0, 2).map((itin: any, i: number) => (
+                    <div key={i} className="flex items-center gap-2 sm:gap-4">
+                      <div className="flex-1 flex items-center gap-2 sm:gap-4">
+                        <div className="text-right min-w-[40px] sm:min-w-[45px]">
+                          <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[0].departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                          <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[0].departure_airport}</p>
                         </div>
-                        <span className={`text-[12px] font-bold ${itin.stops === 0 ? 'text-theme-success' : 'text-theme-light-gray'} tracking-tighter text-center line-clamp-1`}>
-                          {(itin.duration || '').replace('PT','').toLowerCase()} • {itin.stops === 0 ? 'Direct' : `${itin.stops} stop`}
-                        </span>
-                      </div>
+                        
+                        <div className="flex-1 flex flex-col items-center gap-1 px-1 sm:px-2">
+                           <div className="w-10 text-[12px] align-center font-bold text-theme-secondary/50">{i === 0 ? 'DEPART' : 'RETURN'}</div>
+                          <div className="w-full h-[2px] bg-theme-secondary/20 relative rounded-full overflow-hidden">
+                             <div className="absolute inset-y-0 left-0 bg-theme-primary/20 w-full opacity-40" />
+                          </div>
+                          <span className={`text-[12px] font-bold ${itin.stops === 0 ? 'text-theme-success' : 'text-theme-light-gray'} tracking-tighter text-center line-clamp-1`}>
+                            {(itin.duration || '').replace('PT','').toLowerCase()} • {itin.stops === 0 ? 'Direct' : `${itin.stops} stop`}
+                          </span>
+                        </div>
 
-                      <div className="min-w-[40px] sm:min-w-[45px]">
-                        <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[itin.segments.length-1].arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                        <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[itin.segments.length-1].arrival_airport}</p>
+                        <div className="min-w-[40px] sm:min-w-[45px]">
+                          <p className="text-[16px] font-black text-theme-secondary">{new Date(itin.segments[itin.segments.length-1].arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                          <p className="text-[16px] font-bold text-theme-secondary/40">{itin.segments[itin.segments.length-1].arrival_airport}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Main Amenities Row */}
+                <div className="flex flex-wrap items-center gap-2 pt-4 mt-4 border-t border-theme-secondary/5">
+                  {flight.carbon_emissions_kg && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                      <Leaf size={12} /> {flight.carbon_emissions_kg} kg CO₂
+                    </span>
+                  )}
+                  {hasWifi && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-theme-secondary/5 text-theme-secondary/60 rounded-md text-[9px] font-black uppercase tracking-widest border border-theme-secondary/10">
+                      <Wifi size={12} /> WiFi
+                    </span>
+                  )}
+                  {hasPower && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-theme-secondary/5 text-theme-secondary/60 rounded-md text-[9px] font-black uppercase tracking-widest border border-theme-secondary/10">
+                      <BatteryCharging size={12} /> Power
+                    </span>
+                  )}
+                  {foodOption && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-theme-secondary/5 text-theme-secondary/60 rounded-md text-[9px] font-black uppercase tracking-widest border border-theme-secondary/10">
+                      <Utensils size={12} /> Food
+                    </span>
+                  )}
+                  {(totalCheckedBags > 0 || totalCarryOnBags > 0) && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                      <Luggage size={12} /> Bags Included
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-center w-auto lg:w-auto py-2">
@@ -209,7 +249,7 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
 
               <div className="flex flex-row lg:flex-col justify-between items-center lg:items-end gap-3 shrink-0 border-t lg:border-t-0 lg:border-l border-theme-secondary/10 pt-4 lg:pt-0 pl-0 lg:pl-6 w-full lg:w-auto">
                 <div className="text-left lg:text-right">
-                  <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none"><span className="text-[20px] font-black pr-1 font-normal">USD</span>{getPrice(flight).toFixed(0)}</p>
+                  <p className="text-[26px] font-black text-theme-secondary tracking-tighter leading-none"><span className="text-[20px] font-black pr-1 font-normal">{flight.currency || 'USD'} </span>{getPrice(flight).toFixed(0)}</p>
                   <p className="text-[8px] sm:text-[8px] uppercase text-theme-secondary/30 tracking-widest mt-1">
                     {isRoundTrip ? 'Roundtrip' : 'One Way'} / {travelerCount} {travelerCount > 1 ? 'persons' : 'person'}
                   </p>
@@ -240,6 +280,10 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                         <div className="relative pl-5 border-l-2 border-theme-secondary/10 space-y-6 ml-1.5">
                           {itin.segments.map((seg: any, sIdx: number) => {
                             const nextSeg = itin.segments[sIdx + 1];
+                            let aircraftName = null;
+                            if (seg.aircraft && String(seg.aircraft).toLowerCase() !== 'undefined' && String(seg.aircraft).toLowerCase() !== 'null') {
+                              aircraftName = typeof seg.aircraft === 'object' ? seg.aircraft.name : seg.aircraft;
+                            }
 
                             return (
                               <React.Fragment key={sIdx}>
@@ -267,10 +311,10 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                                         </span>
                                       </div>
                                     </div>
-                                    {(seg.aircraft || seg.duration) && (
+                                    {(aircraftName || seg.duration) && (
                                       <div className="mt-4 pt-3 border-t border-theme-secondary/5 flex flex-wrap gap-4 text-[8px] font-black uppercase tracking-widest text-theme-secondary/40">
                                         {seg.carrier_code && <span className="text-theme-secondary/50">{seg.carrier_code} {seg.flight_number}</span>}
-                                        {seg.aircraft && <span className="flex items-center gap-1.5"><Plane size={10} className="text-theme-secondary/30"/> {seg.aircraft}</span>}
+                                        {aircraftName && <span className="flex items-center gap-1.5"><Plane size={10} className="text-theme-secondary/30"/> {aircraftName}</span>}
                                         {seg.duration && <span className="flex items-center gap-1.5"><Clock size={10} className="text-theme-secondary/30"/> {(seg.duration || '').toLowerCase().replace('pt','').replace('h','h ').replace('m','m')}</span>}
                                       </div>
                                     )}
@@ -297,29 +341,53 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                       <h5 className="font-black uppercase tracking-[0.2em] text-theme-primary flex items-center gap-2"><ShieldCheck size={16}/> Policies</h5>
                       <div className="space-y-1">
                         <div className="p-3 bg-theme-white rounded-sm border border-theme-secondary/5 flex justify-between items-center font-black uppercase text-[8px] tracking-widest">
-                          <span className="text-theme-secondary/40 flex items-center gap-2"><Luggage size={16}/> Baggage</span>
+                          <span className="text-theme-secondary/40 flex items-center gap-2"><Luggage size={16}/> Checked Bag</span>
                           <span className={totalCheckedBags > 0 ? "text-theme-secondary" : "text-theme-secondary/40"}>
                             {totalCheckedBags > 0 ? `${totalCheckedBags} Included` : 'Not Included'}
                           </span>
                         </div>
+                        
                         <div className="p-3 bg-theme-white rounded-sm border border-theme-secondary/5 flex justify-between items-center font-black uppercase text-[8px] tracking-widest">
-                          <span className="text-theme-secondary/40 flex items-center gap-2"><Briefcase size={16}/> Changes</span>
-                          <span className="text-emerald-500">Allowed</span>
+                          <span className="text-theme-secondary/40 flex items-center gap-2"><Briefcase size={16}/> Carry-on</span>
+                          <span className={totalCarryOnBags > 0 ? "text-theme-secondary" : "text-theme-secondary/40"}>
+                            {totalCarryOnBags > 0 ? `${totalCarryOnBags} Included` : 'Not Included'}
+                          </span>
+                        </div>
+
+                        <div className="p-3 bg-theme-white rounded-sm border border-theme-secondary/5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 font-black uppercase text-[8px] tracking-widest">
+                          <span className="text-theme-secondary/40 flex items-center gap-2"><RefreshCcw size={16}/> Cancellation</span>
+                          <span className={`${isRefundable ? (penaltyAmount ? 'text-amber-500' : 'text-emerald-500') : 'text-theme-error'} text-left sm:text-right`}>
+                            {!isRefundable 
+                              ? 'Non-Refundable' 
+                              : (penaltyAmount ? `Refundable (Fee: ${penaltyCurrency} ${penaltyAmount})` : 'Fully Refundable')
+                            }
+                          </span>
                         </div>
                       </div>
                     </div>
 
+                    {/* Rich Amenities Layout Extension */}
                     <div className="space-y-3">
                       <h5 className="font-black uppercase tracking-[0.2em] text-theme-primary flex items-center gap-2"><Gift size={16}/> Amenities</h5>
                       <div className="grid grid-cols-2 gap-2">
-                        {hasWifi && <BenefitIcon icon={<Wifi size={16} />} label="WiFi" />}
-                        {hasPower && <BenefitIcon icon={<BatteryCharging size={16} />} label="Power" />}
-                        {foodOption && <BenefitIcon icon={<Utensils size={16} />} label="Food" />}
-                        {!hasWifi && !hasPower && !foodOption && (
-                          <div className="col-span-2 p-3 bg-theme-white rounded-sm border border-theme-secondary/5">
-                            <span className="font-black text-[8px] uppercase tracking-widest text-theme-secondary/40">Standard Amenities</span>
-                          </div>
+                        {hasWifi ? (
+                          <BenefitIcon icon={<Wifi size={16} />} label="WiFi" />
+                        ) : (
+                          <BenefitIcon icon={<Wifi size={16} className="opacity-20" />} label="No WiFi" />
                         )}
+                        {hasPower ? (
+                          <BenefitIcon icon={<BatteryCharging size={16} />} label="Power Outlets" />
+                        ) : (
+                          <BenefitIcon icon={<BatteryCharging size={16} className="opacity-20" />} label="No Power" />
+                        )}
+                        {foodOption ? (
+                          <BenefitIcon icon={<Utensils size={16} />} label={foodOption} />
+                        ) : (
+                          <BenefitIcon icon={<Utensils size={16} className="opacity-20" />} label="Food for Purchase" />
+                        )}
+                        <BenefitIcon icon={<Briefcase size={16} />} label="Carry-on Allowed" />
+                        <BenefitIcon icon={<Plane size={16} />} label="In-Flight Ent." />
+                        <BenefitIcon icon={<CheckCircle2 size={16} />} label="Standard Seating" />
                       </div>
                     </div>
                   </div>
@@ -335,9 +403,9 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
 
 function BenefitIcon({ icon, label }: { icon: React.ReactNode, label: string }) {
   return (
-    <div className="flex items-center gap-2 p-3 bg-theme-white rounded-sm border border-theme-secondary/5">
-      <div className="text-theme-primary">{icon}</div>
-      <span className="font-black uppercase text-[8px] tracking-widest text-theme-secondary/60">{label}</span>
+    <div className="flex items-center gap-2 p-3 bg-theme-white rounded-sm border border-theme-secondary/5 shadow-sm overflow-hidden">
+      <div className="text-theme-primary shrink-0">{icon}</div>
+      <span className="font-black uppercase text-[8px] tracking-widest text-theme-secondary/60 truncate">{label}</span>
     </div>
   );
 }

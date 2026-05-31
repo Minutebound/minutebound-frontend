@@ -434,7 +434,7 @@ export default function SearchBar({
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-bold ">Children</div>
-                        <div className="text-[8px] text-theme-muted uppercase tracking-wider">Ages 0-11</div>
+                        <div className="text-[8px] text-theme-muted uppercase tracking-wider">Ages 2-11</div>
                       </div>
                       <SbCounter value={children} min={0} max={9} onChange={setChildren} />
                     </div>

@@ -334,7 +334,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Link
-                  href="/savedtrips"
+                  href="/savedItineraries"
                   className="group w-full rounded-[1rem] border-[1px] border-theme-secondary/10 bg-theme-white p-5 flex items-center justify-between cursor-pointer hover:border-theme-primary hover:bg-theme-primary/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary transition-all duration-300 shadow-sm"
                 >
                   <div className="flex items-center gap-4">

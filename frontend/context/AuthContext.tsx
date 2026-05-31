@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (token: string, username: string, email: string) => void;
   logout: () => void;
   isLoggedIn: boolean;
+  isLoading: boolean; // <--- ADDED: Loading state
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -16,16 +17,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // <--- ADDED: Starts as true
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = localStorage.getItem("username");
     const savedEmail = localStorage.getItem("email");
+    
     if (savedToken && savedUser) {
       setToken(savedToken);
       setUser(savedUser);
       if (savedEmail) setEmail(savedEmail);
     }
+    
+    // IMPORTANT: Tell the app we are done checking local storage
+    setIsLoading(false); 
   }, []);
 
   const login = (newToken: string, username: string, userEmail: string) => {
@@ -48,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, email, token, login, logout, isLoggedIn: !!token }}
+      value={{ user, email, token, login, logout, isLoggedIn: !!token, isLoading }}
     >
       {children}
     </AuthContext.Provider>

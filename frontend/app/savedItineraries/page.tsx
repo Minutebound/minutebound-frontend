@@ -41,9 +41,9 @@ interface SavedTrip {
   };
 }
 
-export default function SavedTripsPage() {
+export default function savedItinerariesPage() {
   const { isLoggedIn } = useAuth();
-  const [savedTrips, setSavedTrips] = useState<SavedTrip[]>([]);
+  const [savedItineraries, setsavedItineraries] = useState<SavedTrip[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState<SavedTrip | null>(null);
   
@@ -71,7 +71,7 @@ export default function SavedTripsPage() {
       if (!isLoggedIn) return;
       try {
         const data = await travelApi.getMyTrips();
-        setSavedTrips(data);
+        setsavedItineraries(data);
       } catch (error) {
         console.error("Failed to load trips:", error);
       } finally {
@@ -86,7 +86,7 @@ export default function SavedTripsPage() {
       return;
     try {
       await travelApi.deleteTrip(tripId);
-      setSavedTrips((prev) => prev.filter((t) => t.id !== tripId));
+      setsavedItineraries((prev) => prev.filter((t) => t.id !== tripId));
     } catch (error) {
       alert("Failed to delete trip.");
     }
@@ -101,7 +101,7 @@ export default function SavedTripsPage() {
         tripId,
         visibility
       );
-      setSavedTrips((prev) =>
+      setsavedItineraries((prev) =>
         prev.map((t) =>
           t.id === tripId
             ? {
@@ -223,7 +223,7 @@ export default function SavedTripsPage() {
               Saved Itineraries
             </h1>
             <p className="text-[12px] text-theme-secondary/50 font-black uppercase tracking-[0.2em] mt-2">
-              You have {savedTrips.length} saved trip{savedTrips.length !== 1 && "s"}. View, share, or delete them here.
+              You have {savedItineraries.length} saved trip{savedItineraries.length !== 1 && "s"}. View, share, or delete them here.
             </p>
           </div>
           <Link
@@ -238,7 +238,7 @@ export default function SavedTripsPage() {
           <div className="flex justify-center py-32">
             <div className="w-8 h-8 border-4 border-theme-primary/20 border-t-theme-primary rounded-full animate-spin"></div>
           </div>
-        ) : savedTrips.length === 0 ? (
+        ) : savedItineraries.length === 0 ? (
           <div className="bg-theme-white border-[1px] border-theme-secondary/10 p-16 rounded-[2rem] shadow-sm text-center flex flex-col items-center justify-center gap-4">
             <div className="w-20 h-20 bg-theme-secondary/5 rounded-full flex items-center justify-center text-theme-secondary/20">
               <MapIcon size={32} />
@@ -258,7 +258,7 @@ export default function SavedTripsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {savedTrips.map((trip) => (
+            {savedItineraries.map((trip) => (
               <div
                 key={trip.id}
                 className="bg-theme-white border-[1px] border-theme-secondary/10 rounded-[1.5rem] shadow-sm hover:shadow-xl hover:border-theme-primary/50 transition-all duration-300 overflow-hidden flex flex-col relative group"

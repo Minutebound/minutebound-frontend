@@ -246,7 +246,7 @@ export default function Navbar({
                         </Link>
 
                         <Link
-                          href="/savedtrips"
+                          href="/savedItineraries"
                           onClick={() => setIsDropdownOpen(false)}
                           className="group flex items-center gap-3 px-3 py-2.5 text-[14px] font-bold tracking-wide text-theme-secondary/80 hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
                         >
@@ -358,7 +358,7 @@ export default function Navbar({
                 </Link>
 
                 <Link
-                  href="/savedtrips"
+                  href="/savedItineraries"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="group flex items-center gap-4 px-4 py-3.5 text-[16px] font-bold tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-secondary/5 rounded-xl transition-all"
                 >

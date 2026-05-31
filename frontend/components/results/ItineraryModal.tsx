@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   X, PlaneTakeoff,Plane, Building2, MapPin, Calendar, Users, DollarSign, Download, Share2, 
   Loader2, Send, Car, Ticket, Sun, Camera, Save, Plus, CheckCircle2, Receipt, ShieldCheck, Clock, Leaf, Info,
-  CreditCard
+  CreditCard, Luggage, Wifi, BatteryCharging, Utensils, RefreshCcw, Briefcase
 } from "lucide-react";
 import { travelApi } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -203,15 +203,6 @@ export default function ItineraryModal({
     return diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
   };
 
-  const formatRoute = (cities: string[]) => {
-    if (!cities || cities.length === 0) return null;
-    const formattedCities = cities.map(c => c.split(',')[0].trim());
-    if (formattedCities.length <= 4) return formattedCities.join(" - ");
-    const start = formattedCities.slice(0, 2).join(" - ");
-    const end = formattedCities.slice(-2).join(" - ");
-    return `${start} ...... ${end}`;
-  };
-
   const destCityName = rawParams?.destination?.name?.split(",")[0] || rawParams?.destination?.city || "Destination";
   const originCityName = rawParams?.source?.name?.split(",")[0] || "Origin";
   const getFullTripTitle = () => originCityName ? `${originCityName} to ${destCityName}` : destCityName;
@@ -280,6 +271,36 @@ export default function ItineraryModal({
     } catch (e) { alert("Failed to send itinerary to email."); } 
     finally { setIsSharing(false); }
   };
+
+  // --- Pre-Calculate Duffel Flight Details ---
+  let totalCheckedBags = 0;
+  let totalCarryOnBags = 0;
+  let hasWifi = false;
+  let hasPower = false;
+  let foodOption = null;
+
+  if (flight && flight.itineraries) {
+    flight.itineraries.forEach((itin: any) => {
+      itin.segments?.forEach((seg: any) => {
+        if (seg.baggages && Array.isArray(seg.baggages)) {
+          const checked = seg.baggages.find((b:any) => b.type === 'checked')?.quantity || 0;
+          const carryOn = seg.baggages.find((b:any) => b.type === 'carry_on')?.quantity || 0;
+          if (checked > totalCheckedBags) totalCheckedBags = checked;
+          if (carryOn > totalCarryOnBags) totalCarryOnBags = carryOn;
+        } else {
+          if (seg.checked_bags > totalCheckedBags) totalCheckedBags = seg.checked_bags;
+          if (seg.carry_on_bags > totalCarryOnBags) totalCarryOnBags = seg.carry_on_bags;
+        }
+        if (seg.amenities?.wifi) hasWifi = true;
+        if (seg.amenities?.power_usb) hasPower = true;
+        if (seg.amenities?.food) foodOption = seg.amenities.food;
+      });
+    });
+  }
+
+  const isRefundable = flight?.refund_policy?.is_refundable ?? false;
+  const penaltyAmount = flight?.refund_policy?.penalty_amount;
+  const penaltyCurrency = flight?.refund_policy?.currency || flight?.currency;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-3 lg:p-3 overflow-hidden">
@@ -378,7 +399,6 @@ export default function ItineraryModal({
               </div>
             </div>
 
-            {/* ONLY RENDER SAVE BUTTON IF IT IS NOT A SAVED TRIP */}
             {!isSavedView && (
               <div className="w-full p-4 bg-theme-cool-white border-t border-theme-soft-slate shrink-0">
                 <button
@@ -429,6 +449,7 @@ export default function ItineraryModal({
                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-5 gap-4 min-w-0">
                          <div className="min-w-0 flex-1">
                             <span className="font-black text-lg sm:text-xl text-theme-secondary block truncate">{flight.airline_name}</span>
+                            
                             <div className="flex flex-wrap items-center gap-2 mt-2">
                                <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
                                  {flight.travel_class || "Economy"} Class
@@ -436,14 +457,40 @@ export default function ItineraryModal({
                                <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
                                  {flight.itineraries?.[0]?.segments?.length > 1 ? "Connecting" : "Direct"}
                                </span>
+                               
+                               {/* DUFFEL BADGES */}
                                {flight.carbon_emissions_kg && (
-                                 <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1">
+                                 <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1">
                                    <Leaf size={12} /> {flight.carbon_emissions_kg} kg CO₂
                                  </span>
                                )}
+                               {(totalCheckedBags > 0 || totalCarryOnBags > 0) && (
+                                 <span className="text-[10px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100 flex items-center gap-1">
+                                   <Luggage size={12} /> Bags Included
+                                 </span>
+                               )}
+                               {isRefundable ? (
+                                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 flex items-center gap-1">
+                                   <RefreshCcw size={12} /> {penaltyAmount ? `Fee: ${penaltyCurrency || '$'}${penaltyAmount}` : 'Refundable'}
+                                 </span>
+                               ) : (
+                                 <span className="text-[10px] font-black uppercase tracking-widest text-theme-error bg-theme-error/10 px-2 py-1 rounded border border-theme-error/20 flex items-center gap-1">
+                                   <X size={12} /> Non-Refundable
+                                 </span>
+                               )}
                             </div>
+
+                            {/* AMENITIES BADGES */}
+                            {(hasWifi || hasPower || foodOption) && (
+                               <div className="flex flex-wrap items-center gap-2 mt-2">
+                                 {hasWifi && <span className="text-[9px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Wifi size={10}/> WiFi</span>}
+                                 {hasPower && <span className="text-[9px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><BatteryCharging size={10}/> Power</span>}
+                                 {foodOption && <span className="text-[9px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Utensils size={10}/> Food</span>}
+                               </div>
+                            )}
+
                          </div>
-                         <span className="text-theme-primary font-black text-lg bg-theme-primary/10 px-3 py-1.5 rounded-lg inline-block w-fit shrink-0">
+                         <span className="text-theme-primary font-black text-lg bg-theme-primary/10 px-3 py-1.5 rounded-lg inline-block w-fit shrink-0 mt-2 sm:mt-0">
                            ${safeFloat(flight.price?.total || flight.price || 0).toFixed(2)}
                          </span>
                        </div>
@@ -456,7 +503,7 @@ export default function ItineraryModal({
                              <div key={idx} className="bg-theme-cool-white p-4 rounded-xl border border-theme-soft-slate">
                                <div className="flex flex-wrap justify-between items-center mb-3 pb-3 border-b border-theme-soft-slate gap-2">
                                  <span className="text-[12px] uppercase font-black text-theme-secondary/80 tracking-widest flex items-center gap-2">
-                                   {idx === 0 ? <PlaneTakeoff size={12}/> : <PlaneTakeoff size={12} className="rotate-180"/>} 
+                                
                                    {idx === 0 ? "Outbound" : "Return"} <span className="text-theme-secondary/40">•</span> {boundDate}
                                  </span>
                                  <div className="flex items-center gap-2">
@@ -475,6 +522,13 @@ export default function ItineraryModal({
                                  {(itin.segments || []).map((seg: any, sIdx: number) => {
                                    let layoverStr = null;
                                    if (sIdx > 0) layoverStr = getLayoverTime(itin.segments[sIdx - 1].arrival_time, seg.departure_time);
+                                   
+                                   // SAFE AIRCRAFT PARSING
+                                   let aircraftName = null;
+                                   if (seg.aircraft && String(seg.aircraft).toLowerCase() !== 'undefined' && String(seg.aircraft).toLowerCase() !== 'null') {
+                                     aircraftName = typeof seg.aircraft === 'object' ? seg.aircraft.name : seg.aircraft;
+                                   }
+
                                    return (
                                      <React.Fragment key={sIdx}>
                                        {layoverStr && (
@@ -491,7 +545,6 @@ export default function ItineraryModal({
                                              <p className="text-xs font-bold text-theme-light-gray mt-1 truncate">{seg.departure_airport_name || seg.departure_airport}</p>
                                            </div>
                                            
-                                           {/* Optimized Centered Flight/Aircraft Data (No extra bottom section) */}
                                            <div className="flex-1 flex flex-col items-center relative min-w-[60px] shrink-0 pt-1">
                                              <div className="w-full flex items-center relative">
                                                <div className="w-full h-[2px] bg-theme-soft-slate absolute z-0"></div>
@@ -499,9 +552,11 @@ export default function ItineraryModal({
                                                   <PlaneTakeoff size={14} />
                                                </div>
                                              </div>
-                                             <span className="text-[12px] font-black uppercase tracking-widest text-theme-light-gray whitespace-nowrap mt-1 text-center hidden sm:block">
-                                                {typeof seg.aircraft === 'string' ? seg.aircraft : seg.aircraft?.code || `${seg.carrierCode || seg.airline_code}${seg.flightNumber || seg.number}`}
-                                             </span>
+                                             {aircraftName && (
+                                               <span className="text-[9px] font-black uppercase tracking-widest text-theme-primary whitespace-nowrap mt-2 text-center bg-theme-primary/5 px-2 py-0.5 rounded border border-theme-primary/10 max-w-full truncate">
+                                                  {aircraftName}
+                                               </span>
+                                             )}
                                            </div>
                                            
                                            <div className="flex-1 text-right min-w-0">

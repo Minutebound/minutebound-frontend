@@ -161,7 +161,7 @@ export default function Footer() {
               <h4 className="font-black text-lg text-theme-white tracking-wide mb-2 uppercase ">Explore</h4>
               <FooterLink href="/" text="Home" />
               <FooterLink href="/" text="Trip Planner" />
-              <FooterLink href="/savedtrips" text="Saved Itineraries" />
+              <FooterLink href="/savedItineraries" text="Saved Itineraries" />
               <FooterLink href="/profile" text="Your Account" />
             </div>
 
