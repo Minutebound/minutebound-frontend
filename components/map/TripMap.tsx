@@ -15,13 +15,13 @@ interface TripMapProps {
 // --- HELPER: Builds the beautiful hover card HTML ---
 const buildHoverCard = (name: string, category: string, detailLeft: string, detailRight: string) => {
   return `
-    <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none bg-theme-white text-theme-secondary p-3 rounded-2xl shadow-2xl z-50 flex flex-col gap-1 min-w-[160px] max-w-[216px] border border-theme-secondary/10 translate-y-2 group-hover:translate-y-0">
+    <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none bg-theme-white text-theme-secondary p-3 rounded-[16px] shadow-[16px] z-50 flex flex-col gap-1 min-w-[160px] max-w-[216px] border border-theme-secondary/10 translate-y-2 group-hover:translate-y-0">
       <span class="font-black  leading-tight line-clamp-2 break-words">${name}</span>
-      ${category ? `<span class="font-bold text-[12px] uppercase tracking-widest text-theme-primary line-clamp-1">${category}</span>` : ''}
+      ${category ? `<span class="font-bold text-[16px] uppercase tracking-widest text-theme-primary line-clamp-1">${category}</span>` : ''}
       ${(detailLeft || detailRight) ? `
       <div class="flex items-center justify-between mt-1 pt-1.5 border-t border-theme-secondary/10">
-         <span class="font-black text-[12px]text-theme-secondary">${detailLeft || ''}</span>
-         <span class="font-bold text-[12px] text-theme-secondary/50">${detailRight || ''}</span>
+         <span class="font-black text-[16px]text-theme-secondary">${detailLeft || ''}</span>
+         <span class="font-bold text-[16px] text-theme-secondary/50">${detailRight || ''}</span>
       </div>` : ''}
       <div class="w-3 h-3 bg-theme-white border-b border-r border-theme-secondary/10 absolute -bottom-1.5 left-1/2 -translate-x-1/2 rotate-45"></div>
     </div>
@@ -210,8 +210,8 @@ export default function TripMap({ mapData }: TripMapProps) {
 
           const baseClass = "w-8 h-8 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer transition-all duration-300";
           el.className = isSelected
-            ? `${baseClass} bg-theme-primary text-theme-white rounded-xl border-2 border-theme-primary shadow-xl z-30`
-            : `${baseClass} bg-theme-white text-theme-secondary fill-theme-secondary rounded-xl border border-theme-secondary/20 hover:bg-theme-secondary/5 hover:shadow-md transition-all`;
+            ? `${baseClass} bg-theme-primary text-theme-white rounded-[16px] border-2 border-theme-primary shadow-[16px] z-30`
+            : `${baseClass} bg-theme-white text-theme-secondary fill-theme-secondary rounded-[16px] border border-theme-secondary/20 hover:bg-theme-secondary/5 hover:shadow-md transition-all`;
 
           el.innerHTML = `${iconHtml} ${hoverCard}`;
           const marker = new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
@@ -240,8 +240,8 @@ export default function TripMap({ mapData }: TripMapProps) {
 
           const baseClass = "w-8 h-8 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer transition-all duration-300";
           el.className = isSelected
-             ? `${baseClass} bg-theme-info text-theme-white rounded-2xl border-2 border-theme-info shadow-xl z-30`
-            : `${baseClass} bg-theme-white text-theme-emerald rounded-2xl border border-theme-info/20 opacity-80 hover:opacity-100 hover:shadow-md`;
+             ? `${baseClass} bg-theme-info text-theme-white rounded-[16px] border-2 border-theme-info shadow-[16px] z-30`
+            : `${baseClass} bg-theme-white text-theme-emerald rounded-[16px] border border-theme-info/20 opacity-80 hover:opacity-100 hover:shadow-md`;
 
           el.innerHTML = `${iconHtml} ${hoverCard}`;
           const marker = new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
@@ -272,7 +272,7 @@ export default function TripMap({ mapData }: TripMapProps) {
 
           const baseClass = "w-8 h-8 flex items-center justify-center shadow-sm z-20 hover:z-[100] group relative cursor-pointer transition-all duration-300";
           el.className = isSelected
-            ? `${baseClass} bg-theme-info text-theme-white rounded-lg border-2 border-theme-info shadow-xl z-30`
+            ? `${baseClass} bg-theme-info text-theme-white rounded-lg border-2 border-theme-info shadow-[16px] z-30`
             : `${baseClass} bg-theme-secondary/80 text-theme-info rounded-lg border border-theme-info/20 opacity-80 hover:opacity-100 hover:shadow-md`;
 
           el.innerHTML = `${iconHtml} ${hoverCard}`;
@@ -409,7 +409,7 @@ export default function TripMap({ mapData }: TripMapProps) {
   };
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+    <div className="relative w-full h-full rounded-[16px] overflow-hidden">
       <div ref={mapContainer} className="w-full h-full" />
     </div>
   );

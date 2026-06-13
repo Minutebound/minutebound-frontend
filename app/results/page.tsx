@@ -112,7 +112,7 @@ export default function Results() {
       />
 
       {/* STICKY SEARCH BAR (Spans full width at top) */}
-      <div className="sticky top-0 w-full z-[110] border-b border-theme-secondary/10 transition-all">
+      <div className="sticky top-0 w-full z-[110]">
         <SearchBar
           onSearch={handleSearch}
           onSearchStart={() => {
@@ -127,7 +127,7 @@ export default function Results() {
       </div>
 
       {/* THE 85% MASTER WRAPPER (Holds both List and Map) */}
-      <main className="flex-1 flex w-[100%] max-w-[1800px] mx-auto relative bg-theme-white shadow-2xl border-x border-theme-secondary/10">
+      <main className="flex-1 flex w-[100%] max-w-[1800px] mx-auto relative bg-theme-white shadow-[16px]">
         
         {/* LEFT PANEL: 60% of the 85% Wrapper */}
         <div className={`w-full md:w-[60%] ${mapOpen && !loading ? "hidden md:block" : ""}`}>

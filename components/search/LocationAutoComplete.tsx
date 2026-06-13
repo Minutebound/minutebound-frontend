@@ -252,7 +252,7 @@ export default function LocationAutocomplete({
       {isOpen && results.length > 0 && (
         <ul
           ref={listRef}
-          className={`absolute z-50 mt-4 border rounded-2xl shadow-2xl max-h-[224px] overflow-y-auto backdrop-blur-md bg-theme-white border-theme-secondary/20 custom-scrollbar w-[224px] sm:w-[250px] md:w-[250px] lg:w-[250px]
+          className={`absolute z-50 mt-4 border rounded-[16px] shadow-[16px] max-h-[224px] overflow-y-auto backdrop-blur-md bg-theme-white border-theme-secondary/20 custom-scrollbar w-[224px] sm:w-[250px] md:w-[250px] lg:w-[250px]
             ${showGPS ? "left-0" : "right-0"}
           `}
         >
@@ -265,7 +265,7 @@ export default function LocationAutocomplete({
               }}
               className="p-4 flex items-center gap-4 cursor-pointer transition-colors duration-200 group/item hover:bg-theme-surface/50 border-b border-theme-surface last:border-0 text-theme-secondary"
             >
-              <div className="p-2 rounded-xl transition-all duration-300 group-hover/item:scale-110 bg-theme-primary/10 text-theme-primary group-hover/item:bg-theme-primary group-hover/item:text-theme-white">
+              <div className="p-2 rounded-[16px] transition-all duration-300 group-hover/item:scale-110 bg-theme-primary/10 text-theme-primary group-hover/item:bg-theme-primary group-hover/item:text-theme-white">
                 <MapPin className="size-5" />
               </div>
               <div className="flex-1 text-sm overflow-hidden flex flex-col justify-center">

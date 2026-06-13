@@ -89,7 +89,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-6 space-y-6 animate-in fade-in duration-300">
+      <div className="max-w-[24px] mx-auto px-4 pt-6 space-y-6 animate-in fade-in duration-300">
         
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2  font-medium text-gray-500">
@@ -102,9 +102,9 @@ export default function OrderDetailsPage() {
 
         {/* Title & Actions Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-gray-200">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-[24px] font-black text-gray-900 tracking-tight flex items-center gap-3">
             Flight PNR: {pnr} 
-            {isTestMode && <span className="bg-yellow-100 text-yellow-800 text-[12px]font-bold px-2 py-1 rounded-md uppercase tracking-widest">Test</span>}
+            {isTestMode && <span className="bg-yellow-100 text-yellow-800 text-[16px]font-bold px-2 py-1 rounded-md uppercase tracking-widest">Test</span>}
           </h1>
           <div className="flex flex-wrap items-center gap-3">
             <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg  font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
@@ -120,7 +120,7 @@ export default function OrderDetailsPage() {
         </div>
 
         {isTestMode && (
-          <div className="bg-[#FFFBEB] border border-[#FEF3C7] p-4 rounded-xl flex items-center gap-3 text-[#B45309]">
+          <div className="bg-[#FFFBEB] border border-[#FEF3C7] p-4 rounded-[16px] flex items-center gap-3 text-[#B45309]">
             <AlertTriangle size={18} className="shrink-0" />
             <p className=" font-medium"><strong>You are in test mode:</strong> No live orders will be created, nor money change hands, while test mode is enabled</p>
           </div>
@@ -133,7 +133,7 @@ export default function OrderDetailsPage() {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Journey Details */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <h2 className=" font-bold text-gray-900">Journey details</h2>
               </div>
@@ -161,7 +161,7 @@ export default function OrderDetailsPage() {
                           {carrier.logo_symbol_url ? (
                             <img src={carrier.logo_symbol_url} alt={carrier.name} className="h-5 object-contain" />
                           ) : <Plane size={18} className="text-theme-primary" />}
-                          <span className="font-black text-gray-900 text-[12px]tracking-wide">{carrier.name}</span>
+                          <span className="font-black text-gray-900 text-[16px]tracking-wide">{carrier.name}</span>
                         </div>
                       </div>
 
@@ -194,12 +194,12 @@ export default function OrderDetailsPage() {
             {/* HIGHLIGHTED POLICIES */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                   <h3 className=" font-bold text-gray-900">Order change policy</h3>
                 </div>
                 <div className="p-6">
-                  <div className={`flex items-start gap-3 p-4 rounded-xl border ${changeCond?.allowed ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                  <div className={`flex items-start gap-3 p-4 rounded-[16px] border ${changeCond?.allowed ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
                     {changeCond?.allowed ? <CheckCircle2 size={18} className="text-emerald-600 shrink-0" /> : <XCircle size={18} className="text-gray-400 shrink-0" />}
                     <p className=" font-bold leading-relaxed">
                       {changeCond?.allowed 
@@ -210,12 +210,12 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                   <h3 className=" font-bold text-gray-900">Order refund policy</h3>
                 </div>
                 <div className="p-6">
-                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${refundCond?.allowed ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
+                   <div className={`flex items-start gap-3 p-4 rounded-[16px] border ${refundCond?.allowed ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
                     {refundCond?.allowed ? <CheckCircle2 size={18} className="text-emerald-600 shrink-0" /> : <XCircle size={18} className="text-gray-400 shrink-0" />}
                     <p className=" font-bold leading-relaxed">
                       {refundCond?.allowed 
@@ -229,7 +229,7 @@ export default function OrderDetailsPage() {
             </div>
 
             {/* Passengers */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <h2 className=" font-bold text-gray-900">Passengers</h2>
               </div>
@@ -250,30 +250,30 @@ export default function OrderDetailsPage() {
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4 mb-6">
                         <div>
-                          <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Name</p>
+                          <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Name</p>
                           {/* Title is Capitalized Here */}
                           <p className=" font-medium text-gray-900">{formatTitle(p.title)} {p.given_name} {p.family_name}</p>
                         </div>
                         <div>
-                          <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">E-mail</p>
+                          <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">E-mail</p>
                           <p className=" font-medium text-gray-900 break-words">{p.email || 'Not provided'}</p>
                         </div>
                         <div>
-                          <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Date of birth</p>
+                          <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Date of birth</p>
                           <p className=" font-medium text-gray-900">{formatDOB(p.born_on)}</p>
                         </div>
                         <div>
-                          <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Gender</p>
+                          <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Gender</p>
                           <p className=" font-medium text-gray-900 capitalize">{p.gender === 'm' ? 'Male' : p.gender === 'f' ? 'Female' : p.gender}</p>
                         </div>
                         <div>
-                          <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Contact number</p>
+                          <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Contact number</p>
                           <p className=" font-medium text-gray-900">{p.phone_number}</p>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-[12px]font-bold text-gray-500 uppercase mb-2">Flight information</p>
+                        <p className="text-[16px]font-bold text-gray-500 uppercase mb-2">Flight information</p>
                         <p className=" font-medium text-gray-900 mb-1">
                           {firstSeg?.origin?.iata_code} to {order.slices[0]?.segments[order.slices[0].segments.length-1]?.destination?.iata_code} on {formatFullDate(firstSeg?.departing_at)} at {formatTime(firstSeg?.departing_at)}
                         </p>
@@ -292,31 +292,31 @@ export default function OrderDetailsPage() {
           {/* RIGHT COLUMN: Summary, Billing, Timeline */}
           <div className="space-y-6">
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <h2 className=" font-bold text-gray-900">Summary</h2>
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Order ID</p>
+                  <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Order ID</p>
                   <p className=" font-mono text-gray-900">{order.id}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Status</p>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[12px]font-bold bg-emerald-100 text-emerald-800">
+                    <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Status</p>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[16px]font-bold bg-emerald-100 text-emerald-800">
                       Confirmed
                     </span>
                   </div>
                   <div>
-                    <p className="text-[12px]font-bold text-gray-500 uppercase mb-1">Airline</p>
+                    <p className="text-[16px]font-bold text-gray-500 uppercase mb-1">Airline</p>
                     <p className=" font-medium text-gray-900">{airlineOwner}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <h2 className=" font-bold text-gray-900">Billing summary</h2>
               </div>
@@ -350,7 +350,7 @@ export default function OrderDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
                 <h2 className=" font-bold text-gray-900">Timeline</h2>
               </div>
@@ -366,7 +366,7 @@ export default function OrderDetailsPage() {
                     <p className=" font-medium text-gray-900">
                       <strong>{primaryName}</strong> created this order.
                     </p>
-                    <p className="text-[12px]text-gray-500 mt-1">
+                    <p className="text-[16px]text-gray-500 mt-1">
                       {order.created_at ? formatFullDate(order.created_at) + ', ' + formatTime(order.created_at) : 'Just now'}
                     </p>
                   </div>
@@ -378,21 +378,21 @@ export default function OrderDetailsPage() {
         </div>
 
         <div className="pt-8 mt-8 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl p-6 border border-dashed border-gray-300 flex flex-col justify-between gap-4">
+          <div className="bg-white rounded-[16px] p-6 border border-dashed border-gray-300 flex flex-col justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2"><Building2 size={18} className="text-blue-600"/> Accommodation</h3>
               <p className=" text-gray-500 mt-1">Need a place to stay in {destIata}? Add it to your itinerary.</p>
             </div>
-            <Link href={`/?tab=stays&dest=${destIata}`} className="self-start px-4 py-2 bg-blue-50 text-blue-700 font-bold text-[12px]uppercase tracking-widest rounded-lg hover:bg-blue-100 transition-colors">
+            <Link href={`/?tab=stays&dest=${destIata}`} className="self-start px-4 py-2 bg-blue-50 text-blue-700 font-bold text-[16px]uppercase tracking-widest rounded-lg hover:bg-blue-100 transition-colors">
               Add a Hotel
             </Link>
           </div>
-          <div className="bg-white rounded-xl p-6 border border-dashed border-gray-300 flex flex-col justify-between gap-4">
+          <div className="bg-white rounded-[16px] p-6 border border-dashed border-gray-300 flex flex-col justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2"><Ticket size={18} className="text-amber-600"/> Tours & Experiences</h3>
               <p className=" text-gray-500 mt-1">Discover top-rated tours and attractions for your trip.</p>
             </div>
-            <Link href={`/?tab=tours&dest=${destIata}`} className="self-start px-4 py-2 bg-amber-50 text-amber-700 font-bold text-[12px]uppercase tracking-widest rounded-lg hover:bg-amber-100 transition-colors">
+            <Link href={`/?tab=tours&dest=${destIata}`} className="self-start px-4 py-2 bg-amber-50 text-amber-700 font-bold text-[16px]uppercase tracking-widest rounded-lg hover:bg-amber-100 transition-colors">
               Browse Tours
             </Link>
           </div>

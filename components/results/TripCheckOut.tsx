@@ -294,27 +294,27 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
         </h3>
         
         {passengers.map((p: any, idx: number) => (
-          <div key={p.id} className="bg-theme-white p-6 rounded-2xl border border-theme-soft-slate shadow-sm space-y-4 relative overflow-hidden">
+          <div key={p.id} className="bg-theme-white p-6 rounded-[16px] border border-theme-soft-slate shadow-sm space-y-4 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-theme-primary"></div>
-            <h4 className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mb-2">
+            <h4 className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mb-2">
               {p.type === 'child' ? 'Child' : 'Adult'} {idx + 1}
             </h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">First Name</label>
-                <input type="text" value={p.firstName} onChange={(e) => handlePassengerChange(idx, 'firstName', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
+                <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">First Name</label>
+                <input type="text" value={p.firstName} onChange={(e) => handlePassengerChange(idx, 'firstName', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
               </div>
               <div>
-                <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Last Name</label>
-                <input type="text" value={p.lastName} onChange={(e) => handlePassengerChange(idx, 'lastName', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
+                <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Last Name</label>
+                <input type="text" value={p.lastName} onChange={(e) => handlePassengerChange(idx, 'lastName', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
               </div>
               <div>
-                <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Date of Birth</label>
-                <input type="date" value={p.dob} onChange={(e) => handlePassengerChange(idx, 'dob', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
+                <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Date of Birth</label>
+                <input type="date" value={p.dob} onChange={(e) => handlePassengerChange(idx, 'dob', e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
               </div>
               <div>
-                <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Gender</label>
-                <select value={p.gender} onChange={(e) => handlePassengerChange(idx, 'gender', e.target.value)} className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary">
+                <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Gender</label>
+                <select value={p.gender} onChange={(e) => handlePassengerChange(idx, 'gender', e.target.value)} className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary">
                   <option value="MALE">Male</option>
                   <option value="FEMALE">Female</option>
                 </select>
@@ -325,28 +325,28 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
       </div>
 
       {/* CONTACT INFO & BILLING STATE */}
-      <div className="bg-theme-white p-6 rounded-2xl border border-theme-soft-slate shadow-sm space-y-4">
-        <h3 className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mb-2 flex items-center gap-2">
+      <div className="bg-theme-white p-6 rounded-[16px] border border-theme-soft-slate shadow-sm space-y-4">
+        <h3 className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mb-2 flex items-center gap-2">
            Contact Details & Billing Location
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Email (For Tickets & Receipts)</label>
-            <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
+            <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Email (For Tickets & Receipts)</label>
+            <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
           </div>
           <div className="col-span-2 sm:col-span-1">
-            <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Mobile Number</label>
-            <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
+            <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Mobile Number</label>
+            <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] px-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary" />
           </div>
           <div className="col-span-2 sm:col-span-1">
-            <label className="block text-[12px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Billing State</label>
+            <label className="block text-[16px] font-black text-theme-secondary/50 uppercase tracking-widest mb-1">Billing State</label>
             <div className="relative">
               <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-theme-light-gray" />
               <select 
                 value={billingState} 
                 onChange={(e) => setBillingState(e.target.value)} 
                 required 
-                className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-xl pl-10 pr-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary appearance-none cursor-pointer"
+                className="w-full bg-theme-cool-white border border-theme-soft-slate rounded-[16px] pl-10 pr-4 py-3  font-bold text-theme-secondary focus:outline-none focus:border-theme-primary appearance-none cursor-pointer"
               >
                 <option value="" disabled>Select State</option>
                 {US_STATES.map((state) => (
@@ -359,13 +359,13 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
       </div>
 
       {/* PAYMENT & STRIPE CARD ELEMENT */}
-      <div className={`bg-theme-white p-6 rounded-2xl border shadow-sm space-y-4 transition-all ${isSOTRestricted ? "border-theme-error bg-theme-error/5" : "border-theme-soft-slate"}`}>
+      <div className={`bg-theme-white p-6 rounded-[16px] border shadow-sm space-y-4 transition-all ${isSOTRestricted ? "border-theme-error bg-theme-error/5" : "border-theme-soft-slate"}`}>
         <div className="flex justify-between items-center">
           <h3 className="font-black text-theme-secondary tracking-tight flex items-center gap-2">
             <CreditCard className="text-theme-primary" size={18}/> Secure Payment
           </h3>
           
-          <div className="flex items-center gap-1.5 text-[12px] font-black uppercase tracking-widest">
+          <div className="flex items-center gap-1.5 text-[16px] font-black uppercase tracking-widest">
             {detectedState && detectedState !== "Unknown" ? (
               <>
                 <MapPin size={18} className={isSOTRestricted ? "text-theme-error" : "text-theme-success"} />
@@ -379,7 +379,7 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
           </div>
         </div>
         
-        <div className={`p-4 rounded-xl bg-theme-cool-white border ${isSOTRestricted ? "border-theme-error/50" : "border-theme-soft-slate"}`}>
+        <div className={`p-4 rounded-[16px] bg-theme-cool-white border ${isSOTRestricted ? "border-theme-error/50" : "border-theme-soft-slate"}`}>
           <CardElement 
             onChange={(e) => {
               if (e.value.postalCode) {
@@ -392,14 +392,14 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
                 setCardZip("");
               }
             }}
-            options={{ style: { base: { fontSize: '14px', color: '#111827', fontFamily: 'system-ui, -apple-system, sans-serif', fontWeight: 'bold', '::placeholder': { color: '#9CA3AF' } }, invalid: { color: '#EF4444' } } }} 
+            options={{ style: { base: { fontSize: '16px', color: '#111827', fontFamily: 'system-ui, -apple-system, sans-serif', fontWeight: 'bold', '::placeholder': { color: '#9CA3AF' } }, invalid: { color: '#EF4444' } } }} 
           />
         </div>
 
         {isSOTRestricted && (
           <div className="flex items-start gap-2 text-theme-error mt-2 px-1 animate-in fade-in zoom-in duration-300">
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
-            <p className="text-xs font-bold leading-tight">
+            <p className="text-[16px] font-bold leading-tight">
               Due to Seller of Travel laws, we cannot accept payments registered in {SOT_STATES.includes(detectedState) ? detectedState : billingState}. Please use a different card or billing state.
             </p>
           </div>
@@ -409,7 +409,7 @@ const PaymentForm = ({ clientSecret, activeFlightOffer, grandTotal, onBookingCom
       <button
         type="submit"
         disabled={!stripe || isProcessing || isSOTRestricted || !cardZip}
-        className="w-full flex items-center justify-center gap-2 py-4 bg-theme-primary text-theme-white rounded-xl font-black  uppercase tracking-widest hover:bg-theme-primary/90 transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-theme-light-gray"
+        className="w-full flex items-center justify-center gap-2 py-4 bg-theme-primary text-theme-white rounded-[16px] font-black  uppercase tracking-widest hover:bg-theme-primary/90 transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-theme-light-gray"
       >
         {isProcessing ? <Loader2 size={18} className="animate-spin" /> : <Lock size={18} />}
         {isProcessing ? (processStatus || "Processing Securely...") : `Pay $${grandTotal.toFixed(2)}`}
@@ -486,14 +486,14 @@ export default function TripCheckout({ flightOffer, grandTotal, onPriceConfirmed
   };
 
   return (
-    <div className="w-full flex flex-col h-full bg-theme-cool-white relative rounded-b-2xl overflow-hidden">
+    <div className="w-full flex flex-col h-full bg-theme-cool-white relative rounded-b-[16px] overflow-hidden">
       {!isExpanded ? (
         <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
           <div className="text-center sm:text-left flex flex-col">
             <span className=" uppercase tracking-widest text-theme-secondary/50 font-black mb-0.5">Total Due Now</span>
-            <span className=" sm:text-3xl font-black text-theme-primary leading-none">${grandTotal.toFixed(2)}</span>
+            <span className=" sm:text-[24px] font-black text-theme-primary leading-none">${grandTotal.toFixed(2)}</span>
           </div>
-          <button onClick={() => handleInitializeCheckout(activeFlightOffer, false)} className="px-8 py-4 bg-theme-primary text-theme-white font-black  uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto flex items-center justify-center gap-2">
+          <button onClick={() => handleInitializeCheckout(activeFlightOffer, false)} className="px-8 py-4 bg-theme-primary text-theme-white font-black  uppercase tracking-widest rounded-[16px] hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto flex items-center justify-center gap-2">
             <ShieldCheck size={18} /> Confirm & Check Out
           </button>
         </div>
@@ -504,7 +504,7 @@ export default function TripCheckout({ flightOffer, grandTotal, onPriceConfirmed
               {step === "SUCCESS" ? "Booking Complete" : "Complete Booking"}
             </h2>
             {step !== "SUCCESS" && (
-              <button onClick={() => { setIsExpanded(false); onExpandedChange(false); }} className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 hover:text-theme-secondary transition-colors px-3 py-1.5 border border-theme-soft-slate rounded-lg bg-theme-white shadow-sm">
+              <button onClick={() => { setIsExpanded(false); onExpandedChange(false); }} className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 hover:text-theme-secondary transition-colors px-3 py-1.5 border border-theme-soft-slate rounded-lg bg-theme-white shadow-sm">
                 Cancel
               </button>
             )}
@@ -518,12 +518,12 @@ export default function TripCheckout({ flightOffer, grandTotal, onPriceConfirmed
           )}
 
           {step === "ERROR" && (
-            <div className="bg-theme-error/5 border border-theme-error/30 rounded-2xl p-6 flex items-start gap-4 text-theme-error shadow-sm">
+            <div className="bg-theme-error/5 border border-theme-error/30 rounded-[16px] p-6 flex items-start gap-4 text-theme-error shadow-sm">
               <AlertCircle className="shrink-0 mt-0.5" size={24} />
               <div>
                 <h4 className="font-black ">Checkout Failed</h4>
-                <p className=" font-bold mt-1.5 opacity-90">{errorMsg}</p>
-                <button onClick={() => handleInitializeCheckout(activeFlightOffer, false)} className="mt-4 text-[12px] font-black uppercase tracking-widest underline hover:opacity-70 transition-opacity">Try Again</button>
+                {/* <p className=" font-bold mt-1.5 opacity-90">{errorMsg}</p> */}
+                <button onClick={() => handleInitializeCheckout(activeFlightOffer, false)} className="mt-4 text-[16px] font-black uppercase tracking-widest underline hover:opacity-70 transition-opacity">Try Again</button>
               </div>
             </div>
           )}
@@ -531,7 +531,7 @@ export default function TripCheckout({ flightOffer, grandTotal, onPriceConfirmed
           {step === "READY" && clientSecret && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {warningMsg && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4 flex items-start gap-3 text-amber-700 shadow-sm animate-in fade-in zoom-in duration-300">
+                <div className="bg-amber-50 border border-amber-200 rounded-[16px] p-5 mb-4 flex items-start gap-3 text-amber-700 shadow-sm animate-in fade-in zoom-in duration-300">
                   <Info className="shrink-0 mt-0.5 text-amber-500" size={18} />
                   <div className=" font-bold">{warningMsg}</div>
                 </div>

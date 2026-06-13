@@ -152,11 +152,11 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
     <div className="w-full flex flex-col min-h-screen">      
       
       {/* Ensure top offset aligns perfectly under your compact SearchBar */}
-      <div className="sticky top-[78px] z-[50] bg-theme-white transition-all">
+      <div className="sticky top-[80px] z-[50] bg-theme-white transition-all">
         
         <div className="flex justify-between items-center m-2">
           <div>
-            <h1 className=" md:text-[26px] font-black text-theme-secondary tracking-tight">
+            <h1 className=" text-[16px] lg:text-[24px] font-black text-theme-secondary uppercase">
               {loading ? "Planning..." : "Trip Planner"}
             </h1>
           </div>
@@ -165,7 +165,7 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
             <button
               onClick={onOpenItinerary}
               disabled={!canGenerateItinerary}
-              className={`flex items-center gap-2 px-5 py-2 mt-2 uppercase font-bold tracking-wider rounded-xl transition-all active:scale-95 ${
+              className={`flex items-center gap-2 px-5 py-2 mt-2 uppercase font-bold tracking-wider rounded-lg transition-all active:scale-95 ${
                 canGenerateItinerary 
                   ? "bg-theme-primary hover:bg-theme-primary text-theme-white shadow-lg shadow-theme-secondary/20" 
                   : "bg-theme-surface text-theme-secondary/40 cursor-not-allowed border border-theme-secondary/10"
@@ -177,13 +177,13 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 p-3 border border-red-100 rounded-xl mb-2  font-bold shadow-sm">
+          <div className="bg-red-50 text-red-700 p-3 border border-red-100 rounded-[16px] mb-2  font-bold shadow-sm">
             {error}
           </div>
         )}
 
         {isSOT && (
-          <div className="bg-amber-50 text-amber-800 p-2.5 border border-amber-200 rounded-xl mb-2 text-[12px] font-bold shadow-sm flex items-center gap-2">
+          <div className="bg-amber-50 text-amber-800 p-2.5 border border-amber-200 rounded-[16px] mb-2 text-[16px] font-bold shadow-sm flex items-center gap-2">
             <AlertCircle size={18} className="text-amber-600" />
             <span>Viewing Affiliate Results (Required by regional Seller of Travel conditions).</span>
           </div>
@@ -210,14 +210,14 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
                     <span className=" font-bold tracking-wide flex items-center">
                       {tab.label}
                       {badgeCount > 0 && (
-                        <span className="ml-1.5 bg-theme-primary text-theme-white text-[12px] font-black px-1.5 py-0.5 rounded-full leading-none translate-y-[-1px] shadow-sm">
+                        <span className="ml-1.5 bg-theme-primary text-theme-white text-[16px] font-black px-1.5 py-0.5 rounded-full leading-none translate-y-[-1px] shadow-sm">
                           {badgeCount}
                         </span>
                       )}
                     </span>
                     
                     {isActive && (
-                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-theme-primary rounded-t-full shadow-[0_-2px_12px_rgba(var(--theme-primary-rgb),0.3)]" />
+                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-theme-primary rounded-t-full shadow-[0_-2px_16px_rgba(var(--theme-primary-rgb),0.3)]" />
                     )}
                   </button>
                 );
@@ -234,7 +234,7 @@ const TripResults: React.FC<TripResultsProps> = ({ data, loading, error, onOpenI
           </div>
         ) : !data ? (
           <div className="flex flex-col items-center justify-center py-24 md:py-32 bg-theme-cool-white w-full rounded-[2rem] mt-4">
-            <p className="text-[12px] font-black uppercase tracking-[0.15em] text-theme-secondary/70 text-center px-4">
+            <p className="text-[16px] font-black uppercase tracking-[0.15em] text-theme-secondary/70 text-center px-4">
               Awaiting your search details...
             </p>
           </div>

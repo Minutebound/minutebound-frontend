@@ -92,17 +92,17 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
         <div className="relative z-10 w-full p-6 md:p-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-          <div className="flex flex-col gap-2 max-w-2xl">
-            <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[12px] font-black uppercase tracking-widest rounded-full w-max border border-white/20">
+          <div className="flex flex-col gap-2 max-w-[16px]">
+            <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[16px] font-black uppercase tracking-widest rounded-full w-max border border-white/20">
               Trip Overview
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none drop-shadow-md">
+            <h2 className="text-[24px] md:text-[24px] lg:text-[24px] font-black text-white drop-shadow-md whitespace-nowrap">
               {destination}
             </h2>
             {source && (
-              <div className="flex items-center gap-2 text-white/80 mt-1 font-bold  md:text-base drop-shadow-sm">
+              <div className="flex items-center gap-2 text-white/80 mt-1 font-bold  md:text-base drop-shadow-sm whitespace-nowrap">
                 <MapPin size={16} className="text-white" />
-                <span>Traveling from {source}</span>
+                <span> From {source}</span>
               </div>
             )}
           </div>
@@ -128,20 +128,20 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
       {/* 2. ABOUT & ATMOSPHERE GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Atmosphere Section */}
+        {/* Weather Section */}
         <div className="flex flex-col w-full gap-1.5 md:col-span-1">
-          <label className="text-[12px] lg:text-[12px] uppercase font-black tracking-widest text-theme-secondary/60 px-4">Weather</label>
-          <div className="relative overflow-hidden rounded-[2rem] bg-theme-white border-[1px] border-theme-secondary/10 p-6 md:p-8 shadow-sm h-full flex flex-col justify-between group hover:border-theme-primary transition-all duration-300">
+          <label className="text-[16px] lg:text-[16px] uppercase font-black tracking-widest text-theme-secondary/60 px-4">Weather</label>
+          <div className="relative overflow-hidden rounded-[2rem] bg-theme-white border-[1px] border-theme-secondary/10 p-6 md:p-8 shadow-sm h-full flex flex-col justify-between group transition-all duration-300">
             <div className="absolute -top-10 -right-10 p-4 opacity-[0.08] pointer-events-none transition-transform duration-500 group-hover:scale-110">
               <span className="text-[150px]">{getWeatherEmoji(condition)}</span>
             </div>
             <div className="flex items-end gap-3 relative z-10 mb-6 mt-4 md:mt-0">
-              <div className="text-5xl md:text-6xl font-black text-theme-secondary tracking-tighter">
+              <div className="text-5xl font-black text-theme-secondary tracking-tighter">
                 {tempDisplay}°
               </div>
               <div className="pb-1 text-theme-secondary/60 font-bold  md:text-base capitalize">{condition}</div>
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[1rem] bg-theme-primary/5 text-theme-primary text-[12px] font-black border border-theme-primary/10 backdrop-blur-md uppercase tracking-widest w-fit">
+            <div className="inline-flex text-[12px] items-center gap-2 px-4 py-2.5 rounded-[1rem] bg-theme-primary/5 text-theme-primary font-black border border-theme-primary/10 backdrop-blur-md uppercase tracking-widest w-fit">
               Best Month: {idealMonth}
             </div>
           </div>
@@ -149,9 +149,9 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
 
         {/* About Section */}
         <div className="flex flex-col w-full gap-1.5 md:col-span-2">
-          <label className="text-[12px] lg:text-[12px] uppercase font-black tracking-widest text-theme-secondary/60 px-4">About {destination.split(',')[0]}</label>
+          <label className="text-[16px] lg:text-[16px] uppercase font-black tracking-widest text-theme-secondary/60 px-4">About {destination.split(',')[0]}</label>
           <div className="relative overflow-hidden rounded-[2rem] bg-theme-white border-[1px] border-theme-secondary/10 p-6 md:p-8 shadow-sm h-full flex flex-col justify-center">
-             <div className="absolute top-0 right-0 w-64 h-64 bg-theme-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+             <div className="absolute top-0 right-0 w-64 h-64 bg-theme-primary/5 rounded-full blur-[24px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
              <p className=" text-theme-secondary/80 font-medium leading-relaxed line-clamp-4 relative z-10">
                {description}
              </p>
@@ -161,7 +161,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
 
       {/* SECTION HEADER */}
       <div className="flex justify-between items-center px-2 mt-2">
-        <span className="text-[12px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+        <span className="text-[16px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
          Booking Options
         </span>
       </div>
@@ -182,7 +182,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
                <h4 className="font-black  sm:text-base text-theme-secondary group-hover:text-theme-primary transition-colors">
                  {isFlight ? "Flights" : "Drive"}
                </h4>
-               <p className="text-[12px] sm:text-[12px] font-bold text-theme-secondary/50 mt-0.5">
+               <p className="text-[16px] sm:text-[16px] font-bold text-theme-secondary/50 mt-0.5">
                  {isFlight ? `${flightCount} Options Available` : "Route Details Available"}
                </p>
              </div>
@@ -205,7 +205,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
                <h4 className="font-black  sm:text-base text-theme-secondary group-hover:text-theme-primary transition-colors">
                  Accommodations
                </h4>
-               <p className="text-[12px] sm:text-[12px] font-bold text-theme-secondary/50 mt-0.5">
+               <p className="text-[16px] sm:text-[16px] font-bold text-theme-secondary/50 mt-0.5">
                  {staysCount} Properties Available
                </p>
              </div>
@@ -228,7 +228,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
                <h4 className="font-black  sm:text-base text-theme-secondary group-hover:text-theme-primary transition-colors">
                  Tours & Activities
                </h4>
-               <p className="text-[12px] sm:text-[12px] font-bold text-theme-secondary/50 mt-0.5">
+               <p className="text-[16px] sm:text-[16px] font-bold text-theme-secondary/50 mt-0.5">
                  {toursCount} Experiences Available
                </p>
              </div>
@@ -244,13 +244,13 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
       {attractionsList.length > 0 && (
          <div className="mt-4 flex flex-col">
            <div className="flex justify-between items-center px-2 mb-4">
-             <span className="text-[12px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
+             <span className="text-[16px] font-black uppercase tracking-[0.2em] text-theme-secondary/50">
                Top Sights to See
              </span>
              <button 
                 onClick={() => onNavigateTab?.("tours")}
                 aria-label="Navigate to Tours tab to book activities"
-                className="flex items-center gap-1 text-[12px] font-black text-theme-secondary/40 hover:text-theme-primary uppercase tracking-widest transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary rounded-md px-2 py-1"
+                className="flex items-center gap-1 text-[16px] font-black text-theme-secondary/40 hover:text-theme-primary uppercase tracking-widest transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-theme-primary rounded-md px-2 py-1"
              >
                 Book Tours <ChevronRight size={16} />
              </button>
@@ -280,7 +280,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
                          <div className="w-full h-full flex items-center justify-center"><Sparkles size={24} className="text-theme-secondary/20" /></div>
                       )}
                       {attr.rating && (
-                        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1.5 rounded-md text-[12px] font-bold text-white flex items-center gap-1.5">
+                        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1.5 rounded-md text-[16px] font-bold text-white flex items-center gap-1.5">
                           ⭐ {attr.rating}
                         </div>
                       )}
@@ -290,7 +290,7 @@ export default function SummaryCard({ data, onNavigateTab }: SummaryCardProps) {
                        <span className=" font-bold text-theme-secondary line-clamp-2 leading-tight group-hover:text-theme-primary transition-colors">
                          {attr.name || attr.title || "Local Experience"}
                        </span>
-                       <span className="text-[12px] font-black text-theme-secondary/40 uppercase tracking-widest line-clamp-1">
+                       <span className="text-[16px] font-black text-theme-secondary/40 uppercase tracking-widest line-clamp-1">
                          {categoryLabel}
                        </span>
                     </div>

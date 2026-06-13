@@ -85,10 +85,10 @@ const getBoardLabel = (room: any): string | null => {
 const BoardBadge = ({ label }: { label: string }) => {
   const isInclusive = label.toLowerCase().includes('inclusive') || label.toLowerCase().includes('board') || label.toLowerCase().includes('breakfast');
   return (
-    <span className={`inline-flex items-center gap-1 text-[12px] font-semibold px-2 py-0.5 rounded border ${
+    <span className={`inline-flex items-center gap-1 text-[16px] font-semibold px-2 py-0.5 rounded border ${
       isInclusive
-        ? 'bg-[var(--color-theme-secondary)]/[0.06] text-[var(--color-theme-secondary)] border-[var(--color-theme-secondary)]/20'
-        : 'bg-[var(--color-theme-cool-white)] text-[var(--color-theme-light-slate)] border-[var(--color-theme-soft-slate)]'
+        ? 'bg-theme-secondary/[0.06] text-theme-secondary border-theme-secondary/20'
+        : 'bg-theme-cool-white text-theme-light-slate border-theme-soft-slate'
     }`}>
       {isInclusive ? <Utensils size={18} /> : <UtensilsCrossed size={18} />}
       {label}
@@ -100,9 +100,9 @@ const BoardBadge = ({ label }: { label: string }) => {
 const CancellationPolicyBlock = ({ policies, isRefundable }: { policies: any[]; isRefundable: boolean }) => {
   if (!policies || policies.length === 0) {
     return isRefundable ? (
-      <div className="flex items-center gap-1.5 text-[var(--color-theme-success)]">
+      <div className="flex items-center gap-1.5 text-theme-success">
         <ShieldCheck size={18} />
-        <span className="text-[12px] font-semibold">Free cancellation — no deadline</span>
+        <span className="text-[16px] font-semibold">Free cancellation — no deadline</span>
       </div>
     ) : null;
   }
@@ -114,12 +114,12 @@ const CancellationPolicyBlock = ({ policies, isRefundable }: { policies: any[]; 
         const isUrgent = days !== null && days <= 3;
         const isSoon = days !== null && days > 3 && days <= 7;
         return (
-          <div key={idx} className={`flex items-start gap-2 px-2.5 py-2 rounded-md border text-[12px] font-medium ${
+          <div key={idx} className={`flex items-start gap-2 px-2.5 py-2 rounded-md border text-[16px] font-medium ${
             isUrgent
-              ? 'bg-[var(--color-theme-error)]/[0.05] border-[var(--color-theme-error)]/20 text-[var(--color-theme-error)]/80'
+              ? 'bg-theme-error/[0.05] border-theme-error/20 text-theme-error/80'
               : isSoon
-              ? 'bg-[var(--color-theme-gold)]/[0.07] border-[var(--color-theme-gold)]/25 text-[var(--color-theme-dark-slate)]'
-              : 'bg-[var(--color-theme-cool-white)] border-[var(--color-theme-soft-slate)] text-[var(--color-theme-light-slate)]'
+              ? 'bg-theme-gold/[0.07] border-theme-gold/25 text-theme-dark-slate'
+              : 'bg-theme-cool-white border-theme-soft-slate text-theme-light-slate'
           }`}>
             <CalendarX size={18} className="shrink-0 mt-0.5" />
             <div className="flex flex-col gap-0.5">
@@ -128,7 +128,7 @@ const CancellationPolicyBlock = ({ policies, isRefundable }: { policies: any[]; 
                 <strong>{formatDateTime(pol.deadline)}</strong>
               </span>
               {days !== null && (
-                <span className={`text-[12px] font-semibold ${isUrgent ? 'text-[var(--color-theme-error)]' : isSoon ? 'text-[var(--color-theme-gold)]' : 'text-[var(--color-theme-light-gray)]'}`}>
+                <span className={`text-[16px] font-semibold ${isUrgent ? 'text-theme-error' : isSoon ? 'text-theme-gold' : 'text-theme-light-gray'}`}>
                   {days <= 0 ? 'Deadline passed' : isUrgent ? `⚠ ${days}d remaining` : isSoon ? `${days} days remaining` : `${days} days away`}
                 </span>
               )}
@@ -146,10 +146,10 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
   if (!offer?.rooms) return null;
 
   return (
-    <div className="border-t border-[var(--color-theme-soft-slate)] rounded-b-lg" style={{ background: 'rgba(248,250,252,0.8)' }}>
+    <div className="border-t border-theme-soft-slate rounded-b-lg" style={{ background: 'rgba(248,250,252,0.8)' }}>
 
       {/* Table header */}
-      <div className="hidden lg:grid grid-cols-12 gap-3 px-5 py-3 border-b border-[var(--color-theme-soft-slate)] text-[12px] font-semibold text-[var(--color-theme-light-gray)] uppercase tracking-wider">
+      <div className="hidden lg:grid grid-cols-12 gap-3 px-5 py-3 border-b border-theme-soft-slate text-[16px] font-semibold text-theme-light-gray uppercase tracking-wider">
         <div className="col-span-4">Room & Configuration</div>
         <div className="col-span-3">Inclusions & Policy</div>
         <div className="col-span-2">Amenities</div>
@@ -173,16 +173,12 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
             <div
               key={i}
               onClick={() => toggleStaySelection(stay, uniqueKey, i)}
-              className={`relative flex flex-col lg:grid lg:grid-cols-12 gap-3 px-4 lg:px-5 py-4 border-b last:border-b-0 border-[var(--color-theme-soft-slate)] cursor-pointer transition-colors duration-100 ${
+              className={`relative flex flex-col lg:grid lg:grid-cols-12 gap-3 px-4 lg:px-5 py-4 cursor-pointer transition-colors duration-100 ${
                 isThisRoomSelected
-                  ? 'bg-[var(--color-theme-surface)]'
-                  : 'hover:bg-[var(--color-theme-white)]'
+                  ? 'bg-theme-surface/60'
+                  : 'hover:bg-theme-white'
               }`}
             >
-              {/* Left accent bar */}
-              <div className={`hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] rounded-r transition-colors duration-150 ${
-                isThisRoomSelected ? 'bg-[var(--color-theme-primary)]' : 'bg-transparent'
-              }`} />
 
               {/* ── COL 1: Room Identity & Configuration (4 cols) ── */}
               <div className="col-span-4 flex flex-col gap-2">
@@ -190,70 +186,70 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
                 {/* Room name + rate plan */}
                 <div>
                   <p className={`font-semibold  leading-snug transition-colors duration-150 ${
-                    isThisRoomSelected ? 'text-[var(--color-theme-primary)]' : 'text-[var(--color-theme-dark-slate)]'
+                    isThisRoomSelected ? 'text-theme-primary' : 'text-theme-dark-slate'
                   }`}>
                     {room.category === "ROOM" ? "Standard Room" : room.category || room.room_name || "Standard Room"}
                   </p>
                   {ratePlanName && (
-                    <p className="text-[12px] text-[var(--color-theme-light-gray)] mt-0.5 flex items-center gap-1">
+                    <p className="text-[16px] text-theme-light-gray mt-0.5 flex items-center gap-1">
                       <Tag size={18} /> {ratePlanName}
                     </p>
                   )}
                 </div>
 
-                {/* Room description */}
+                {/* Room description
                 {room.description && (
-                  <p className="text-[12px] text-[var(--color-theme-light-slate)] leading-relaxed line-clamp-2">
+                  <p className="text-[16px] text-theme-light-slate leading-relaxed line-clamp-2">
                     {room.description.replace(/\n/g, ' ')}
                   </p>
-                )}
+                )} */}
 
                 {/* Physical attributes grid */}
                 <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-0.5">
                   {/* Bed configuration */}
-                  <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)]">
-                    <BedDouble size={18} className="text-[var(--color-theme-secondary)]/50" />
+                  <span className="flex items-center gap-1.5 text-[16px] text-theme-light-slate">
+                    <BedDouble size={18} className="text-theme-secondary/50" />
                     {room.beds_count ? `${room.beds_count}× ` : ''}{room.bed_type || 'Standard Bed'}
                   </span>
 
                   {/* Max occupancy */}
                   {maxOccupancy && (
-                    <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)]">
-                      <Users size={18} className="text-[var(--color-theme-secondary)]/50" />
+                    <span className="flex items-center gap-1.5 text-[16px] text-theme-light-slate">
+                      <Users size={18} className="text-theme-secondary/50" />
                       Up to {maxOccupancy} guests
                     </span>
                   )}
 
                   {/* Room size */}
                   {roomSize && (
-                    <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)]">
-                      <Maximize2 size={18} className="text-[var(--color-theme-secondary)]/50" />
+                    <span className="flex items-center gap-1.5 text-[16px] text-theme-light-slate">
+                      <Maximize2 size={18} className="text-theme-secondary/50" />
                       {roomSize} m²
                     </span>
                   )}
 
                   {/* View */}
                   {viewType && (
-                    <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)]">
-                      <Eye size={18} className="text-[var(--color-theme-secondary)]/50" />
+                    <span className="flex items-center gap-1.5 text-[16px] text-theme-light-slate">
+                      <Eye size={18} className="text-theme-secondary/50" />
                       {viewType}
                     </span>
                   )}
 
                   {/* Floor */}
                   {floorLevel && (
-                    <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)]">
-                      <Layers size={18} className="text-[var(--color-theme-secondary)]/50" />
+                    <span className="flex items-center gap-1.5 text-[16px] text-theme-light-slate">
+                      <Layers size={18} className="text-theme-secondary/50" />
                       Floor {floorLevel}
                     </span>
                   )}
 
                   {/* Smoking policy */}
                   {smokingPolicy !== null && (
-                    <span className={`flex items-center gap-1.5 text-[12px] ${smokingPolicy ? 'text-[var(--color-theme-light-slate)]' : 'text-[var(--color-theme-light-slate)]'}`}>
+                    <span className={`flex items-center gap-1.5 text-[16px] ${smokingPolicy ? 'text-theme-light-slate' : 'text-theme-light-slate'}`}>
                       {smokingPolicy
-                        ? <Cigarette size={18} className="text-[var(--color-theme-light-gray)]" />
-                        : <CigaretteOff size={18} className="text-[var(--color-theme-light-gray)]" />}
+                        ? <Cigarette size={18} className="text-theme-light-gray" />
+                        : <CigaretteOff size={18} className="text-theme-light-gray" />}
                       {smokingPolicy ? 'Smoking' : 'Non-smoking'}
                     </span>
                   )}
@@ -269,11 +265,11 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
                 {/* Refundability */}
                 <div>
                   {room.is_refundable ? (
-                    <span className="inline-flex items-center gap-1.5 text-[var(--color-theme-success)] bg-[var(--color-theme-success)]/[0.08] border border-[var(--color-theme-success)]/20 px-2 py-1 rounded text-[12px] font-semibold">
+                    <span className="inline-flex items-center gap-1.5 text-theme-success bg-theme-success/[0.08] border border-theme-success/20 px-2 py-1 rounded text-[16px] font-semibold">
                       <Unlock size={18} /> Free cancellation
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-[var(--color-theme-light-slate)] bg-[var(--color-theme-white)] border border-[var(--color-theme-soft-slate)] px-2 py-1 rounded text-[12px] font-semibold">
+                    <span className="inline-flex items-center gap-1.5 text-theme-light-slate bg-theme-white border border-theme-soft-slate px-2 py-1 rounded text-[16px] font-semibold">
                       <Lock size={18} /> Non-refundable
                     </span>
                   )}
@@ -294,21 +290,21 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
                       {roomAmenities.slice(0, 5).map((a: string, ai: number) => {
                         const icon = getAmenityIcon(a);
                         return (
-                          <span key={ai} className="flex items-center gap-1.5 text-[12px] text-[var(--color-theme-light-slate)] capitalize">
-                            <span className="text-[var(--color-theme-secondary)]/40">{icon || <Star size={18} />}</span>
+                          <span key={ai} className="flex items-center gap-1.5 text-[16px] text-theme-light-slate capitalize">
+                            <span className="text-theme-secondary/40">{icon || <Star size={18} />}</span>
                             {a.replace(/_/g, ' ').toLowerCase()}
                           </span>
                         );
                       })}
                     </div>
                     {roomAmenities.length > 5 && (
-                      <span className="text-[12px] font-medium text-[var(--color-theme-light-gray)]">
+                      <span className="text-[16px] font-medium text-theme-light-gray">
                         +{roomAmenities.length - 5} more
                       </span>
                     )}
                   </>
                 ) : (
-                  <span className="text-[12px] text-[var(--color-theme-light-gray)]/60 italic">
+                  <span className="text-[16px] text-theme-light-gray/60 italic">
                     Standard amenities
                   </span>
                 )}
@@ -316,13 +312,10 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
 
               {/* ── COL 4: Per-night price (1 col) ── */}
               <div className="col-span-1 flex flex-col items-end justify-center gap-0.5">
-                <p className="text-base font-bold text-[var(--color-theme-dark-slate)] leading-none">
+                <p className="text-base font-bold text-theme-dark-slate leading-none">
                   ${(room.price / numNights).toFixed(0)}
                 </p>
-                <p className="text-[12px] text-[var(--color-theme-light-gray)] leading-none">/night</p>
-                <p className="text-[12px] font-semibold text-[var(--color-theme-light-slate)] mt-1.5">
-                  ${room.price.toFixed(0)} <span className="font-normal text-[12px]">total</span>
-                </p>
+                <p className="text-[16px] text-theme-light-gray leading-none">/night</p>
               </div>
 
               {/* ── COL 5: Action (2 cols) ── */}
@@ -331,16 +324,16 @@ const RoomDetailRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleS
                     unselected → secondary (dark green) bg, white text
                     hover      → primary (orange) bg  — attractive color shift
                     selected   → primary bg + check   */}
-                <button className={`w-full flex items-center justify-center gap-1.5 px-4 py-2 rounded-md font-semibold text-[12px] transition-colors duration-150 border ${
+                <button className={`w-full flex items-center justify-center gap-1.5 px-4 py-2 rounded-md font-semibold text-[16px] transition-colors duration-150 border ${
                   isThisRoomSelected
-                    ? 'bg-[var(--color-theme-primary)] border-[var(--color-theme-primary)] text-white'
-                    : 'bg-[var(--color-theme-secondary)] border-[var(--color-theme-secondary)] text-white hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)]'
+                    ? 'bg-theme-primary border-theme-primary text-white'
+                    : 'bg-theme-secondary border-theme-secondary text-white hover:bg-theme-primary hover:border-theme-primary'
                 }`}>
                   {isThisRoomSelected ? <><CheckCircle2 size={18} /> Selected</> : "Select Room"}
                 </button>
 
                 {/* Price-per-night mobile fallback label */}
-                <p className="lg:hidden text-[12px] text-[var(--color-theme-light-gray)] text-right">
+                <p className="lg:hidden text-[16px] text-theme-light-gray text-right">
                   ${(room.price / numNights).toFixed(2)}/night · ${room.price.toFixed(2)} total
                 </p>
               </div>
@@ -366,10 +359,10 @@ const StayRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleStaySel
   }, [isSelected]);
 
   return (
-    <div className={`flex flex-col rounded-lg border-2 bg-[var(--color-theme-white)] transition-all duration-150 ${
+    <div className={`flex flex-col rounded-lg border-2 bg-theme-white transition-all duration-150 ${
       isSelected
-        ? 'border-[var(--color-theme-primary)] shadow-[0_4px_26px_rgba(249,115,22,0.10)]'
-        : 'border-[var(--color-theme-soft-slate)] hover:border-[var(--color-theme-light-slate)]/40 hover:shadow-[0_4px_14px_rgba(15,23,42,0.07)]'
+        ? 'border-theme-primary shadow-[0_4px_26px_rgba(249,115,22,0.10)]'
+        : 'border-theme-soft-slate hover:border-theme-light-slate/40 hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)]'
     }`}>
 
       {/* HOTEL SUMMARY */}
@@ -378,45 +371,40 @@ const StayRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleStaySel
         onClick={() => { if (!isUnavailable) setIsExpanded(!isExpanded); }}
       >
         {/* Thumbnail */}
-        <div className="w-full md:w-40 h-32 md:h-auto bg-[var(--color-theme-cool-white)] rounded-md border border-[var(--color-theme-soft-slate)] flex flex-col items-center justify-center shrink-0 text-[var(--color-theme-light-gray)] relative">
+        <div className="w-full md:w-40 h-32 md:h-auto bg-theme-cool-white rounded-md border border-theme-soft-slate flex flex-col items-center justify-center shrink-0 text-theme-light-gray relative">
           <ImageIcon size={28} className="mb-2 opacity-40" />
-          <span className="text-xs font-medium uppercase tracking-wide opacity-50">No Image</span>
-          {isSelected && (
-            <div className="absolute top-2 left-2 bg-[var(--color-theme-primary)] text-[var(--color-theme-white)] rounded-full p-1 shadow-sm">
-              <CheckCircle2 size={18} />
-            </div>
-          )}
+          <span className="text-[16px] font-medium uppercase tracking-wide opacity-50">No Image</span>
         </div>
 
         {/* Core Details */}
         <div className="flex flex-col flex-1 justify-center">
           <div className="flex items-center gap-2 mb-1">
             <h3 className={`font-semibold  md: leading-tight transition-colors duration-150 ${
-              isSelected ? 'text-[var(--color-theme-primary)]' : 'text-[var(--color-theme-dark-slate)]'
+              isSelected ? 'text-theme-primary' : 'text-theme-dark-slate'
             }`}>
               {stay.name || stay.hotel?.name || "Standard Accommodation"}
             </h3>
             {chainCode && (
-              <span className="flex items-center gap-1 bg-[var(--color-theme-cool-white)] text-[var(--color-theme-light-slate)] px-2 py-0.5 rounded text-[12px] font-medium border border-[var(--color-theme-soft-slate)]">
+              <span className="flex items-center gap-1 bg-theme-cool-white text-theme-light-slate px-2 py-0.5 rounded text-[16px] font-medium border border-theme-soft-slate">
                 <Building size={18} /> {chainCode}
               </span>
             )}
           </div>
 
-          <p className=" text-[var(--color-theme-light-gray)] flex items-start gap-1.5 mb-3">
-            <MapPin size={18} className="shrink-0 mt-0.5 text-[var(--color-theme-light-slate)]/50" />
+          <p className=" text-theme-light-gray flex items-start gap-1.5 mb-3">
+            <MapPin size={18} className="shrink-0 mt-0.5 text-theme-light-slate/50" />
             {formatAddress(stay.address)}
           </p>
 
           {offer?.rooms?.[0]?.amenities && offer.rooms[0].amenities.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-auto">
               {offer.rooms[0].amenities.slice(0, 4).map((amenity: string, idx: number) => (
-                <span key={idx} className="text-xs text-[var(--color-theme-light-slate)] bg-[var(--color-theme-cool-white)] px-2 py-1 rounded border border-[var(--color-theme-soft-slate)] capitalize">
+                <span key={idx} className="text-[16px] text-theme-light-slate bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate capitalize">
                   {amenity.replace(/_/g, ' ').toLowerCase()}
                 </span>
               ))}
               {offer.rooms[0].amenities.length > 4 && (
-                <span className="text-xs font-medium text-[var(--color-theme-light-gray)] self-center px-1">
+                <span className="text-[16px] font-medium text-theme-light-gray self-center px-1">
                   +{offer.rooms[0].amenities.length - 4} more
                 </span>
               )}
@@ -426,21 +414,21 @@ const StayRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleStaySel
 
         {/* Price + Actions */}
         <div
-          className="flex flex-row md:flex-col justify-between items-center md:items-end shrink-0 md:pl-6 md:border-l border-[var(--color-theme-soft-slate)] md:min-w-[164px]"
+          className="flex flex-row md:flex-col justify-between items-center md:items-end shrink-0 md:pl-6 md:border-l border-theme-soft-slate md:min-w-[164px]"
           onClick={(e) => e.stopPropagation()}
         >
           {!isUnavailable && offer ? (
             <div className="text-left md:text-right">
-              <p className="text-[12px] font-semibold text-[var(--color-theme-light-gray)] mb-0.5 uppercase tracking-wider">Starting At</p>
-              <p className=" md:text-3xl font-bold text-[var(--color-theme-dark-slate)] leading-none">
+              <p className="text-[16px] font-semibold text-theme-light-gray mb-0.5 uppercase tracking-wider">Starting At</p>
+              <p className=" md:text-[24px] font-bold text-theme-dark-slate leading-none">
                 ${offer.price?.toFixed(2)}
               </p>
-              <p className="text-xs text-[var(--color-theme-light-slate)] mt-1">
+              <p className="text-[16px] text-theme-light-slate mt-1">
                 {numNights} {numNights > 1 ? 'nights' : 'night'}
               </p>
             </div>
           ) : (
-            <span className="text-[var(--color-theme-error)] text-xs font-semibold uppercase tracking-wide border border-[var(--color-theme-error)]/30 px-3 py-1.5 rounded bg-[var(--color-theme-error)]/[0.05]">
+            <span className="text-theme-error text-[16px] font-semibold uppercase tracking-wide border border-theme-error/30 px-3 py-1.5 rounded bg-theme-error/[0.05]">
               Sold Out
             </span>
           )}
@@ -455,8 +443,8 @@ const StayRow = ({ stay, uniqueKey, isSelected, selectedRoomIndex, toggleStaySel
                 onClick={() => setIsExpanded(!isExpanded)}
                 className={`hidden md:flex w-full items-center justify-center gap-1.5 px-4 py-2 rounded-md font-semibold  transition-colors duration-150 border ${
                   isExpanded
-                    ? 'bg-[var(--color-theme-cool-white)] border-[var(--color-theme-soft-slate)] text-[var(--color-theme-dark-slate)]/70 hover:bg-[var(--color-theme-soft-slate)]'
-                    : 'bg-[var(--color-theme-secondary)] border-[var(--color-theme-secondary)] text-white hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)]'
+                    ? 'bg-theme-cool-white border-theme-soft-slate text-theme-dark-slate/70 hover:bg-theme-soft-slate'
+                    : 'bg-theme-secondary border-theme-secondary text-white hover:bg-theme-primary hover:border-theme-primary'
                 }`}
               >
                 {isExpanded ? "Close Rooms" : `View ${offer?.rooms?.length || 0} Rooms`}
@@ -543,10 +531,10 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
 
   if (!stays || stays.length === 0) {
     return (
-      <div className="p-8 border border-dashed border-[var(--color-theme-soft-slate)] bg-[var(--color-theme-cool-white)] rounded-lg text-center flex flex-col items-center justify-center min-h-[200px]">
-        <Info size={32} className="text-[var(--color-theme-light-gray)]/50 mb-4" />
-        <h4 className="text-base text-[var(--color-theme-dark-slate)] font-semibold mb-1">No accommodations found</h4>
-        <span className=" text-[var(--color-theme-light-slate)]/70">Try adjusting your filters or date range.</span>
+      <div className="p-8 border border-dashed border-theme-soft-slate bg-theme-cool-white rounded-lg text-center flex flex-col items-center justify-center min-h-[200px]">
+        <Info size={32} className="text-theme-light-gray/50 mb-4" />
+        <h4 className="text-base text-theme-dark-slate font-semibold mb-1">No accommodations found</h4>
+        <span className=" text-theme-light-slate/70">Try adjusting your filters or date range.</span>
       </div>
     );
   }
@@ -555,18 +543,13 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
     <div className="flex flex-col gap-5 animate-in fade-in duration-300">
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[var(--color-theme-white)] p-2 rounded-lg border border-[var(--color-theme-soft-slate)]">
-        <div className="flex items-center gap-2.5  text-[var(--color-theme-dark-slate)]">
-          <Building size={18} className="text-[var(--color-theme-light-gray)]/70" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-white p-2 rounded-lg border border-theme-soft-slate">
+        <div className="flex items-center gap-2.5  text-theme-dark-slate">
+          <Building size={18} className="text-theme-light-gray/70" />
           <span className="font-medium">
-            <strong className="text-[var(--color-theme-primary)] font-semibold">{stays.length}</strong>
-            <span className="text-[var(--color-theme-light-slate)] font-normal"> properties available</span>
+            <strong className="text-theme-primary font-semibold">{stays.length}</strong>
+            <span className="text-theme-light-slate font-normal"> properties available</span>
           </span>
-          {selectedStayKey && (
-            <span className="flex items-center gap-1 text-[12px] font-semibold text-[var(--color-theme-primary)] bg-[var(--color-theme-primary)]/[0.08] border border-[var(--color-theme-primary)]/20 px-2.5 py-1 rounded-full">
-              <CheckCircle2 size={18} /> 1 selected
-            </span>
-          )}
         </div>
 
         <div className="relative w-full sm:w-auto" ref={sortRef}>
@@ -575,8 +558,8 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
             onClick={() => setSortMenuOpen(!sortMenuOpen)}
             className={`w-full sm:w-auto flex justify-between items-center gap-3 px-4 py-2 border rounded-md  font-semibold transition-colors duration-150 ${
               sortMenuOpen
-                ? 'bg-[var(--color-theme-secondary)] border-[var(--color-theme-secondary)] text-white'
-                : 'bg-[var(--color-theme-secondary)] border-[var(--color-theme-secondary)] text-white hover:bg-[var(--color-theme-primary)] hover:border-[var(--color-theme-primary)]'
+                ? 'bg-theme-secondary border-theme-secondary text-white'
+                : 'bg-theme-secondary border-theme-secondary text-white hover:bg-theme-primary hover:border-theme-primary'
             }`}
           >
             <span className="flex items-center gap-2">
@@ -587,23 +570,23 @@ export default function StaysCard({ stays, searchParams }: { stays: any[]; searc
           </button>
 
           {sortMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-full sm:w-48 bg-[var(--color-theme-white)] border border-[var(--color-theme-soft-slate)] rounded-md shadow-[0_8px_26px_rgba(15,23,42,0.08)] z-10 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="absolute right-0 top-full mt-1 w-full sm:w-48 bg-theme-white border border-theme-soft-slate rounded-md shadow-[0_12px_26px_rgba(15,23,42,0.08)] z-10 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
               <button
                 onClick={() => { setSortBy('price_asc'); setSortMenuOpen(false); }}
                 className={`text-left px-4 py-3  font-medium transition-colors duration-100 ${
                   sortBy === 'price_asc'
-                    ? 'bg-[var(--color-theme-secondary)]/[0.07] text-[var(--color-theme-secondary)] font-semibold'
-                    : 'text-[var(--color-theme-dark-slate)] hover:bg-[var(--color-theme-cool-white)]'
+                    ? 'bg-theme-secondary/[0.07] text-theme-secondary font-semibold'
+                    : 'text-theme-dark-slate hover:bg-theme-cool-white'
                 }`}
               >
                 Lowest Price First
               </button>
               <button
                 onClick={() => { setSortBy('price_desc'); setSortMenuOpen(false); }}
-                className={`text-left px-4 py-3  font-medium transition-colors duration-100 border-t border-[var(--color-theme-soft-slate)] ${
+                className={`text-left px-4 py-3  font-medium transition-colors duration-100 border-t border-theme-soft-slate ${
                   sortBy === 'price_desc'
-                    ? 'bg-[var(--color-theme-secondary)]/[0.07] text-[var(--color-theme-secondary)] font-semibold'
-                    : 'text-[var(--color-theme-dark-slate)] hover:bg-[var(--color-theme-cool-white)]'
+                    ? 'bg-theme-secondary/[0.07] text-theme-secondary font-semibold'
+                    : 'text-theme-dark-slate hover:bg-theme-cool-white'
                 }`}
               >
                 Highest Price First

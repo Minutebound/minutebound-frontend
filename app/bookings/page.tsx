@@ -45,7 +45,7 @@ export default function BookingsPage() {
       <div className="min-h-screen bg-theme-cool-white flex flex-col items-center justify-center gap-4">
         <div className="flex-1 flex flex-col items-center justify-center">
           <Loader2 className="animate-spin text-theme-primary" size={32} />
-          <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mt-2">Loading your itineraries...</p>
+          <p className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mt-2">Loading your itineraries...</p>
         </div>
       </div>
     );
@@ -53,7 +53,7 @@ export default function BookingsPage() {
 
   return (
     <div className="min-h-screen bg-theme-cool-white pb-20">
-      <div className="max-w-5xl mx-auto px-4 pt-6 space-y-6 animate-in fade-in duration-500">
+      <div className="max-w-[24px] mx-auto px-4 pt-6 space-y-6 animate-in fade-in duration-500">
         
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2  font-medium text-gray-500">
@@ -64,11 +64,11 @@ export default function BookingsPage() {
 
         {/* Page Header */}
         <div className="mb-10 flex items-center gap-3">
-          <div className="w-12 h-12 bg-theme-primary rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-theme-primary rounded-[16px] flex items-center justify-center shadow-lg">
             <Ticket size={24} className="text-theme-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-theme-secondary tracking-tight">My Bookings</h1>
+            <h1 className="text-[24px] font-black text-theme-secondary tracking-tight">My Bookings</h1>
             <p className=" font-bold text-theme-secondary/70 mt-1">Manage your complete trip bookings and reservations.</p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function BookingsPage() {
             <Plane size={48} className="text-theme-secondary/20 mx-auto mb-4" />
             <h3 className=" font-black text-theme-secondary">No Bookings Yet</h3>
             <p className="text-theme-secondary/70 font-bold mt-2 mb-6">You haven't booked any complete itineraries with Minutebound yet.</p>
-            <Link href="/" className="inline-block px-8 py-4 bg-theme-primary text-theme-white font-black text-[12px] uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-md active:scale-95">
+            <Link href="/" className="inline-block px-8 py-4 bg-theme-primary text-theme-white font-black text-[16px] uppercase tracking-widest rounded-[16px] hover:bg-theme-primary/90 transition-all shadow-md active:scale-95">
               Start Planning
             </Link>
           </div>
@@ -117,12 +117,12 @@ export default function BookingsPage() {
                     
                     {/* Badges Row */}
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[12px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm">
+                      <span className="text-[16px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1 shadow-sm">
                         <ShieldCheck size={18} /> Confirmed
                       </span>
                       
                       {/* Highlighted MinuteBound System ID (Hides Airline PNR) */}
-                      <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate flex items-center gap-1.5 shadow-sm">
+                      <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate flex items-center gap-1.5 shadow-sm">
                         Ref: {mbSystemId}
                       </span>
                     </div>
@@ -145,7 +145,7 @@ export default function BookingsPage() {
                     </div>
                     
                     {/* Quick Stats Row */}
-                    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[12px] font-black uppercase tracking-widest text-theme-secondary/70">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[16px] font-black uppercase tracking-widest text-theme-secondary/70">
                       <span className="flex items-center gap-1.5 bg-theme-cool-white px-2.5 py-1 rounded border border-theme-soft-slate">
                         <Calendar size={18} className="text-theme-secondary/50"/> 
                         {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric'})} - {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -161,7 +161,7 @@ export default function BookingsPage() {
 
                     {/* Included Components Checklist */}
                     <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-theme-soft-slate/50">
-                      <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/40 mr-1">Included:</span>
+                      <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/40 mr-1">Included:</span>
                       <ComponentBadge active={hasFlight} icon={<Plane size={18}/>} label="Flight" />
                       <ComponentBadge active={hasHotel} icon={<Building2 size={18}/>} label="Hotel" />
                       <ComponentBadge active={hasTour} icon={<Ticket size={18}/>} label="Tours" />
@@ -173,12 +173,12 @@ export default function BookingsPage() {
                     {duffelOrderId ? (
                       <Link 
                         href={`/bookings/${duffelOrderId}`}
-                        className="w-full sm:w-auto text-center px-8 py-4 bg-theme-primary/10 text-theme-primary hover:bg-theme-primary hover:text-theme-white font-black text-[12px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-theme-primary/20 hover:border-theme-primary shadow-sm"
+                        className="w-full sm:w-auto text-center px-8 py-4 bg-theme-primary/10 text-theme-primary hover:bg-theme-primary hover:text-theme-white font-black text-[16px] uppercase tracking-widest rounded-[16px] transition-all flex items-center justify-center gap-2 border border-theme-primary/20 hover:border-theme-primary shadow-sm"
                       >
                         View Full Itinerary <ExternalLink size={18} />
                       </Link>
                     ) : (
-                      <button disabled className="w-full sm:w-auto px-8 py-4 bg-theme-cool-white text-theme-secondary/40 font-black text-[12px] uppercase tracking-widest rounded-xl border border-theme-soft-slate cursor-not-allowed">
+                      <button disabled className="w-full sm:w-auto px-8 py-4 bg-theme-cool-white text-theme-secondary/40 font-black text-[16px] uppercase tracking-widest rounded-[16px] border border-theme-soft-slate cursor-not-allowed">
                         Processing...
                       </button>
                     )}
@@ -198,13 +198,13 @@ export default function BookingsPage() {
 function ComponentBadge({ active, icon, label }: { active: boolean, icon: React.ReactNode, label: string }) {
   if (active) {
     return (
-      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-theme-primary/10 text-theme-primary border border-theme-primary/20 rounded shadow-sm text-[12px] font-black uppercase tracking-widest">
+      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-theme-primary/10 text-theme-primary border border-theme-primary/20 rounded shadow-sm text-[16px] font-black uppercase tracking-widest">
         {icon} {label} <CheckCircle2 size={18} className="ml-0.5 opacity-70"/>
       </div>
     );
   }
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-theme-white text-theme-secondary/40 border border-theme-soft-slate rounded text-[12px] font-black uppercase tracking-widest">
+    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-theme-white text-theme-secondary/40 border border-theme-soft-slate rounded text-[16px] font-black uppercase tracking-widest">
       {icon} {label} <X size={18} className="ml-0.5 opacity-50"/>
     </div>
   );

@@ -198,8 +198,10 @@ export default function ItineraryModal({
     return diffHrs > 0 ? `${diffHrs}h ${diffMins}m` : `${diffMins}m`;
   };
 
-  const destCityName = rawParams?.destination?.name?.split(",")[0] || "Destination";
-  const originCityName = rawParams?.source?.name?.split(",")[0] || "Origin";
+  const destField = typeof rawParams?.destination === "string" ? rawParams.destination : rawParams?.destination?.name;
+  const sourceField = typeof rawParams?.source === "string" ? rawParams.source : rawParams?.source?.name;
+  const destCityName = (destField && destField.split(",")[0]) || "Destination";
+  const originCityName = (sourceField && sourceField.split(",")[0]) || "Origin";
 
   const getFullStateName = (fullString: string) => {
      if (!fullString) return "";
@@ -209,8 +211,8 @@ export default function ItineraryModal({
      return STATE_MAP[statePart.toUpperCase()] || statePart;
   };
 
-  const destState = getFullStateName(rawParams?.destination?.name || "");
-  const originState = getFullStateName(rawParams?.source?.name || "");
+  const destState = getFullStateName(destField || "");
+  const originState = getFullStateName(sourceField || "");
 
   const getFullTripTitle = () => originCityName ? `${originCityName} to ${destCityName}` : destCityName;
   const cityImageUrl = `https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=800&q=80`;
@@ -222,7 +224,7 @@ export default function ItineraryModal({
       if (travelApi.sendBookingReceipt) {
         await travelApi.sendBookingReceipt({
           destination: getFullTripTitle(),
-          username: user?.name || "Traveler",
+          username: typeof user === "string" ? user : user?.name || "Traveler",
           check_in_date: rawParams?.startDate,
           check_out_date: rawParams?.endDate,
           email: targetEmail,
@@ -285,10 +287,9 @@ export default function ItineraryModal({
     setIsExporting(true);
     try {
       const pdfBlob = await travelApi.exportPdf({
-        destination: getFullTripTitle(), username: user?.name || "Traveler",
+        // FIX: Replaced user?.name with just user
+        destination: getFullTripTitle(), username: user || "Traveler", 
         check_in_date: rawParams?.startDate, check_out_date: rawParams?.endDate,
-        booking_ref: bookingRef,
-        system_booking_id: systemBookingId,
         weather: isWeatherSelected ? weatherData : null,
         flight, drive, hotel: stay, attractions: activeAttractions, activities: tours,
       });
@@ -308,10 +309,9 @@ export default function ItineraryModal({
     setIsSharing(true);
     try {
       await travelApi.sharePdf({
-        destination: getFullTripTitle(), username: user?.name || "Traveler",
+        // FIX: Replaced user?.name with just user
+        destination: getFullTripTitle(), username: user || "Traveler",
         check_in_date: rawParams?.startDate, check_out_date: rawParams?.endDate,
-        booking_ref: bookingRef,
-        system_booking_id: systemBookingId,
         weather: isWeatherSelected ? weatherData : null,
         flight, drive, hotel: stay, attractions: activeAttractions, activities: tours,
       }, email);
@@ -355,7 +355,7 @@ export default function ItineraryModal({
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-0 md:p-3 lg:p-3 overflow-hidden">
       <div className="absolute inset-0 bg-theme-secondary/90 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-      <div className="relative bg-theme-white w-full h-full md:h-[90vh] max-w-[1200px] md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border border-theme-soft-slate/50">
+      <div className="relative bg-theme-white w-full h-full md:h-[90vh] max-w-[1200px] md:rounded-[2rem] shadow-[16px] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border border-theme-soft-slate/50">
         
         {/* Modal Header */}
         <div className="px-5 py-4 sm:px-6 sm:py-5 flex justify-between items-center bg-theme-white border-b border-theme-soft-slate shrink-0 z-20 relative">
@@ -383,14 +383,14 @@ export default function ItineraryModal({
                 <img src={cityImageUrl} alt={destCityName} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-theme-secondary via-theme-secondary/40 to-transparent"></div>
                 <div className="absolute bottom-4 left-5 right-5">
-                  <p className="text-theme-white/80 text-xs font-black uppercase tracking-widest mb-1 truncate">
+                  <p className="text-theme-white/80 text-[16px] font-black uppercase tracking-widest mb-1 truncate">
                     {originCityName}{originState ? `, ${originState}` : ""} to
                   </p>
-                  <h3 className=" sm:text-3xl font-black text-theme-white tracking-tight leading-none truncate">
+                  <h3 className=" sm:text-[24px] font-black text-theme-white tracking-tight leading-none truncate">
                     {destCityName}
                   </h3>
                   {destState && (
-                    <p className="text-theme-white/80 text-xs font-bold mt-1 truncate">{destState}</p>
+                    <p className="text-theme-white/80 text-[16px] font-bold mt-1 truncate">{destState}</p>
                   )}
                 </div>
               </div>
@@ -402,29 +402,29 @@ export default function ItineraryModal({
                 </div>
 
                 {isWeatherSelected && firstDayWeather && (
-                  <div className="p-4 rounded-2xl bg-theme-white border border-theme-soft-slate shadow-sm mt-1">
+                  <div className="p-4 rounded-[16px] bg-theme-white border border-theme-soft-slate shadow-sm mt-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50">Destination Weather Estimate</span>
+                      <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50">Weather Estimate</span>
                       <Sun size={18} className="text-theme-primary" />
                     </div>
                     <div className="flex items-end gap-2 mt-2">
-                      <span className="text-3xl font-black text-theme-secondary leading-none">{Math.round(firstDayWeather.max_temp ?? 0)}°</span>
+                      <span className="text-[24px] font-black text-theme-secondary leading-none">{Math.round(firstDayWeather.max_temp ?? 0)}°</span>
                       <span className=" font-bold text-theme-secondary/50 mb-1">/ {Math.round(firstDayWeather.min_temp ?? 0)}° F</span>
                     </div>
                     <p className=" font-bold text-theme-secondary/80 mt-1 capitalize">{firstDayWeather.weather ?? "Clear skies"}</p>
                   </div>
                 )}
 
-                <div className="rounded-2xl bg-theme-white border border-theme-soft-slate shadow-sm overflow-hidden mt-1 transition-all">
+                <div className="rounded-[16px] bg-theme-white border border-theme-soft-slate shadow-sm overflow-hidden mt-1 transition-all">
                    <div className="p-4 bg-theme-secondary flex items-center justify-between transition-all duration-300">
                      <div className="flex items-center gap-2">
                        <Receipt size={18} className="text-theme-white" />
-                       <span className="font-black uppercase tracking-widest text-[12px] text-theme-white">Breakdown</span>
+                       <span className="font-black uppercase tracking-widest text-[16px] text-theme-white">Breakdown</span>
                      </div>
                      {checkoutStep === "READY" && (
                        <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-2 duration-300">
                          <ShieldCheck size={18} className="text-theme-primary" />
-                         <span className="font-black uppercase tracking-widest text-[12px] text-theme-primary">
+                         <span className="font-black uppercase tracking-widest text-[16px] text-theme-primary">
                            Fares Confirmed
                          </span>
                        </div>
@@ -441,8 +441,8 @@ export default function ItineraryModal({
                        <span>${taxesAndFees.toFixed(2)}</span>
                      </div>
                      {drive && (
-                        <div className="flex justify-between items-center text-xs font-bold text-theme-secondary/50 border-b border-theme-soft-slate pb-3">
-                          <span className="flex items-center gap-1.5">Est. Fuel <span className="text-[12px] font-black uppercase tracking-widest text-theme-primary">(Not Charged)</span></span>
+                        <div className="flex justify-between items-center text-[16px] font-bold text-theme-secondary/50 border-b border-theme-soft-slate pb-3">
+                          <span className="flex items-center gap-1.5">Est. Fuel <span className="text-[16px] font-black uppercase tracking-widest text-theme-primary">(Not Charged)</span></span>
                           <span>~${estimatedFuel.toFixed(2)}</span>
                         </div>
                      )}
@@ -460,7 +460,7 @@ export default function ItineraryModal({
                 <button
                   onClick={() => handleSaveTrip()}
                   disabled={isSaving || isSaved || isAlreadySaved} 
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-black  transition-all active:scale-[0.98] ${
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-[16px] font-black  transition-all active:scale-[0.98] ${
                     (isSaving || isSaved || isAlreadySaved)
                       ? "bg-theme-white text-theme-secondary/40 cursor-not-allowed shadow-none border border-theme-soft-slate"
                       : "bg-theme-secondary text-theme-white shadow-lg hover:bg-theme-secondary/90"
@@ -497,43 +497,43 @@ export default function ItineraryModal({
               
               {/* Only show the inventory if we aren't displaying the success screen */}
               {checkoutStep !== "SUCCESS" && (
-                <div className="p-5 sm:p-8 flex flex-col gap-8 max-w-4xl mx-auto w-full min-w-0">
+                <div className="p-5 sm:p-8 flex flex-col gap-8 max-w-[24px] mx-auto w-full min-w-0">
                   
                   {/* 1. TRANSPORTATION */}
                   <section className="min-w-0">
                     <SectionTitle icon={flight ? <Plane size={18} /> : <Car size={18} />} title="Transportation" />
                     {flight ? (
-                      <div className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
+                      <div className="bg-theme-white rounded-[16px] p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
                         <div className="absolute top-0 left-0 w-1 h-full bg-theme-primary"></div>
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-5 gap-4 min-w-0">
                           <div className="min-w-0 flex-1">
                               <span className="font-black  sm: text-theme-secondary block truncate">{flight.airline_name}</span>
                               
                               <div className="flex flex-wrap items-center gap-2 mt-2">
-                                <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
+                                <span className="text-[16px] font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
                                   {flight.travel_class || "Economy"} Class
                                 </span>
-                                <span className="text-xs font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
+                                <span className="text-[16px] font-bold text-theme-secondary/80 bg-theme-cool-white px-2 py-1 rounded border border-theme-soft-slate">
                                   {flight.itineraries?.[0]?.segments?.length > 1 ? "Connecting" : "Direct"}
                                 </span>
                                 
                                 {/* DUFFEL BADGES */}
                                 {flight.carbon_emissions_kg && (
-                                  <span className="text-[12px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1">
+                                  <span className="text-[16px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 flex items-center gap-1">
                                     <Leaf size={18} /> {flight.carbon_emissions_kg} kg CO₂
                                   </span>
                                 )}
                                 {(totalCheckedBags > 0 || totalCarryOnBags > 0) && (
-                                  <span className="text-[12px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100 flex items-center gap-1">
+                                  <span className="text-[16px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100 flex items-center gap-1">
                                     <Luggage size={18} /> Bags Included
                                   </span>
                                 )}
                                 {isRefundable ? (
-                                  <span className="text-[12px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 flex items-center gap-1">
+                                  <span className="text-[16px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 flex items-center gap-1">
                                     <RefreshCcw size={18} /> {penaltyAmount ? `Fee: ${penaltyCurrency || '$'}${penaltyAmount}` : 'Refundable'}
                                   </span>
                                 ) : (
-                                  <span className="text-[12px] font-black uppercase tracking-widest text-theme-error bg-theme-error/10 px-2 py-1 rounded border border-theme-error/20 flex items-center gap-1">
+                                  <span className="text-[16px] font-black uppercase tracking-widest text-theme-error bg-theme-error/10 px-2 py-1 rounded border border-theme-error/20 flex items-center gap-1">
                                     <X size={18} /> Non-Refundable
                                   </span>
                                 )}
@@ -542,9 +542,9 @@ export default function ItineraryModal({
                               {/* AMENITIES BADGES */}
                               {(hasWifi || hasPower || foodOption) && (
                                 <div className="flex flex-wrap items-center gap-2 mt-2">
-                                  {hasWifi && <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Wifi size={18}/> WiFi</span>}
-                                  {hasPower && <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><BatteryCharging size={18}/> Power</span>}
-                                  {foodOption && <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Utensils size={18}/> Food</span>}
+                                  {hasWifi && <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Wifi size={18}/> WiFi</span>}
+                                  {hasPower && <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><BatteryCharging size={18}/> Power</span>}
+                                  {foodOption && <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1"><Utensils size={18}/> Food</span>}
                                 </div>
                               )}
 
@@ -559,18 +559,18 @@ export default function ItineraryModal({
                             const stops = itin.segments?.length ? itin.segments.length - 1 : 0;
                             const boundDate = itin.segments?.[0]?.departure_time ? formatShortDate(itin.segments[0].departure_time) : "";
                             return (
-                              <div key={idx} className="bg-theme-cool-white p-4 rounded-xl border border-theme-soft-slate">
+                              <div key={idx} className="bg-theme-cool-white p-4 rounded-[16px] border border-theme-soft-slate">
                                 <div className="flex flex-wrap justify-between items-center mb-3 pb-3 border-b border-theme-soft-slate gap-2">
-                                  <span className="text-[12px] uppercase font-black text-theme-secondary/80 tracking-widest flex items-center gap-2">
+                                  <span className="text-[16px] uppercase font-black text-theme-secondary/80 tracking-widest flex items-center gap-2">
                                     {idx === 0 ? "Outbound" : "Return"} <span className="text-theme-secondary/40">•</span> {boundDate}
                                   </span>
                                   <div className="flex items-center gap-2">
                                     {itin.duration && (
-                                      <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1">
+                                      <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/60 flex items-center gap-1">
                                         <Clock size={18} /> {(itin.duration || '').replace('PT', '').toLowerCase()}
                                       </span>
                                     )}
-                                    <span className={`text-[12px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${stops === 0 ? "bg-theme-primary/10 text-theme-primary" : "bg-theme-secondary/10 text-theme-secondary"}`}>
+                                    <span className={`text-[16px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${stops === 0 ? "bg-theme-primary/10 text-theme-primary" : "bg-theme-secondary/10 text-theme-secondary"}`}>
                                       {stops === 0 ? "Direct" : `${stops} Stop(s)`}
                                     </span>
                                   </div>
@@ -591,16 +591,16 @@ export default function ItineraryModal({
                                       <React.Fragment key={sIdx}>
                                         {layoverStr && (
                                           <div className="flex items-center justify-center my-2">
-                                              <span className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/60 bg-theme-white px-3 py-1 rounded-full border border-theme-soft-slate shadow-sm">
+                                              <span className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/60 bg-theme-white px-3 py-1 rounded-full border border-theme-soft-slate shadow-sm">
                                                 ⏱ Layover: {layoverStr}
                                               </span>
                                           </div>
                                         )}
-                                        <div className="flex flex-col justify-center bg-theme-white p-4 rounded-xl border border-theme-soft-slate shadow-sm min-w-0">
+                                        <div className="flex flex-col justify-center bg-theme-white p-4 rounded-[16px] border border-theme-soft-slate shadow-sm min-w-0">
                                           <div className="flex items-center gap-4 text-theme-secondary min-w-0">
                                             <div className="flex-1 min-w-0">
                                               <p className="font-black  text-theme-secondary">{formatTime(seg.departure_time)}</p>
-                                              <p className="text-xs font-bold text-theme-secondary/60 mt-1 truncate">{seg.departure_airport_name || seg.departure_airport}</p>
+                                              <p className="text-[16px] font-bold text-theme-secondary/60 mt-1 truncate">{seg.departure_airport_name || seg.departure_airport}</p>
                                             </div>
                                             
                                             <div className="flex-1 flex flex-col items-center relative min-w-[60px] shrink-0 pt-1">
@@ -611,7 +611,7 @@ export default function ItineraryModal({
                                                 </div>
                                               </div>
                                               {aircraftName && (
-                                                <span className="text-[12px] font-black uppercase tracking-widest text-theme-primary whitespace-nowrap mt-2 text-center bg-theme-primary/5 px-2 py-0.5 rounded border border-theme-primary/10 max-w-full truncate">
+                                                <span className="text-[16px] font-black uppercase tracking-widest text-theme-primary whitespace-nowrap mt-2 text-center bg-theme-primary/5 px-2 py-0.5 rounded border border-theme-primary/10 max-w-full truncate">
                                                     {aircraftName}
                                                 </span>
                                               )}
@@ -619,7 +619,7 @@ export default function ItineraryModal({
                                             
                                             <div className="flex-1 text-right min-w-0">
                                               <p className="font-black  text-theme-secondary">{formatTime(seg.arrival_time)}</p>
-                                              <p className="text-xs font-bold text-theme-secondary/60 mt-1 truncate">{seg.arrival_airport_name || seg.arrival_airport}</p>
+                                              <p className="text-[16px] font-bold text-theme-secondary/60 mt-1 truncate">{seg.arrival_airport_name || seg.arrival_airport}</p>
                                             </div>
                                           </div>
                                         </div>
@@ -633,13 +633,13 @@ export default function ItineraryModal({
                         </div>
                       </div>
                     ) : drive ? (
-                      <div className="bg-theme-white rounded-2xl p-6 border border-theme-soft-slate shadow-sm relative overflow-hidden">
+                      <div className="bg-theme-white rounded-[16px] p-6 border border-theme-soft-slate shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-theme-primary"></div>
                         <div className="flex justify-between items-center mb-5">
                           <span className="font-black  text-theme-secondary flex items-center gap-2"><Car size={18} /> Road Trip</span>
                           <span className="text-theme-primary font-black  bg-theme-primary/10 px-3 py-1.5 rounded-lg">{displayDriveDuration}</span>
                         </div>
-                        <div className="flex flex-col gap-4 bg-theme-cool-white p-5 rounded-xl border border-theme-soft-slate">
+                        <div className="flex flex-col gap-4 bg-theme-cool-white p-5 rounded-[16px] border border-theme-soft-slate">
                           <div className="flex justify-between items-end gap-2">
                             <div className="flex flex-col gap-1 min-w-0">
                               <p className="font-black text-base text-theme-secondary flex items-center gap-2 flex-wrap">
@@ -647,11 +647,11 @@ export default function ItineraryModal({
                                 <span className="text-theme-secondary/40 ">➔</span>
                                 <span className="truncate">{destCityName}</span>
                               </p>
-                              <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50">Total Distance: {displayDriveDistance}</p>
+                              <p className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50">Total Distance: {displayDriveDistance}</p>
                             </div>
                             <div className="text-right flex flex-col items-end gap-1">
                               <p className="text-theme-primary font-black ">~${estimatedFuel.toFixed(2)}</p>
-                              <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50">Est. Fuel</p>
+                              <p className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50">Est. Fuel</p>
                             </div>
                           </div>
                         </div>
@@ -665,7 +665,7 @@ export default function ItineraryModal({
                   <section className="min-w-0">
                     <SectionTitle icon={<Building2 size={18} />} title="Accommodation" />
                     {stay ? (
-                      <div className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
+                      <div className="bg-theme-white rounded-[16px] p-5 border border-theme-soft-slate shadow-sm relative overflow-hidden min-w-0">
                         <div className="absolute top-0 left-0 w-1 h-full bg-theme-secondary"></div>
                         
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-5 min-w-0">
@@ -673,34 +673,34 @@ export default function ItineraryModal({
                             <div className="flex flex-wrap items-center gap-2 mb-1.5">
                                <h4 className="font-black  sm: text-theme-secondary leading-tight break-words">{stay.name}</h4>
                                {(stay.rating || stay.hotel?.rating) && (
-                                  <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[12px] font-black uppercase tracking-widest px-2 py-1 rounded flex items-center gap-1 shadow-sm shrink-0">
+                                  <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[16px] font-black uppercase tracking-widest px-2 py-1 rounded flex items-center gap-1 shadow-sm shrink-0">
                                     ★ {stay.rating || stay.hotel?.rating} Star
                                   </span>
                                )}
                             </div>
-                            <p className="text-xs sm: text-theme-secondary/70 font-medium flex items-start gap-1.5 min-w-0">
+                            <p className="text-[16px] sm: text-theme-secondary/70 font-medium flex items-start gap-1.5 min-w-0">
                                <MapPin size={18} className="shrink-0 mt-0.5 text-theme-secondary/40" /> 
                                <span className="truncate">{stay.address?.lines?.join(", ") || stay.address || "Address unavailable"}</span>
                             </p>
                           </div>
-                          <div className="text-left sm:text-right shrink-0 bg-theme-cool-white px-4 py-3 rounded-xl border border-theme-soft-slate shadow-sm">
+                          <div className="text-left sm:text-right shrink-0 bg-theme-cool-white px-4 py-3 rounded-[16px] border border-theme-soft-slate shadow-sm">
                             <p className="text-theme-secondary font-black ">${safeFloat(stay.offerDetails?.price || stay.price || 0).toFixed(2)}</p>
-                            <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mt-0.5">Total Stay</p>
+                            <p className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mt-0.5">Total Stay</p>
                           </div>
                         </div>
 
-                        <div className="bg-theme-cool-white rounded-xl p-4 border border-theme-soft-slate flex flex-col gap-3">
-                           <div className="flex justify-between items-center text-xs sm: font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
+                        <div className="bg-theme-cool-white rounded-[16px] p-4 border border-theme-soft-slate flex flex-col gap-3">
+                           <div className="flex justify-between items-center text-[16px] sm: font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
                              <span className="flex items-center gap-2 text-theme-secondary/60"><Calendar size={18}/> Check In</span>
                              <span className="text-theme-secondary font-black">{formatDate(rawParams?.startDate)}</span>
                            </div>
-                           <div className="flex justify-between items-center text-xs sm: font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
+                           <div className="flex justify-between items-center text-[16px] sm: font-bold text-theme-secondary border-b border-theme-soft-slate/50 pb-2">
                              <span className="flex items-center gap-2 text-theme-secondary/60"><Calendar size={18}/> Check Out</span>
                              <span className="text-theme-secondary font-black">{formatDate(rawParams?.endDate)}</span>
                            </div>
                            
                            {stay.offerDetails && (
-                             <div className="flex flex-wrap gap-2 pt-1 text-[12px] font-black uppercase tracking-widest text-theme-secondary">
+                             <div className="flex flex-wrap gap-2 pt-1 text-[16px] font-black uppercase tracking-widest text-theme-secondary">
                                {stay.offerDetails?.rooms?.[0]?.category && (
                                  <span className="bg-theme-white px-2 py-1 rounded border border-theme-soft-slate shadow-sm">
                                    {stay.offerDetails.rooms[0].category.replace(/_/g, " ")}
@@ -732,23 +732,23 @@ export default function ItineraryModal({
                     {tours.length > 0 ? (
                       <div className="flex flex-col gap-4 min-w-0">
                         {tours.map((tour: any, idx: number) => (
-                          <div key={idx} className="bg-theme-white rounded-2xl p-5 border border-theme-soft-slate shadow-sm flex flex-col gap-3 min-w-0">
+                          <div key={idx} className="bg-theme-white rounded-[16px] p-5 border border-theme-soft-slate shadow-sm flex flex-col gap-3 min-w-0">
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 min-w-0">
                               <div className="flex-1 min-w-0">
                                 <h5 className="font-black text-base sm: text-theme-secondary leading-snug break-words">{tour.name || tour.title}</h5>
-                                <p className="text-xs sm: text-theme-secondary/70 font-medium mt-1.5 line-clamp-2 leading-relaxed">
+                                <p className="text-[16px] sm: text-theme-secondary/70 font-medium mt-1.5 line-clamp-2 leading-relaxed">
                                   {tour.short_description || tour.description || "Experience the best of the local culture and sights with this highly-rated guided tour."}
                                 </p>
                               </div>
                               {tour.price && (tour.price.amount || tour.price) && (
-                                <div className="text-left sm:text-right shrink-0 bg-theme-cool-white p-3 rounded-xl border border-theme-soft-slate">
+                                <div className="text-left sm:text-right shrink-0 bg-theme-cool-white p-3 rounded-[16px] border border-theme-soft-slate">
                                   <p className="text-theme-primary font-black ">${safeFloat(tour.price.amount || tour.price).toFixed(2)}</p>
-                                  <p className="text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mt-0.5">Per Person</p>
+                                  <p className="text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mt-0.5">Per Person</p>
                                 </div>
                               )}
                             </div>
                             
-                            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-theme-soft-slate/50 text-[12px] font-black uppercase tracking-widest">
+                            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-theme-soft-slate/50 text-[16px] font-black uppercase tracking-widest">
                                {tour.duration && (
                                   <span className="bg-theme-cool-white border border-theme-soft-slate px-2 py-1 rounded text-theme-secondary/70 flex items-center gap-1 shadow-sm">
                                     <Clock size={18} className="text-theme-secondary/40"/> {tour.duration}
@@ -777,7 +777,7 @@ export default function ItineraryModal({
                     {activeAttractions.length > 0 ? (
                       <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory custom-scrollbar">
                         {activeAttractions.map((attr: any, idx: number) => (
-                          <div key={idx} className="min-w-[200px] w-[200px] sm:min-w-[240px] sm:w-[240px] snap-start bg-theme-white rounded-2xl border border-theme-soft-slate shadow-sm flex flex-col group hover:border-theme-primary/30 transition-colors overflow-hidden">
+                          <div key={idx} className="min-w-[200px] w-[200px] sm:min-w-[240px] sm:w-[240px] snap-start bg-theme-white rounded-[16px] border border-theme-soft-slate shadow-sm flex flex-col group hover:border-theme-primary/30 transition-colors overflow-hidden">
                             <div className="w-full h-32 sm:h-36 bg-theme-cool-white flex items-center justify-center overflow-hidden relative">
                               {attr.image || attr.photo ? (
                                   <img src={attr.image || attr.photo} alt={attr.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -787,7 +787,7 @@ export default function ItineraryModal({
                             </div>
                             <div className="p-4 flex flex-col gap-1.5 bg-theme-white">
                               <h5 className="font-black  sm:text-base text-theme-secondary truncate">{attr.name}</h5>
-                              <p className="text-[12px] text-theme-secondary/50 font-black uppercase tracking-widest truncate">
+                              <p className="text-[16px] text-theme-secondary/50 font-black uppercase tracking-widest truncate">
                                 {attr.category || attr.kinds?.split(",")[0]?.replace(/_/g, " ") || "Point of Interest"}
                               </p>
                             </div>
@@ -807,30 +807,30 @@ export default function ItineraryModal({
                   <div className="w-20 h-20 bg-theme-success/10 text-theme-success rounded-full flex items-center justify-center mb-2 shadow-sm border border-theme-success/20">
                     <CheckCircle2 size={40} strokeWidth={3} />
                   </div>
-                  <h3 className="text-3xl font-black text-theme-secondary">You're All Set!</h3>
+                  <h3 className="text-[24px] font-black text-theme-secondary">You're All Set!</h3>
                   <p className=" font-bold text-theme-secondary/70 max-w-sm">
                     Your trip has been successfully booked and your itinerary has been emailed to you.
                   </p>
                   
                   {/* Dynamic Confirmation IDs Display */}
-                  <div className="bg-theme-cool-white px-8 py-5 rounded-2xl border border-theme-soft-slate mt-2 shadow-sm text-center min-w-[280px]">
+                  <div className="bg-theme-cool-white px-8 py-5 rounded-[16px] border border-theme-soft-slate mt-2 shadow-sm text-center min-w-[280px]">
                     <div className="mb-4">
-                      <span className="block text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mb-1">Provider Ref (PNR)</span>
+                      <span className="block text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mb-1">Provider Ref (PNR)</span>
                       <span className="block  font-black text-theme-primary tracking-widest">{bookingRef || "MB-CONFIRMED"}</span>
                     </div>
                     {systemBookingId && (
                       <div className="border-t border-theme-soft-slate pt-4">
-                        <span className="block text-[12px] font-black uppercase tracking-widest text-theme-secondary/50 mb-1">System Booking ID</span>
+                        <span className="block text-[16px] font-black uppercase tracking-widest text-theme-secondary/50 mb-1">System Booking ID</span>
                         <span className="block  font-black text-theme-secondary tracking-widest">{systemBookingId}</span>
                       </div>
                     )}
                   </div>
                   
                   <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full max-w-md px-4">
-                     <button onClick={handleExportPdf} disabled={isExporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-xs sm: bg-theme-primary text-theme-white shadow-lg hover:bg-theme-primary/90 transition-all active:scale-95 disabled:opacity-50">
+                     <button onClick={handleExportPdf} disabled={isExporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-black text-[16px] sm: bg-theme-primary text-theme-white shadow-lg hover:bg-theme-primary/90 transition-all active:scale-95 disabled:opacity-50">
                        {isExporting ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />} Download PDF
                      </button>
-                     <button onClick={() => { onClose(); window.location.href = "/"; }} className="flex-1 px-8 py-3 bg-theme-secondary text-theme-white font-black  uppercase tracking-widest rounded-xl hover:bg-theme-secondary/90 transition-colors shadow-md active:scale-95">
+                     <button onClick={() => { onClose(); window.location.href = "/"; }} className="flex-1 px-8 py-3 bg-theme-secondary text-theme-white font-black  uppercase tracking-widest rounded-[16px] hover:bg-theme-secondary/90 transition-colors shadow-md active:scale-95">
                        Return to Home
                      </button>
                   </div>
@@ -864,10 +864,10 @@ export default function ItineraryModal({
                      ) : (
                        <div className="p-4 lg:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
                          <div className="text-center sm:text-left flex flex-col">
-                           <span className="text-[12px] uppercase tracking-widest text-theme-secondary/50 font-black mb-0.5">Total Due Now</span>
-                           <span className=" sm:text-3xl font-black text-theme-secondary leading-none">${grandTotal.toFixed(2)}</span>
+                           <span className="text-[16px] uppercase tracking-widest text-theme-secondary/50 font-black mb-0.5">Total Due Now</span>
+                           <span className=" sm:text-[24px] font-black text-theme-secondary leading-none">${grandTotal.toFixed(2)}</span>
                          </div>
-                         <button onClick={() => handleBookingSuccess("TRIP-1234")} className="px-6 py-3.5 bg-theme-primary text-theme-white font-black  uppercase tracking-widest rounded-xl hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
+                         <button onClick={() => handleBookingSuccess("TRIP-1234")} className="px-6 py-3.5 bg-theme-primary text-theme-white font-black  uppercase tracking-widest rounded-[16px] hover:bg-theme-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto">
                            Finish Trip Plan
                          </button>
                        </div>
@@ -894,10 +894,10 @@ function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string })
 
 function SummaryCard({ icon, label, value }: any) {
   return (
-    <div className="p-4 rounded-xl bg-theme-white border border-theme-soft-slate shadow-sm flex flex-col justify-center min-w-0">
+    <div className="p-4 rounded-[16px] bg-theme-white border border-theme-soft-slate shadow-sm flex flex-col justify-center min-w-0">
       <div className="flex items-center gap-1.5 text-theme-secondary/50 mb-1.5">
         {React.cloneElement(icon, { size: 14 })}
-        <span className="text-[12px] font-black uppercase tracking-widest">{label}</span>
+        <span className="text-[16px] font-black uppercase tracking-widest">{label}</span>
       </div>
       <p className="font-black  sm:text-base leading-tight text-theme-secondary truncate">{value}</p>
     </div>
@@ -906,12 +906,12 @@ function SummaryCard({ icon, label, value }: any) {
 
 function EmptyStateCard({ title, message, buttonText, onAdd }: { title: string, message: string, buttonText: string, onAdd: () => void }) {
   return (
-    <div className="relative rounded-2xl p-6 border border-dashed border-theme-soft-slate bg-theme-cool-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group">
+    <div className="relative rounded-[16px] p-6 border border-dashed border-theme-soft-slate bg-theme-cool-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group">
       <div className="flex flex-col gap-1 min-w-0">
-        <span className="font-black text-theme-secondary/40 uppercase tracking-widest text-[12px]">{title}</span>
+        <span className="font-black text-theme-secondary/40 uppercase tracking-widest text-[16px]">{title}</span>
         <span className="font-bold text-theme-secondary  truncate">{message}</span>
       </div>
-      <button onClick={onAdd} className="flex items-center gap-1.5 px-5 py-2.5 bg-theme-white border border-theme-soft-slate text-theme-secondary font-black text-[12px] uppercase tracking-widest rounded-xl hover:border-theme-primary hover:text-theme-primary transition-all shadow-sm active:scale-95 shrink-0">
+      <button onClick={onAdd} className="flex items-center gap-1.5 px-5 py-2.5 bg-theme-white border border-theme-soft-slate text-theme-secondary font-black text-[16px] uppercase tracking-widest rounded-[16px] hover:border-theme-primary hover:text-theme-primary transition-all shadow-sm active:scale-95 shrink-0">
         <Plus size={18} /> {buttonText}
       </button>
     </div>

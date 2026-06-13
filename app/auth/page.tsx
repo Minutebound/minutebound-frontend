@@ -275,10 +275,10 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-theme-secondary/95 via-theme-secondary/40 to-transparent"></div>
         <div className="relative z-10 max-w-lg text-theme-white animate-in fade-in slide-in-from-left-8 duration-1000 delay-300 fill-mode-both">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-theme-white/10 backdrop-blur-md border border-theme-white/20 text-[12px]font-bold uppercase tracking-widest mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-theme-white/10 backdrop-blur-md border border-theme-white/20 text-[16px]font-bold uppercase tracking-widest mb-6">
             <SparkleIcon /> Smart Planning
           </div>
-          <h1 className="text-5xl font-black tracking-tight mb-4 leading-[1.1]">
+          <h1 className="text-[24px] font-black tracking-tight mb-4 leading-[1.1]">
             Your next great adventure,{" "}
             <span className="text-theme-accent">planned in seconds.</span>
           </h1>
@@ -297,7 +297,7 @@ export default function LoginPage() {
 
           {/* FIXED: Removed 'hidden lg:block', applied responsive text alignment, unified text for sign-in/sign-up */}
           <div className="mb-8 text-center lg:text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-3xl font-extrabold text-theme-secondary tracking-tight">
+            <h2 className="text-[24px] font-extrabold text-theme-secondary tracking-tight">
               {isForgotMode
                 ? "Reset Password"
                 : isVerifyMode
@@ -313,11 +313,11 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="bg-theme-surface/80 backdrop-blur-xl rounded-[2rem] shadow-sm border border-theme-surface p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+          <div className="bg-theme-surface/80 backdrop-blur-[16px] rounded-[2rem] shadow-sm border border-theme-surface p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             {!isForgotMode && !isVerifyMode && (
-              <div className="flex bg-theme-white p-1 rounded-2xl mb-8 relative border border-theme-surface">
+              <div className="flex bg-theme-white p-1 rounded-[16px] mb-8 relative border border-theme-surface">
                 <div
-                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-theme-surface rounded-xl shadow-sm transition-all duration-300 ease-out ${
+                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-theme-surface rounded-[16px] shadow-sm transition-all duration-300 ease-out ${
                     isLogin ? "left-1" : "left-[calc(50%+2px)]"
                   }`}
                 ></div>
@@ -328,7 +328,7 @@ export default function LoginPage() {
                     clearMessages();
                     setFieldErrors({});
                   }}
-                  className={`flex-1 py-2.5  font-bold rounded-xl transition-colors duration-300 z-10 ${
+                  className={`flex-1 py-2.5  font-bold rounded-[16px] transition-colors duration-300 z-10 ${
                     isLogin
                       ? "text-theme-white bg-theme-secondary hover:bg-theme-secondary/80"
                       : "text-theme-secondary hover:text-theme-secondary/60"
@@ -343,7 +343,7 @@ export default function LoginPage() {
                     clearMessages();
                     setFieldErrors({});
                   }}
-                  className={`flex-1 py-2.5  font-bold rounded-xl transition-colors duration-300 z-10 ${
+                  className={`flex-1 py-2.5  font-bold rounded-[16px] transition-colors duration-300 z-10 ${
                     !isLogin
                       ? "text-theme-white bg-theme-secondary hover:bg-theme-secondary/80"
                       : "text-theme-secondary hover:text-theme-secondary/60"
@@ -365,19 +365,19 @@ export default function LoginPage() {
               className="flex flex-col gap-4"
             >
               {globalError && (
-                <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-[12px]font-bold rounded-xl text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
+                <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-[16px]font-bold rounded-[16px] text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
                   <AlertCircle size={18} /> {globalError}
                 </div>
               )}
 
               {infoMessage && (
-                <div className="p-3 bg-blue-50 border border-blue-100 text-blue-700 text-[12px]font-bold rounded-xl text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
+                <div className="p-3 bg-blue-50 border border-blue-100 text-blue-700 text-[16px]font-bold rounded-[16px] text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
                   <AlertCircle size={18} /> {infoMessage}
                 </div>
               )}
 
               {successMessage && (
-                <div className="p-3 bg-green-50 border border-green-100 text-green-700 text-[12px]font-bold rounded-xl text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
+                <div className="p-3 bg-green-50 border border-green-100 text-green-700 text-[16px]font-bold rounded-[16px] text-center animate-in fade-in zoom-in-95 duration-200 flex items-center justify-center gap-2">
                   <CheckCircle2 size={18} /> {successMessage}
                 </div>
               )}
@@ -400,14 +400,14 @@ export default function LoginPage() {
                         placeholder="First Name"
                         value={firstName}
                         onChange={handleInputChange(setFirstName, "firstName")}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.firstName
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
                         }`}
                       />
                       {fieldErrors.firstName && (
-                        <p className="text-red-500 text-[12px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[16px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.firstName}
                         </p>
                       )}
@@ -419,7 +419,7 @@ export default function LoginPage() {
                         placeholder="Middle (Opt)"
                         value={middleName}
                         onChange={(e) => setMiddleName(e.target.value)}
-                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all"
+                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all"
                       />
                     </div>
                   </div>
@@ -431,14 +431,14 @@ export default function LoginPage() {
                         placeholder="Last Name"
                         value={lastName}
                         onChange={handleInputChange(setLastName, "lastName")}
-                        className={`w-full px-4 py-3.5 bg-theme-white border rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                        className={`w-full px-4 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.lastName
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
                         }`}
                       />
                       {fieldErrors.lastName && (
-                        <p className="text-red-500 text-[12px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[16px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.lastName}
                         </p>
                       )}
@@ -447,7 +447,7 @@ export default function LoginPage() {
                       <select
                         value={suffix}
                         onChange={(e) => setSuffix(e.target.value)}
-                        className="w-full px-2 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                        className="w-full px-2 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
                       >
                         <option value="">Suffix</option>
                         {SUFFIXES.map((s) => (
@@ -480,7 +480,7 @@ export default function LoginPage() {
                       <select
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
+                        className="w-full px-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all appearance-none"
                       >
                         <option value="" disabled>
                           Select Gender
@@ -519,14 +519,14 @@ export default function LoginPage() {
                           setPhoneCountryCode,
                           "phoneCountryCode"
                         )}
-                        className={`w-full px-3 py-3.5 bg-theme-white border rounded-xl  font-medium text-center text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                        className={`w-full px-3 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-center text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.phoneCountryCode
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
                         }`}
                       />
                       {fieldErrors.phoneCountryCode && (
-                        <p className="text-red-500 text-[12px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">
+                        <p className="text-red-500 text-[16px] font-bold mt-1 ml-1 absolute -bottom-5 left-0 whitespace-nowrap">
                           {fieldErrors.phoneCountryCode}
                         </p>
                       )}
@@ -543,14 +543,14 @@ export default function LoginPage() {
                           setPhoneNumber,
                           "phoneNumber"
                         )}
-                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                        className={`w-full pl-10 pr-3 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.phoneNumber
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
                         }`}
                       />
                       {fieldErrors.phoneNumber && (
-                        <p className="text-red-500 text-[12px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
+                        <p className="text-red-500 text-[16px] font-bold mt-1 ml-1 absolute -bottom-5 left-0">
                           {fieldErrors.phoneNumber}
                         </p>
                       )}
@@ -578,7 +578,7 @@ export default function LoginPage() {
                         value={email}
                         disabled={isForgotMode && resetStep === "verify"}
                         onChange={handleInputChange(setEmail, "email")}
-                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                        className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                           fieldErrors.email
                             ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                             : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -590,7 +590,7 @@ export default function LoginPage() {
                       />
                     </div>
                     {fieldErrors.email && (
-                      <p className="text-red-500 text-[12px] font-bold mt-1.5 ml-1">
+                      <p className="text-red-500 text-[16px] font-bold mt-1.5 ml-1">
                         {fieldErrors.email}
                       </p>
                     )}
@@ -615,7 +615,7 @@ export default function LoginPage() {
                           }
                           value={password}
                           onChange={handleInputChange(setPassword, "password")}
-                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
+                          className={`w-full pl-11 pr-4 py-3.5 bg-theme-white border rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:bg-theme-white transition-all ${
                             fieldErrors.password
                               ? "border-red-300 focus:ring-red-500/20 focus:border-red-500"
                               : "border-theme-secondary/30 focus:ring-theme-primary/20 focus:border-theme-primary"
@@ -623,7 +623,7 @@ export default function LoginPage() {
                         />
                       </div>
                       {fieldErrors.password && (
-                        <p className="text-red-500 text-[12px] font-bold mt-1.5 ml-1">
+                        <p className="text-red-500 text-[16px] font-bold mt-1.5 ml-1">
                           {fieldErrors.password}
                         </p>
                       )}
@@ -644,7 +644,7 @@ export default function LoginPage() {
                       placeholder="6-Digit Email Code"
                       value={emailOtp}
                       onChange={(e) => setEmailOtp(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
+                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
                       maxLength={6}
                     />
                   </div>
@@ -662,7 +662,7 @@ export default function LoginPage() {
                       placeholder="6-Digit Code from Email"
                       value={resetCode}
                       onChange={(e) => setResetCode(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-xl  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
+                      className="w-full pl-11 pr-4 py-3.5 bg-theme-white border border-theme-secondary/30 rounded-[16px]  font-medium text-theme-secondary placeholder:text-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary transition-all tracking-widest"
                       maxLength={6}
                     />
                   </div>
@@ -670,14 +670,14 @@ export default function LoginPage() {
               )}
 
               {isLogin && !isForgotMode && !isVerifyMode && (
-                <div className="flex justify-end mt-[-12px] animate-in fade-in duration-300">
+                <div className="flex justify-end mt-[-16px] animate-in fade-in duration-300">
                   <button
                     type="button"
                     onClick={() => {
                       setIsForgotMode(true);
                       clearMessages();
                     }}
-                    className="text-[12px]font-bold text-theme-primary hover:text-theme-secondary transition-colors"
+                    className="text-[16px]font-bold text-theme-primary hover:text-theme-secondary transition-colors"
                   >
                     Forgot password?
                   </button>
@@ -687,7 +687,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3.5 px-4 bg-theme-primary hover:bg-theme-secondary text-theme-white rounded-xl  font-bold flex items-center justify-center gap-2 shadow-lg shadow-theme-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
+                className="w-full mt-2 py-3.5 px-4 bg-theme-primary hover:bg-theme-secondary text-theme-white rounded-[16px]  font-bold flex items-center justify-center gap-2 shadow-lg shadow-theme-primary/30 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {isLoading ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -721,7 +721,7 @@ export default function LoginPage() {
                       setEmailOtp("");
                       clearMessages();
                     }}
-                    className="text-[12px]font-bold text-theme-muted hover:text-theme-secondary transition-colors"
+                    className="text-[16px]font-bold text-theme-muted hover:text-theme-secondary transition-colors"
                   >
                     Back to login
                   </button>
@@ -733,7 +733,7 @@ export default function LoginPage() {
               <>
                 <div className="mt-8 flex items-center gap-4">
                   <div className="flex-1 h-px bg-theme-surface"></div>
-                  <span className="text-[12px] font-bold text-theme-muted uppercase tracking-widest">
+                  <span className="text-[16px] font-bold text-theme-muted uppercase tracking-widest">
                     Or continue with
                   </span>
                   <div className="flex-1 h-px bg-theme-surface"></div>
@@ -741,7 +741,7 @@ export default function LoginPage() {
                 <div className="mt-6">
                   <button
                     type="button"
-                    className="w-full flex items-center justify-center gap-3 py-3 bg-theme-white border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-xl  font-bold text-theme-secondary transition-all shadow-sm active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-3 py-3 bg-theme-white border border-theme-secondary/30 hover:bg-theme-surface hover:border-theme-secondary/50 rounded-[16px]  font-bold text-theme-secondary transition-all shadow-sm active:scale-[0.98]"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                       <path

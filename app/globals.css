@@ -11,7 +11,7 @@
 
 @layer base {
   html {
-    font-size: 18px; /* Your desired site-wide baseline */
+    font-size: 16px; /* Your desired site-wide baseline */
     font-weight: 600; /* This is a fallback for browsers that don't support the new font-weight syntax */
   }
   
@@ -115,7 +115,7 @@ body {
   width: 100%;
 }
 .react-datepicker {
-  @apply bg-theme-white! border! border-theme-secondary/30! font-sans! shadow-xl!;
+  @apply bg-theme-white! border! border-theme-secondary/30! font-sans! shadow-[16px]!;
 }
 .react-datepicker__header {
   @apply bg-theme-surface/50! border-b! border-theme-secondary/20!;

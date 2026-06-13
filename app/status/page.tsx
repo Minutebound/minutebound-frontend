@@ -121,17 +121,17 @@ export default function StatusPage() {
   return (
     <div className="min-h-screen flex flex-col bg-theme-white text-theme-secondary font-sans">
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 sm:px-6 flex flex-col gap-6 animate-in fade-in duration-500">
+      <main className="flex-1 w-full max-w-[24px] mx-auto px-4 py-8 sm:px-6 flex flex-col gap-6 animate-in fade-in duration-500">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-surface/50 p-5 rounded-2xl border border-theme-muted/20 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-surface/50 p-5 rounded-[16px] border border-theme-muted/20 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-theme-primary/10 rounded-xl text-theme-primary hidden sm:block">
+            <div className="p-3 bg-theme-primary/10 rounded-[16px] text-theme-primary hidden sm:block">
               <ActivityIcon size={24} />
             </div>
             <div>
               <h1 className=" font-black">System Status</h1>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-1.5 text-xs">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-1.5 text-[16px]">
                 <span className="flex items-center gap-1.5 text-theme-muted font-medium">
                   <Clock size={18} className="text-theme-secondary" />
                  Last Checked: {healthData?.external_apis_last_checked 
@@ -151,7 +151,7 @@ export default function StatusPage() {
           <button
             onClick={() => fetchHealth(true)}
             disabled={isAnyLoading}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl  font-black shadow-md transition-all active:scale-95 flex-shrink-0 ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-[16px]  font-black shadow-md transition-all active:scale-95 flex-shrink-0 ${
               isAnyLoading
                 ? "bg-theme-muted/50 text-theme-secondary/50 cursor-not-allowed" 
                 : "bg-theme-primary text-white hover:bg-theme-secondary hover:shadow-lg hover:-translate-y-0.5"
@@ -163,17 +163,17 @@ export default function StatusPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-xl shadow-sm flex items-center gap-3">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-[16px] shadow-sm flex items-center gap-3">
             <XCircle size={24} className="text-red-500 flex-shrink-0" />
             <p className="font-medium ">{error}</p>
           </div>
         )}
 
         {loading ? (
-          <div className="h-96 w-full bg-theme-secondary/10 rounded-3xl animate-pulse"></div>
+          <div className="h-96 w-full bg-theme-secondary/10 rounded-[24px] animate-pulse"></div>
         ) : (
           /* UNIFIED DARK SECTION */
-          <section className="bg-theme-secondary text-theme-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
+          <section className="bg-theme-secondary text-theme-white rounded-[24px] shadow-[16px] overflow-hidden flex flex-col">
             
             {/* INTERNAL DIVIDER HEADER */}
             <div className="px-6 py-5 border-b border-theme-white/10 flex items-center gap-3 bg-white/5">
@@ -216,7 +216,7 @@ export default function StatusPage() {
                 <Globe className="text-theme-white/70" size={24} />
                 <h2 className=" font-bold tracking-wide">External API Integrations</h2>
               </div>
-              <div className="flex items-center gap-1.5 text-[12px]font-semibold text-theme-white/80 bg-theme-white/10 px-3 py-1.5 rounded-lg border border-theme-white/20">
+              <div className="flex items-center gap-1.5 text-[16px]font-semibold text-theme-white/80 bg-theme-white/10 px-3 py-1.5 rounded-lg border border-theme-white/20">
                 <Info size={18} /> TTL: 48h
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function StatusPage() {
                   />
                 ))
               ) : (
-                <div className="py-12 flex flex-col items-center justify-center text-theme-white/50 font-medium border-2 border-dashed border-theme-white/10 rounded-2xl">
+                <div className="py-12 flex flex-col items-center justify-center text-theme-white/50 font-medium border-2 border-dashed border-theme-white/10 rounded-[16px]">
                   <Globe size={48} className="mb-4 opacity-50" />
                   <p>No external API records found.</p>
                 </div>
@@ -261,7 +261,7 @@ function StatusCard({
   const Icon = getApiIcon(internalKey);
   
   return (
-    <div className="relative flex flex-col p-5 bg-transparent rounded-2xl border border-theme-white/15 hover:border-theme-white/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[126px]">
+    <div className="relative flex flex-col p-5 bg-transparent rounded-[16px] border border-theme-white/15 hover:border-theme-white/40 hover:bg-white/5 transition-all duration-300 overflow-hidden group min-h-[126px]">
       
       {/* Background Icon Watermark */}
       <div className="absolute right-0 -bottom-4 opacity-[0.04] text-theme-white pointer-events-none transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
@@ -270,7 +270,7 @@ function StatusCard({
       
       {/* Background Text Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden">
-        <span className="text-8xl font-black uppercase whitespace-nowrap tracking-tighter text-theme-white">
+        <span className="text-[24px] font-black uppercase whitespace-nowrap tracking-tighter text-theme-white">
           {name}
         </span>
       </div>
@@ -279,7 +279,7 @@ function StatusCard({
       <div className="relative z-10 flex justify-between items-start mb-auto gap-4">
         <div className="overflow-hidden">
           <h3 className="font-bold  text-theme-white truncate">{name}</h3>
-          <p className="text-[12px]font-mono text-theme-white/50 mt-1 truncate max-w-[250px] sm:max-w-full">
+          <p className="text-[16px]font-mono text-theme-white/50 mt-1 truncate max-w-[250px] sm:max-w-full">
             {endpoint || "Unknown endpoint"}
           </p>
         </div>
@@ -289,7 +289,7 @@ function StatusCard({
           <button
             onClick={onRefresh}
             disabled={disabled}
-            className={`p-2.5 rounded-xl transition-all border active:scale-95 backdrop-blur-sm ${
+            className={`p-2.5 rounded-[16px] transition-all border active:scale-95 backdrop-blur-sm ${
               isRefreshing 
                 ? "bg-theme-white/20 text-theme-white border-theme-white/40 shadow-inner" 
                 : disabled 
@@ -306,7 +306,7 @@ function StatusCard({
       <div className="relative z-10 mt-5 pt-3 border-t border-theme-white/10 flex flex-col gap-1.5">
         <div className="flex items-center gap-2 ">
           {statusCode && (
-            <span className={`font-black text-[12px]px-2 py-0.5 rounded ${
+            <span className={`font-black text-[16px]px-2 py-0.5 rounded ${
               status === 'UP' && statusCode === 200 ? 'bg-green-500/20 text-green-400' : 
               status === 'UP' ? 'bg-yellow-500/20 text-yellow-400' : 
               'bg-red-500/20 text-red-400'
@@ -319,7 +319,7 @@ function StatusCard({
           </span>
         </div>
         
-        <div className="flex items-center gap-1.5 text-[12px]text-theme-white/50 font-mono tracking-tight mt-1">
+        <div className="flex items-center gap-1.5 text-[16px]text-theme-white/50 font-mono tracking-tight mt-1">
           <Clock size={18} /> 
           {formatTime(timestamp)}
         </div>
@@ -336,7 +336,7 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isUp && statusCode === 200) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/30 rounded-lg font-black text-[12px] sm:text-[12px]tracking-wider shadow-sm backdrop-blur-sm">
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-400 border border-green-500/30 rounded-lg font-black text-[16px] sm:text-[16px]tracking-wider shadow-sm backdrop-blur-sm">
         <CheckCircle2 size={18} className="text-green-400" /> 
         <span className="hidden sm:inline">OPERATIONAL</span><span className="sm:hidden">UP</span>
       </div>
@@ -345,7 +345,7 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isUp && statusCode && statusCode !== 200) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-lg font-black text-[12px] sm:text-[12px]tracking-wider shadow-sm backdrop-blur-sm">
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-lg font-black text-[16px] sm:text-[16px]tracking-wider shadow-sm backdrop-blur-sm">
         <AlertTriangle size={18} className="text-yellow-400" /> 
         <span className="hidden sm:inline">CAUTION</span><span className="sm:hidden">WARN</span>
       </div>
@@ -354,7 +354,7 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
 
   if (isDown) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg font-black text-[12px] sm:text-[12px]tracking-wider shadow-sm backdrop-blur-sm">
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg font-black text-[16px] sm:text-[16px]tracking-wider shadow-sm backdrop-blur-sm">
         <XCircle size={18} className="text-red-400" /> 
         <span className="hidden sm:inline">OUTAGE</span><span className="sm:hidden">DOWN</span>
       </div>
@@ -362,7 +362,7 @@ function StatusBadge({ status, statusCode }: { status: string; statusCode?: numb
   }
 
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-white/10 text-theme-white/70 border border-theme-white/20 rounded-lg font-black text-[12px] sm:text-[12px]tracking-wider shadow-sm backdrop-blur-sm">
+    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-theme-white/10 text-theme-white/70 border border-theme-white/20 rounded-lg font-black text-[16px] sm:text-[16px]tracking-wider shadow-sm backdrop-blur-sm">
       <RefreshCw size={18} className="animate-spin text-theme-white/50" /> 
       <span className="hidden sm:inline">PENDING</span><span className="sm:hidden">WAIT</span>
     </div>

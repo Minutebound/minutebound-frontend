@@ -9,7 +9,7 @@ interface ToursCardProps {
   tours: any[];
 }
 
-type SortOption = 'recommended' | 'price_asc' | 'price_desc' | 'rating_desc';
+type SortOption = 'price_asc' | 'price_desc' | 'rating_desc';
 
 // ─── STATE SYSTEM ─────────────────────────────────────────────────────────────
 //
@@ -25,7 +25,7 @@ type SortOption = 'recommended' | 'price_asc' | 'price_desc' | 'rating_desc';
 
 export default function ToursCard({ tours }: ToursCardProps) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<SortOption>('recommended');
+  const [sortBy, setSortBy] = useState<SortOption>('rating_desc');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -80,14 +80,12 @@ export default function ToursCard({ tours }: ToursCardProps) {
   }, [tours, sortBy]);
 
   const sortLabels: Record<SortOption, string> = {
-    recommended: 'Recommended',
     price_asc: 'Price: Low to high',
     price_desc: 'Price: High to low',
     rating_desc: 'Top rated',
   };
 
   const sortOptions: { value: SortOption; label: string }[] = [
-    { value: 'recommended', label: 'Recommended' },
     { value: 'price_asc',   label: 'Price: Low to high' },
     { value: 'price_desc',  label: 'Price: High to low' },
     { value: 'rating_desc', label: 'Top rated' },
@@ -98,7 +96,7 @@ export default function ToursCard({ tours }: ToursCardProps) {
       <div className="p-10 border-2 border-dashed border-theme-secondary/[0.12] bg-theme-secondary/[0.03] rounded-lg text-center flex flex-col items-center justify-center min-h-[160px]">
         <Ticket size={28} className="text-theme-secondary/25 mb-3" />
         <p className=" font-semibold text-theme-secondary/50 mb-1">No tours found</p>
-        <span className="text-xs text-theme-secondary/35 font-medium">Try a different location or date range.</span>
+        <span className="text-[16px] text-theme-secondary/35 font-medium">Try a different location or date range.</span>
       </div>
     );
   }
@@ -106,27 +104,15 @@ export default function ToursCard({ tours }: ToursCardProps) {
   return (
     <div className="flex flex-col gap-4 animate-in fade-in duration-300">
 
-      {/* ── TOOLBAR ── */}
-      <div className="sticky top-[243px] z-[45] bg-theme-white py-3.5 border-b border-theme-secondary/10 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-theme-secondary flex items-center justify-center">
-              <Ticket size={18} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-theme-secondary/40 leading-none mb-0.5">Tours</p>
-              <p className="text-[12px] font-bold text-theme-secondary leading-none">
-                {tours.length} <span className="font-normal text-theme-secondary/50">available</span>
-              </p>
-            </div>
-          </div>
-
-          {selectedKeys.length > 0 && (
-            <span className="hidden sm:flex items-center gap-1 text-[12px] font-semibold text-theme-primary bg-theme-primary/[0.08] border border-theme-primary/20 px-2.5 py-1 rounded-full">
-              <CheckCircle2 size={18} /> {selectedKeys.length} selected
-            </span>
-          )}
-        </div>
+      {/* Toolbar */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-theme-white p-2 rounded-lg border border-theme-soft-slate">
+              <div className="flex items-center gap-2.5  text-theme-dark-slate">
+                <Ticket size={18} className="text-theme-light-gray/70" />
+                <span className="font-medium">
+                  <strong className="text-theme-primary font-semibold">{tours.length}</strong>
+                  <span className="text-theme-light-slate font-normal"> properties available</span>
+                </span>
+              </div>
 
         {/* Sort — secondary→primary, click-controlled */}
         <div className="relative" ref={sortRef}>
@@ -144,7 +130,7 @@ export default function ToursCard({ tours }: ToursCardProps) {
           </button>
 
           {sortMenuOpen && (
-            <div className="absolute right-0 mt-1.5 w-52 bg-theme-white border border-theme-secondary/[0.12] rounded-lg shadow-[0_8px_26px_rgba(15,23,42,0.10)] z-[60] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="absolute right-0 mt-1.5 w-52 bg-theme-white border border-theme-secondary/[0.12] rounded-lg shadow-[0_12px_26px_rgba(15,23,42,0.10)] z-[60] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
               {sortOptions.map((opt, i) => (
                 <button
                   key={opt.value}
@@ -190,14 +176,9 @@ export default function ToursCard({ tours }: ToursCardProps) {
               className={`relative group flex flex-col rounded-lg border-2 bg-theme-white cursor-pointer transition-all duration-150 overflow-hidden ${
                 isSelected
                   ? 'border-theme-primary shadow-[0_4px_26px_rgba(249,115,22,0.10)]'
-                  : 'border-theme-secondary/10 hover:border-theme-secondary/30 hover:shadow-[0_4px_14px_rgba(15,23,42,0.07)]'
+                  : 'border-theme-secondary/10 hover:border-theme-secondary/30 hover:shadow-[0_4px_16px_rgba(15,23,42,0.07)]'
               }`}
             >
-              {/* Left accent bar */}
-              <div className={`absolute top-0 left-0 w-[3px] h-full rounded-r z-10 transition-colors duration-150 ${
-                isSelected ? 'bg-theme-primary' : 'bg-transparent'
-              }`} />
-
               {/* ── IMAGE ── */}
               <div className="w-full h-48 sm:h-52 shrink-0 overflow-hidden relative bg-theme-secondary/[0.05]">
                 {hasImage ? (
@@ -218,11 +199,11 @@ export default function ToursCard({ tours }: ToursCardProps) {
                   {rating !== null && (
                     <div className="flex items-center gap-1 bg-theme-white/95 px-2 py-1 rounded-md border border-theme-secondary/[0.12] shadow-sm">
                       <Star size={18} className="fill-theme-gold text-theme-gold" />
-                      <span className="text-[12px] font-bold text-theme-secondary leading-none">
+                      <span className="text-[16px] font-bold text-theme-secondary leading-none">
                         {rating.toFixed(1)}
                       </span>
                       {reviewCount && (
-                        <span className="text-[12px] font-medium text-theme-secondary/45">
+                        <span className="text-[16px] font-medium text-theme-secondary/45">
                           ({reviewCount})
                         </span>
                       )}
@@ -233,17 +214,10 @@ export default function ToursCard({ tours }: ToursCardProps) {
                   {category && (
                     <div className="flex items-center gap-1 bg-theme-secondary/80 text-white px-2 py-1 rounded-md shadow-sm">
                       <Tag size={18} />
-                      <span className="text-[12px] font-semibold capitalize">{category}</span>
+                      <span className="text-[16px] font-semibold capitalize">{category}</span>
                     </div>
                   )}
                 </div>
-
-                {/* Selected overlay tick */}
-                {isSelected && (
-                  <div className="absolute bottom-3 right-3 bg-theme-primary text-white rounded-full p-1 shadow-md">
-                    <CheckCircle2 size={18} />
-                  </div>
-                )}
               </div>
 
               {/* ── CONTENT ── */}
@@ -259,7 +233,7 @@ export default function ToursCard({ tours }: ToursCardProps) {
 
                   {/* Location */}
                   {location && (
-                    <p className="flex items-center gap-1 text-[12px] text-theme-secondary/45 font-medium mt-1">
+                    <p className="flex items-center gap-1 text-[16px] text-theme-secondary/45 font-medium mt-1">
                       <MapPin size={18} className="text-theme-secondary/30 shrink-0" />
                       {location}
                     </p>
@@ -267,7 +241,7 @@ export default function ToursCard({ tours }: ToursCardProps) {
                 </div>
 
                 {/* Description */}
-                <p className="text-[12px] text-theme-secondary/55 font-medium leading-relaxed line-clamp-2">
+                <p className="text-[16px] text-theme-secondary/55 font-medium leading-relaxed line-clamp-2">
                   {tour.short_description || tour.description || "Explore the highlights of this destination with a knowledgeable local guide."}
                 </p>
 
@@ -275,13 +249,13 @@ export default function ToursCard({ tours }: ToursCardProps) {
                 {(duration || groupSize) && (
                   <div className="flex flex-wrap gap-3">
                     {duration && (
-                      <span className="flex items-center gap-1.5 text-[12px] font-medium text-theme-secondary/50">
+                      <span className="flex items-center gap-1.5 text-[16px] font-medium text-theme-secondary/50">
                         <Clock size={18} className="text-theme-secondary/30" />
                         {typeof duration === 'number' ? `${duration}h` : duration}
                       </span>
                     )}
                     {groupSize && (
-                      <span className="flex items-center gap-1.5 text-[12px] font-medium text-theme-secondary/50">
+                      <span className="flex items-center gap-1.5 text-[16px] font-medium text-theme-secondary/50">
                         <Users size={18} className="text-theme-secondary/30" />
                         Up to {groupSize}
                       </span>
@@ -292,10 +266,10 @@ export default function ToursCard({ tours }: ToursCardProps) {
                 {/* ── PRICE + CTA ── */}
                 <div className="flex items-center justify-between pt-3 mt-auto border-t border-theme-secondary/[0.08]">
                   <div>
-                    <p className="text-[12px] font-semibold text-theme-secondary/40 uppercase tracking-wider mb-0.5">
+                    <p className="text-[16px] font-semibold text-theme-secondary/40 uppercase tracking-wider mb-0.5">
                       {pricePerPerson ? 'Per person' : 'From'}
                     </p>
-                    <p className="text-[26px] font-bold text-theme-secondary leading-none tracking-tight tabular-nums">
+                    <p className="text-[24px] font-bold text-theme-secondary leading-none tracking-tight tabular-nums">
                       {displayPrice}
                     </p>
                   </div>

@@ -320,7 +320,7 @@ export default function SearchBar({
                     isDark={false}
                     showGPS={true}
                   />
-                  {errors.source && <span className="absolute -bottom-5 left-4 text-red-500 text-[12px] font-bold">{errors.source}</span>}
+                  {errors.source && <span className="absolute -bottom-5 left-4 text-red-500 text-[16px] font-bold">{errors.source}</span>}
                 </div>
 
                 <div className="flex-1 relative flex items-center px-3 md:px-5 lg:px-6 lg:pl-5 rounded-r-[1rem] lg:rounded-r-[1rem] hover:bg-theme-secondary/5 transition-colors z-[60] focus-within:z-[100]">
@@ -334,7 +334,7 @@ export default function SearchBar({
                     isDark={false}
                     showGPS={false}
                   />
-                  {errors.destination && <span className="absolute -bottom-5 left-4 text-red-500 text-[12px] font-bold">{errors.destination}</span>}
+                  {errors.destination && <span className="absolute -bottom-5 left-4 text-red-500 text-[16px] font-bold">{errors.destination}</span>}
                 </div>
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function SearchBar({
                     placeholderText="Add date"
                     className="w-full bg-transparent font-bold text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40"
                   />
-                  {errors.start && <span className="absolute -bottom-5 left-4 text-red-500 text-[12px] font-bold">{errors.start}</span>}
+                  {errors.start && <span className="absolute -bottom-5 left-4 text-red-500 text-[16px] font-bold">{errors.start}</span>}
                 </div>
 
                 <div className={`flex-1 relative flex items-center px-3 md:px-5 lg:px-5 rounded-r-[1rem] lg:rounded-r-[1rem] transition-colors z-[60] focus-within:z-[100] ${tripType === 'one-way' ? 'bg-theme-secondary/5 cursor-not-allowed' : 'hover:bg-theme-secondary/5'}`}>
@@ -382,7 +382,7 @@ export default function SearchBar({
                     placeholderText={tripType === 'one-way' ? 'One Way' : 'Add date'}
                     className="w-full bg-transparent font-bold text-theme-secondary outline-none border-none cursor-pointer placeholder-theme-secondary/40 disabled:cursor-not-allowed disabled:text-theme-secondary/40"
                   />
-                  {errors.end && <span className="absolute -bottom-5 left-4 text-red-500 text-[12px] font-bold">{errors.end}</span>}
+                  {errors.end && <span className="absolute -bottom-5 left-4 text-red-500 text-[16px] font-bold">{errors.end}</span>}
                 </div>
               </div>
             </div>
@@ -418,18 +418,18 @@ export default function SearchBar({
                 </button>
                 
                 {showTravellerDropdown && (
-                  <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-white text-theme-secondary rounded-2xl shadow-xl border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    
+                  <div className="absolute top-full left-0 mt-3 w-[260px] sm:w-72 bg-theme-white text-theme-secondary rounded-[16px] shadow-[16px] border border-theme-secondary/20 p-5 z-[100] animate-in fade-in zoom-in-95 duration-200">                    
                     <div className="flex items-center justify-between mb-5">
                       <div>
                         <div className="font-bold ">Adults</div>
-                        <div className="text-[12px] text-theme-muted uppercase tracking-wider">Ages 12+</div>
+                        <div className="text-[16px] text-theme-muted uppercase tracking-wider">Ages 12+</div>
                       </div>
                       <SbCounter value={adults} min={1} max={9} onChange={setAdults} />
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-bold ">Children</div>
-                        <div className="text-[12px] text-theme-muted uppercase tracking-wider">Ages 2-11</div>
+                        <div className="text-[16px] text-theme-muted uppercase tracking-wider">Ages 2-11</div>
                       </div>
                       <SbCounter value={children} min={0} max={9} onChange={setChildren} />
                     </div>
@@ -489,7 +489,7 @@ export default function SearchBar({
               <div className="flex flex-row items-center w-full xl:w-auto relative z-10 py-1">
                 <div className="flex items-center gap-1.5 shrink-0 pr-3">
                    <TrendingUp size={18} className="text-theme-primary" />
-                   <span className="text-[12px] font-black uppercase text-theme-secondary/60 tracking-wider">Trending:</span>
+                   <span className="text-[16px] font-black uppercase text-theme-secondary/60 tracking-wider">Trending:</span>
                 </div>
                 <div className="flex flex-row items-center gap-2 overflow-x-auto no-scrollbar w-full">
                   {topDestinations.map((dest, idx) => (
@@ -500,7 +500,7 @@ export default function SearchBar({
                         setDestination(dest.full_name); setDestValid(true);
                         if (errors.destination) setErrors((prev) => ({ ...prev, destination: "" }));
                       }}
-                      className="px-4 py-1.5 rounded-full bg-theme-secondary/5 text-theme-secondary/80 text-[12px] font-bold hover:bg-theme-secondary/10 transition-all whitespace-nowrap border border-theme-secondary/10 shadow-sm shrink-0"
+                      className="px-4 py-1.5 rounded-full bg-theme-secondary/5 text-theme-secondary/80 text-[16px] font-bold hover:bg-theme-secondary/10 transition-all whitespace-nowrap border border-theme-secondary/10 shadow-sm shrink-0"
                     >
                       {dest.city}
                     </button>
@@ -544,14 +544,14 @@ export default function SearchBar({
             
             <button
               onClick={() => setIsOverlayOpen(true)}
-              className="w-full md:w-auto bg-theme-white border border-theme-secondary/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-2 transition-all duration-300 cursor-pointer group flex-1 md:flex-none"
+              className="w-full md:w-auto bg-theme-white border border-theme-secondary/20 shadow-[0_2px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] rounded-full flex items-center p-2 transition-all duration-300 cursor-pointer group flex-1 md:flex-none"
             >
               {/* MOBILE COMPACT VIEW (Full width, stacked text) */}
-              <div className="flex flex-col md:hidden flex-1 text-left overflow-hidden pl-3 py-1">
+              <div className="flex flex-col md:hidden flex-1 text-left overflow-hidden pl-3 py-1 uppercase">
                 <span className="font-bold  text-theme-secondary truncate w-full">
                   {source || 'Anywhere'} {destination ? `to ${destination}` : ''}
                 </span>
-                <div className="flex items-center text-[12px] text-theme-secondary/60 gap-1.5 mt-1 truncate font-medium w-full">
+                <div className="flex items-center text-[16px] text-theme-secondary/60 gap-1.5 mt-1 truncate font-medium w-full">
                   <span>{dates.start ? `${dates.start}` : 'Any dates'}</span>
                   {tripType === "round-trip" && dates.end && (
                     <><span>•</span><span>{dates.end}</span></>
@@ -568,10 +568,10 @@ export default function SearchBar({
               </div>
 
               {/* DESKTOP/TABLET COMPACT VIEW (Hugging content) */}
-              <div className="hidden md:flex items-center justify-between flex-1 pl-2 pr-1">
+              <div className="hidden md:flex items-center justify-between flex-1 pl-2 pr-1 uppercase">
                 <div className="flex items-center flex-1">
                   
-                  <div className="font-bold  text-theme-secondary px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[200px] lg:max-w-[316px]">
+                  <div className="font-bold  text-theme-secondary px-4 py-2 rounded-full hover:bg-theme-secondary/5 transition-colors truncate max-w-[800px]">
                     {source || 'Anywhere'} {destination ? `→ ${destination}` : ''}
                   </div>
                   
@@ -589,7 +589,7 @@ export default function SearchBar({
 
                   <div className="w-[1px] h-6 bg-theme-secondary/20 mx-1 shrink-0"></div>
 
-                  <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-[12px] text-theme-secondary font-black bg-theme-primary/10 px-2.5 py-1.5 shrink-0">
+                  <div className="ml-2 flex items-center gap-1.5 uppercase tracking-widest rounded-full text-theme-secondary font-black bg-theme-primary/10 px-2.5 py-1.5 shrink-0">
                     {travelMode === 'fly' ? <Plane size={18}/> : <Car size={18}/>}
                     {travelMode === 'fly' ? 'Flights' : 'Drive'}
                   </div>
@@ -605,7 +605,7 @@ export default function SearchBar({
             {onMapToggle && (
               <button
                 onClick={onMapToggle}
-                className="ml-3 p-4 rounded-2xl bg-theme-white text-theme-secondary border border-theme-secondary/30 hover:bg-theme-secondary/10 hover:border-theme-primary/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
+                className="ml-3 p-4 rounded-[16px] bg-theme-white text-theme-secondary border border-theme-secondary/30 hover:bg-theme-secondary/10 hover:border-theme-primary/40 transition-colors shadow-sm md:hidden flex-shrink-0 active:scale-95"
               >
                 {mapOpen ? <X size={24} className="text-theme-secondary" /> : <Map size={24} className="text-theme-secondary" />}
               </button>
@@ -621,7 +621,7 @@ export default function SearchBar({
           <div className="absolute inset-0 cursor-pointer" onClick={() => setIsOverlayOpen(false)}></div>
           
           <div className="relative w-[90%] max-w-[1800px] animate-in slide-in-from-top-4 fade-in duration-200 z-[100]">
-            <div className="w-full bg-transparent rounded-[2.5rem] shadow-2xl overflow-visible relative border-none z-[100]">
+            <div className="w-full bg-transparent rounded-[2.5rem] shadow-[16px] overflow-visible relative border-none z-[100]">
               {renderFullSearchContent()}
             </div>
           </div>

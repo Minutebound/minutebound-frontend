@@ -120,14 +120,14 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
     <div className="flex flex-col gap-3 animate-in fade-in duration-300">
 
       {/* ── TOOLBAR ── */}
-      <div className="bg-theme-white p-2 border border-theme-secondary/10 flex rounded-xl justify-between items-center">
+      <div className="bg-theme-white p-2 border border-theme-secondary/10 flex rounded-lg justify-between items-center">
         <div className="flex items-center gap-3">
           {/* Icon + count — secondary bg, consistent with flight toolbar */}
           <div className="flex items-center gap-2">
-               <Plane size={18} className="text-[var(--color-theme-light-gray)]/70" />
+               <Plane size={18} className="text-theme-light-gray/70" />
                         <span className="font-medium">
-                          <strong className="text-[var(--color-theme-primary)] font-semibold">{flights.length}</strong>
-                          <span className="text-[var(--color-theme-light-slate)] font-normal"> flights available</span>
+                          <strong className="text-theme-primary font-semibold">{flights.length}</strong>
+                          <span className="text-theme-light-slate font-normal"> flights available</span>
                         </span>
           </div>
         </div>
@@ -136,10 +136,10 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
         <div className="relative" ref={sortRef}>
           <button
             onClick={() => setSortMenuOpen(!sortMenuOpen)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md  font-semibold transition-colors duration-150 border ${
+            className={`flex items-center gap-2 px-4 py-2 font-semibold transition-colors duration-150 rounded-lg ${
               sortMenuOpen
-                ? 'bg-theme-secondary text-theme-white'
-                : 'bg-theme-secondary text-theme-white'
+                ? 'bg-theme-cool-white text-theme-secondary font-semibold shadow-[0_4px_16px_rgba(15,23,42,0.1)]'
+                : 'bg-theme-cool-white text-theme-secondary hover:bg-theme-secondary/20'
             }`}
           >
             <ArrowUpDown size={18} />
@@ -148,7 +148,7 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
           </button>
 
           {sortMenuOpen && (
-            <div className="absolute right-0 mt-1.5 w-52 bg-theme-white rounded-xl shadow-[0_8px_26px_rgba(15,23,42,0.10)] z-[60] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="absolute right-0 mt-1.5 w-52 bg-theme-white rounded-[16px] shadow-[0_8px_26px_rgba(15,23,42,0.10)] z-[60] overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-1 duration-150">
               {([
                 { value: 'price_asc' as SortOption, label: `Lowest Price${isRoundTrip ? ' (avg)' : ''}` },
                 { value: 'duration_asc' as SortOption, label: `Fastest${isRoundTrip ? ' (avg)' : ''}` },
@@ -298,9 +298,6 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
 
                 {/* Amenity badges */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-theme-secondary/[0.08]">
-                  {flight.carbon_emissions_kg && (
-                    <FlightBadge variant="emerald" icon={<Leaf size={18} />} label={`${flight.carbon_emissions_kg} kg CO₂`} />
-                  )}
                   {(totalCheckedBags > 0 || totalCarryOnBags > 0) && (
                     <FlightBadge variant="blue" icon={<Luggage size={18} />} label="Bags included" />
                   )}
@@ -333,22 +330,22 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                   <p className="text-[12px] font-semibold text-theme-secondary/40 uppercase r mb-0.5">
                     {isRoundTrip ? 'Roundtrip' : 'One way'}
                   </p>
-                  <p className="text-[26px] font-bold text-theme-secondary leading-none tabular-nums tracking-tight">
+                  <p className="text-[24px] font-bold text-theme-secondary leading-none tabular-nums tracking-tight">
                     {price.toFixed(0)}
                     <span className="text-[12px] font-semibold text-theme-secondary/40 ml-0.5">{flight.currency || 'USD'}</span>
                   </p>
                   <p className="text-[12px] text-theme-secondary/40 font-medium mt-1">
-                    {travelerCount} {travelerCount > 1 ? 'travelers' : 'traveler'}
+                   / {travelerCount} {travelerCount > 1 ? 'persons' : 'person'}
                   </p>
                 </div>
 
                 {/* CTA: secondary→primary shift */}
                 <button
                   onClick={(e) => toggleFlightSelection(flight, uniqueKey, e)}
-                  className={`flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl font-semibold  transition-colors duration-150 border whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-lg font-semibold  transition-colors duration-150 border whitespace-nowrap ${
                     isSelected
                       ? 'bg-theme-primary border-theme-primary text-white'
-                      : 'bg-theme-secondary border-theme-secondary text-theme-white hover:bg-theme-primary hover:border-theme-primary'
+                      : 'bg-theme-cool-white border-theme-secondary/20 text-theme-black hover:bg-theme-primary hover:text-theme-white hover:border-theme-primary'
                   }`}
                 >
                   {isSelected && <CheckCircle2 size={18} />}
@@ -386,8 +383,8 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                       return (
                         <div key={idx}>
                           {/* Bound header */}
-                          <div className="flex flex-wrap justify-between items-center mb-4 pb-3 border-b border-theme-secondary/[0.08] gap-2">
-                            <div className="flex items-center gap-2.5">
+                          <div className="flex flex-wrap justify-between items-center mt-2 mb-4 pb-3 border-b border-theme-secondary/[0.08]">
+                            <div className="flex items-center gap-3">
                               <div className="h-[3px] w-4 rounded-full bg-theme-secondary" />
                               <span className="text-[12px] font-semibold uppercase text-theme-secondary">
                                 {idx === 0 ? 'Outbound' : 'Return'}
@@ -426,7 +423,7 @@ export default function FlightCard({ flights, loading, searchParams }: { flights
                                 <React.Fragment key={sIdx}>
                                   <div className="relative">
                                     {/* Timeline dot */}
-                                    <div className="absolute -left-[26px] top-4 w-2.5 h-2.5 rounded-full bg-theme-white border-2 border-theme-primary shadow-sm" />
+                                    <div className="absolute -left-[24px] top-4 w-2.5 h-2.5 rounded-full bg-theme-white border-2 border-theme-primary shadow-sm" />
 
                                     {/* Segment card */}
                                     <div className="bg-theme-white rounded-lg border-2 border-theme-secondary/[0.08] p-4 transition-colors duration-150 hover:border-theme-secondary/20">
